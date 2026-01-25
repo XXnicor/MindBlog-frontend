@@ -57,11 +57,7 @@ A inteligência artificial está mudando radicalmente a forma como desenvolvemos
 
 ## Impacto na Produtividade
 
-Estudos recentes mostram que desenvolvedores que utilizam ferramentas de IA são até 40% mais produtivos. Isso não significa que a IA vai substituir desenvolvedores, mas sim que ela se tornará uma ferramenta essencial no dia a dia.
-
-## Conclusão
-
-A IA está aqui para ficar. Aproveite essas ferramentas para se tornar um desenvolvedor mais eficiente e focado em resolver problemas complexos.`,
+Estudos recentes mostram que desenvolvedores que utilizam ferramentas de IA são até 40% mais produtivos.`,
         tags: ['IA', 'Produtividade', 'Desenvolvimento', 'ChatGPT'],
         imagem_url: 'uploads/2026/01/inteligencia_artigo.png'
       };
@@ -126,7 +122,20 @@ A IA está aqui para ficar. Aproveite essas ferramentas para se tornar um desenv
     setIsSubmitting(true);
 
     try {
-      // Cria FormData para envio
+      // Simula envio (comentado até API estar pronta)
+      console.log('Dados do formulário:', {
+        title,
+        summary,
+        category,
+        content,
+        tags,
+        image: image?.name,
+        isEditMode,
+        id
+      });
+
+      // TODO: Descomentar quando a API estiver pronta
+      /*
       const formData = new FormData();
       formData.append('titulo', title);
       formData.append('resumo', summary);
@@ -138,7 +147,6 @@ A IA está aqui para ficar. Aproveite essas ferramentas para se tornar um desenv
         formData.append('imagem', image);
       }
 
-      // Envia para API (PUT para edição, POST para criação)
       if (isEditMode && id) {
         await api.put(`/articles/${id}`, formData, {
           headers: {
@@ -152,7 +160,13 @@ A IA está aqui para ficar. Aproveite essas ferramentas para se tornar um desenv
           },
         });
       }
+      */
 
+      // Simula delay de rede
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      alert(`Artigo ${isEditMode ? 'editado' : 'criado'} com sucesso!`);
+      
       // Redireciona para dashboard após sucesso
       navigate('/dashboard');
     } catch (error) {
@@ -171,14 +185,9 @@ A IA está aqui para ficar. Aproveite essas ferramentas para se tornar um desenv
       <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block w-8 h-8 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-          <p className="text-slate-400">Carregando
-            {isEditMode ? 'Editar Artigo' : 'Criar Novo Artigo'}
-          </h1>
-          <p className="text-slate-400">
-            {isEditMode 
-              ? 'Atualize as informações do seu artigo' 
-              : 'Compartilhe seu conhecimento com a comunidade'
-            }
+          <p className="text-slate-400">Carregando artigo...</p>
+        </div>
+      </div>
     );
   }
 
@@ -196,9 +205,14 @@ A IA está aqui para ficar. Aproveite essas ferramentas para se tornar um desenv
 
         {/* Título da página */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Criar Novo Artigo</h1>
+          <h1 className="text-3xl font-bold mb-2">
+            {isEditMode ? 'Editar Artigo' : 'Criar Novo Artigo'}
+          </h1>
           <p className="text-slate-400">
-            Compartilhe seu conhecimento com a comunidade
+            {isEditMode 
+              ? 'Atualize as informações do seu artigo' 
+              : 'Compartilhe seu conhecimento com a comunidade'
+            }
           </p>
         </div>
 
@@ -271,7 +285,12 @@ A IA está aqui para ficar. Aproveite essas ferramentas para se tornar um desenv
                 className="hidden"
               />
               <label
-                htmlFor="
+                htmlFor="image"
+                className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-slate-400 hover:text-white hover:border-cyan-500 cursor-pointer transition-colors"
+              >
+                <Upload className="w-5 h-5" />
+                <span>
+                  {image 
                     ? image.name 
                     : existingImageUrl 
                       ? existingImageUrl 
@@ -284,12 +303,7 @@ A IA está aqui para ficar. Aproveite essas ferramentas para se tornar um desenv
               <p className="mt-1 text-xs text-slate-500">
                 Imagem atual: {existingImageUrl}
               </p>
-            )}pload className="w-5 h-5" />
-                <span>
-                  {image ? image.name : 'Clique para fazer upload da imagem'}
-                </span>
-              </label>
-            </div>
+            )}
           </div>
 
           {/* Tags */}
@@ -331,34 +345,31 @@ A IA está aqui para ficar. Aproveite essas ferramentas para se tornar um desenv
                       className="hover:text-red-400 transition-colors"
                     >
                       <X className="w-3 h-3" />
-                    </button>.slice(0, CONTENT_MAX))}
-              placeholder="Escreva o conteúdo completo do seu artigo... Você pode usar Markdown."
-              required
-              rows={16}
-              className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors resize-none font-mono text-sm"
-            />
-            <div className="mt-2 flex justify-between text-sm text-slate-400">
-              <span>
-                {content.length}/{CONTENT_MAX} caracteres • {wordCount} palavras • {readingTime} {readingTime === 1 ? 'minuto' : 'minutos'} de leitura
-              
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Conteúdo do Artigo */}
+          <div>
             <label htmlFor="content" className="block text-white font-medium mb-2">
               Conteúdo do Artigo
             </label>
             <textarea
               id="content"
               value={content}
-              onChange={(e) => setContent(e.target.value)}
+              onChange={(e) => setContent(e.target.value.slice(0, CONTENT_MAX))}
               placeholder="Escreva o conteúdo completo do seu artigo... Você pode usar Markdown."
               required
               rows={16}
               className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors resize-none font-mono text-sm"
             />
-            <div className="mt-2 flex justify-between text-sm text-slate-400">
-              <span>{content.length} caracteres</span>
-              <span>~{readin
-                ? (isEditMode ? 'Salvando...' : 'Publicando...') 
-                : (isEditMode ? 'Salvar Alterações' : 'Publicar Artigo')
-              
+            <div className="mt-2 text-sm text-slate-400">
+              <span>
+                {content.length}/{CONTENT_MAX} caracteres • {wordCount} palavras • {readingTime} {readingTime === 1 ? 'minuto' : 'minutos'} de leitura
+              </span>
             </div>
           </div>
 
@@ -367,9 +378,12 @@ A IA está aqui para ficar. Aproveite essas ferramentas para se tornar um desenv
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 px-6 py-3 bg-cyan-500 hover:bg-cyan-600 disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors"
+              className="flex-1 px-6 py-3 bg-cyan-500 hover:bg-cyan-600 disabled:bg-slate-700 disabled:cursor-not-allowed text-slate-900 font-semibold rounded-lg transition-colors"
             >
-              {isSubmitting ? 'Publicando...' : 'Publicar Artigo'}
+              {isSubmitting 
+                ? (isEditMode ? 'Salvando...' : 'Publicando...') 
+                : (isEditMode ? 'Salvar Alterações' : 'Publicar Artigo')
+              }
             </button>
             <Link
               to="/dashboard"

@@ -117,7 +117,7 @@ export default function Dashboard() {
               Configurações
             </Link>
             <Link
-              to="/new"
+              to="/artigos/novo"
               className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-semibold rounded-lg transition-colors"
             >
               <Plus size={18} />
@@ -154,7 +154,7 @@ export default function Dashboard() {
                   <FileText className="w-16 h-16 text-slate-700 mx-auto mb-4" />
                   <p className="text-slate-400">Você ainda não tem artigos publicados</p>
                   <Link
-                    to="/new"
+                    to="/artigos/novo"
                     className="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-semibold rounded-lg transition-colors"
                   >
                     <Plus size={18} />
@@ -199,7 +199,7 @@ export default function Dashboard() {
                       {/* Actions */}
                       <div className="flex flex-col gap-2 flex-shrink-0">
                         <Link
-                          to={`/edit/${article.id}`}
+                          to={`/artigos/editar/${article.id}`}
                           className="p-2 text-cyan-400 hover:bg-cyan-500/10 border border-cyan-500/30 rounded-lg transition-colors"
                           title="Editar"
                         >
