@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Loader2 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import { authService, auth } from '../lib/api';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -17,21 +18,25 @@ export default function Login() {
     setLoading(true);
 
     try {
-      // Simulação de login (substituir com useAuth quando implementado)
-      if (email && password) {
-        // Simulando delay de API
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Validação básica
-        if (password.length < 6) {
-          throw new Error('Senha deve ter pelo menos 6 caracteres');
-        }
-
-        // Sucesso - redireciona para dashboard
-        navigate('/dashboard');
-      } else {
+      // Validação básica
+      if (!email || !password) {
         throw new Error('Preencha todos os campos');
       }
+
+      if (password.length < 6) {
+        throw new Error('Senha deve ter pelo menos 6 caracteres');
+      }
+
+      // Fazer login com o backend
+      const response = await authService.login({ email, senha: password });
+      
+      // Salvar token no localStorage
+      if (response.token) {
+        auth.setToken(response.token);
+      }
+
+      // Sucesso - redireciona para dashboard
+      navigate('/dashboard');
     } catch (err: any) {
       setError(err.message || 'Erro ao fazer login. Tente novamente.');
     } finally {

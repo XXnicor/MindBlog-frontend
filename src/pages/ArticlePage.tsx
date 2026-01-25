@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { ArrowLeft, Heart, Bookmark, Share2, Eye, MessageCircle, ThumbsUp } from 'lucide-react';
+import { ArrowLeft, Heart, Bookmark, Share2, Eye, MessageCircle } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import CommentSection from '../components/CommentSection';
 
 // Mock Data - Múltiplos artigos
 const MOCK_ARTICLES_DATA: Record<string, any> = {
@@ -256,39 +257,6 @@ const MOCK_ARTICLES_DATA: Record<string, any> = {
   }
 };
 
-const MOCK_COMMENTS = [
-  {
-    id: '1',
-    author: {
-      name: 'Ana Paula Silva',
-      avatar: 'https://i.pravatar.cc/150?img=5'
-    },
-    date: '21 jan 2025',
-    text: 'Excelente artigo! Muito bem explicado e com exemplos práticos. Já estou aplicando no meu projeto.',
-    likes: 15
-  },
-  {
-    id: '2',
-    author: {
-      name: 'Carlos Eduardo',
-      avatar: 'https://i.pravatar.cc/150?img=33'
-    },
-    date: '21 jan 2025',
-    text: 'Concordo com os pontos levantados. Muito útil para quem está começando!',
-    likes: 8
-  },
-  {
-    id: '3',
-    author: {
-      name: 'Maria Costa',
-      avatar: 'https://i.pravatar.cc/150?img=9'
-    },
-    date: '22 jan 2025',
-    text: 'Tutorial muito bem estruturado. Consegui aplicar os conceitos no meu projeto.',
-    likes: 12
-  }
-];
-
 export default function ArticlePage() {
   const { id } = useParams<{ id: string }>();
   const [isLiked, setIsLiked] = useState(false);
@@ -298,19 +266,6 @@ export default function ArticlePage() {
   const ARTICLE_DATA = MOCK_ARTICLES_DATA[id || '1'] || MOCK_ARTICLES_DATA['1'];
   const [likesCount, setLikesCount] = useState(ARTICLE_DATA.likes);
 
-  // Estados para comentários
-  const [comments, setComments] = useState(MOCK_COMMENTS);
-  const [newComment, setNewComment] = useState('');
-  
-  // Simula usuário logado (substitua por useAuth() quando disponível)
-  const user = {
-    nome: 'João Silva',
-    avatar: 'https://i.pravatar.cc/150?img=33',
-    email: 'joao@example.com'
-  };
-  // Para testar sem login, comente o objeto user acima e descomente abaixo:
-  // const user = null;
-
   const handleLike = () => {
     if (isLiked) {
       setLikesCount(likesCount - 1);
@@ -318,25 +273,6 @@ export default function ArticlePage() {
       setLikesCount(likesCount + 1);
     }
     setIsLiked(!isLiked);
-  };
-
-  // Adiciona novo comentário
-  const handleAddComment = () => {
-    if (!newComment.trim()) return;
-    
-    const newCommentObj = {
-      id: String(comments.length + 1),
-      author: {
-        name: user?.nome || 'Usuário',
-        avatar: user?.avatar || 'https://i.pravatar.cc/150?img=1'
-      },
-      date: 'Agora',
-      text: newComment,
-      likes: 0
-    };
-    
-    setComments([newCommentObj, ...comments]);
-    setNewComment('');
   };
 
   return (
@@ -484,92 +420,8 @@ export default function ArticlePage() {
         </article>
 
         {/* Seção de Comentários */}
-        <section className="mt-16 border-t border-slate-800 pt-8">
-          <h2 className="text-2xl font-bold text-white mb-6">
-            Comentários ({comments.length})
-          </h2>
-
-          {/* Formulário de Comentário (apenas se logado) */}
-          {user ? (
-            <div className="mb-8 bg-slate-900 border border-slate-800 rounded-lg p-6">
-              <div className="flex items-start gap-4">
-                {/* Avatar do usuário */}
-                <div className="flex-shrink-0">
-                  {user.avatar ? (
-                    <img
-                      src={user.avatar}
-                      alt={user.nome}
-                      className="w-10 h-10 rounded-full border-2 border-slate-700"
-                    />
-                  ) : (
-                    <div className="w-10 h-10 rounded-full bg-cyan-500 flex items-center justify-center text-slate-900 font-bold">
-                      {user.nome.charAt(0).toUpperCase()}
-                    </div>
-                  )}
-                </div>
-
-                {/* Campo de texto */}
-                <div className="flex-1">
-                  <textarea
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    placeholder="Escreva seu comentário..."
-                    rows={4}
-                    className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors resize-none"
-                  />
-                  <div className="mt-3 flex justify-end">
-                    <button
-                      onClick={handleAddComment}
-                      disabled={!newComment.trim()}
-                      className="bg-cyan-500 hover:bg-cyan-600 disabled:bg-slate-700 disabled:cursor-not-allowed text-slate-900 font-semibold px-6 py-2 rounded-lg transition-colors"
-                    >
-                      Publicar Comentário
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ) : (
-            /* Caixa de Login para Comentar */
-            <div className="mb-8 bg-slate-900 border border-slate-800 rounded-lg p-6 text-center">
-              <p className="text-slate-400 mb-4">Faça login para participar da discussão</p>
-              <Link
-                to="/login"
-                className="inline-block bg-cyan-500 hover:bg-cyan-600 text-slate-900 font-semibold px-6 py-2 rounded-lg transition-colors"
-              >
-                Fazer Login
-              </Link>
-            </div>
-          )}
-
-          {/* Lista de Comentários */}
-          <div className="space-y-6">
-            {comments.map((comment) => (
-              <div
-                key={comment.id}
-                className="bg-slate-900 border border-slate-800 rounded-lg p-6 hover:border-slate-700 transition-colors"
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={comment.author.avatar}
-                      alt={comment.author.name}
-                      className="w-10 h-10 rounded-full"
-                    />
-                    <div>
-                      <div className="text-white font-medium">{comment.author.name}</div>
-                      <div className="text-sm text-slate-500">{comment.date}</div>
-                    </div>
-                  </div>
-                  <button className="flex items-center gap-1 text-slate-400 hover:text-cyan-500 transition-colors">
-                    <ThumbsUp size={16} />
-                    <span className="text-sm">{comment.likes}</span>
-                  </button>
-                </div>
-                <p className="text-slate-300 leading-relaxed">{comment.text}</p>
-              </div>
-            ))}
-          </div>
+        <section className="mt-16">
+          <CommentSection articleId={id || '1'} />
         </section>
       </main>
 

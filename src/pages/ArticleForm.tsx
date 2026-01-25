@@ -1,7 +1,7 @@
 import { useState, useEffect, FormEvent, ChangeEvent, KeyboardEvent } from 'react';
 import { ArrowLeft, Upload, X, Plus } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { api } from '../lib/api';
+import { articleService } from '../lib/api';
 
 export default function ArticleForm() {
   const navigate = useNavigate();
@@ -21,7 +21,7 @@ export default function ArticleForm() {
   const [isLoading, setIsLoading] = useState(false);
 
   // Limites de caracteres
-  const SUMMARY_MAX = 120;
+  const SUMMARY_MAX = 200;
   const CONTENT_MAX = 8000;
   const WORDS_PER_MINUTE = 200;
 
@@ -32,42 +32,18 @@ export default function ArticleForm() {
     }
   }, [isEditMode, id]);
 
-  // Simula busca de dados (MOCK DATA)
+  // Busca de dados da API
   const loadArticleData = async (articleId: string) => {
     setIsLoading(true);
     try {
-      // TODO: Substituir por chamada real à API
-      // const response = await api.get(`/articles/${articleId}`);
-      // const article = response.data;
+      const article = await articleService.getById(articleId);
       
-      // MOCK DATA para demonstração
-      const mockArticle = {
-        titulo: 'Como a Inteligência Artificial está Revolucionando o Desenvolvimento',
-        resumo: 'Descubra as principais ferramentas de IA que estão transformando a forma como desenvolvemos software em 2026.',
-        categoria: 'IA',
-        conteudo: `# Introdução
-
-A inteligência artificial está mudando radicalmente a forma como desenvolvemos software. Neste artigo, vou explorar as principais ferramentas e técnicas que todo desenvolvedor deveria conhecer.
-
-## Ferramentas de IA para Desenvolvimento
-
-1. **GitHub Copilot** - Assistente de código baseado em IA
-2. **ChatGPT** - Para resolução de problemas e documentação
-3. **Tabnine** - Autocomplete inteligente
-
-## Impacto na Produtividade
-
-Estudos recentes mostram que desenvolvedores que utilizam ferramentas de IA são até 40% mais produtivos.`,
-        tags: ['IA', 'Produtividade', 'Desenvolvimento', 'ChatGPT'],
-        imagem_url: 'uploads/2026/01/inteligencia_artigo.png'
-      };
-
-      setTitle(mockArticle.titulo);
-      setSummary(mockArticle.resumo);
-      setCategory(mockArticle.categoria);
-      setContent(mockArticle.conteudo);
-      setTags(mockArticle.tags);
-      setExistingImageUrl(mockArticle.imagem_url);
+      setTitle(article.titulo);
+      setSummary(article.resumo || '');
+      setCategory(article.categoria);
+      setContent(article.conteudo);
+      setTags(article.tags || []);
+      setExistingImageUrl(article.imagem || '');
     } catch (error) {
       console.error('Erro ao carregar artigo:', error);
       alert('Erro ao carregar artigo para edição.');
@@ -122,56 +98,63 @@ Estudos recentes mostram que desenvolvedores que utilizam ferramentas de IA são
     setIsSubmitting(true);
 
     try {
-      // Simula envio (comentado até API estar pronta)
-      console.log('Dados do formulário:', {
-        title,
-        summary,
-        category,
-        content,
-        tags,
-        image: image?.name,
-        isEditMode,
-        id
-      });
+      // Validações
+      if (title.length < 5 || title.length > 200) {
+        throw new Error('O título deve ter entre 5 e 200 caracteres');
+      }
 
-      // TODO: Descomentar quando a API estiver pronta
-      /*
+      if (content.length < 100) {
+        throw new Error('O conteúdo deve ter pelo menos 100 caracteres');
+      }
+
+      if (summary.length > 200) {
+        throw new Error('O resumo deve ter no máximo 200 caracteres');
+      }
+
       const formData = new FormData();
       formData.append('titulo', title);
-      formData.append('resumo', summary);
-      formData.append('categoria', category);
       formData.append('conteudo', content);
-      formData.append('tags', JSON.stringify(tags));
+      formData.append('categoria', category);
+      
+      if (summary) {
+        formData.append('resumo', summary);
+      }
+      
+      if (tags.length > 0) {
+        formData.append('tags', JSON.stringify(tags));
+      }
       
       if (image) {
         formData.append('imagem', image);
       }
 
       if (isEditMode && id) {
-        await api.put(`/articles/${id}`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+        await articleService.update(id, formData);
       } else {
-        await api.post('/articles', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
+        console.log('[ArticleForm] Criando artigo com dados:', {
+          titulo: title,
+          categoria: category,
+          resumo: summary,
+          tags: tags,
+          temImagem: !!image,
+          tamanhoConteudo: content.length
         });
+        await articleService.create(formData);
       }
-      */
-
-      // Simula delay de rede
-      await new Promise(resolve => setTimeout(resolve, 1000));
       
       alert(`Artigo ${isEditMode ? 'editado' : 'criado'} com sucesso!`);
-      
-      // Redireciona para dashboard após sucesso
       navigate('/dashboard');
-    } catch (error) {
-      console.error(`Erro ao ${isEditMode ? 'editar' : 'criar'} artigo:`, error);
-      alert(`Erro ao ${isEditMode ? 'editar' : 'criar'} artigo. Tente novamente.`);
+      
+    } catch (error: any) {
+      console.error(`[ArticleForm] Erro completo:`, {
+        message: error.message,
+        stack: error.stack,
+        error: error
+      });
+      
+      // Mostrar mensagem de erro detalhada
+      const errorMessage = error.message || `Erro ao ${isEditMode ? 'editar' : 'criar'} artigo. Tente novamente.`;
+      alert(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

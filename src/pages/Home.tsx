@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import ArticleCard, { Article } from '../components/ArticleCard'
-import { api } from '../lib/api'
+import { articleService } from '../lib/api'
 import { Mail } from 'lucide-react'
 
 const mockArticles: Article[] = [
@@ -53,9 +53,10 @@ export default function Home(){
     let mounted = true
     ;(async ()=>{
       try{
-        const res = await api.get('/api/articles')
-        if(mounted && Array.isArray(res.data)) setArticles(res.data)
+        const res = await articleService.getAll(1, 10)
+        if(mounted && res.articles) setArticles(res.articles)
       }catch(err){
+        console.error('Erro ao carregar artigos:', err)
         if(mounted) setArticles(mockArticles)
       }
     })()

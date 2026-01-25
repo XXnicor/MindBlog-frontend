@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { Clock, Eye } from 'lucide-react'
+import { getImageUrl } from '../lib/imageUtils'
 
 export type Article = {
   id: string
@@ -16,12 +17,26 @@ export type Article = {
 }
 
 export default function ArticleCard({ article }: { article: Article }){
+  const imageUrl = getImageUrl(article.image);
+  
   return (
     <Link to={`/artigo/${article.id}`}>
       <article className={`bg-slate-900 border ${article.highlight ? 'border-cyan-500' : 'border-slate-800'} rounded-md overflow-hidden hover:border-slate-700 transition-colors cursor-pointer`}> 
         <div className="h-40 bg-gradient-to-br from-pink-300 to-sky-200 flex items-center justify-center text-slate-900 font-extrabold text-3xl">
           {/* placeholder image */}
-          {article.image ? <img src={article.image} alt={article.title} className="w-full h-full object-cover"/> : <div className="p-6">Lorem<br/>ipsum</div>}
+          {imageUrl ? (
+            <img 
+              src={imageUrl} 
+              alt={article.title} 
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+                e.currentTarget.parentElement!.innerHTML = '<div class="p-6">Lorem<br/>ipsum</div>';
+              }}
+            />
+          ) : (
+            <div className="p-6">Lorem<br/>ipsum</div>
+          )}
         </div>
 
         <div className="p-4">

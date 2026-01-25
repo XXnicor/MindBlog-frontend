@@ -5,9 +5,9 @@ import UserMenu from './UserMenu'
 
 export default function Navbar(){
   // Simula usuário logado (substituir com contexto de autenticação real)
-  //const [user] = useState<{name: string; email: string; avatar?: string} | null>(null);
+  const [user] = useState<{name: string; email: string; avatar?: string} | null>(null);
   //Para testar o menu, descomente a linha abaixo:
-   const [user] = useState({ name: 'João Silva', email: 'joao@email.com' });
+   //const [user] = useState({ name: 'João Silva', email: 'joao@email.com' });
 
   const handleSignOut = () => {
     console.log('Logout realizado');

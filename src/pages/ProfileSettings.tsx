@@ -1,44 +1,118 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, Camera, Loader2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { ArrowLeft, Camera, Loader2, BarChart3 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-
-// Mock Data - Dados iniciais do usuário
-const MOCK_USER = {
-  nome: 'John Doe',
-  email: 'john.doe@email.com',
-  bio: 'Desenvolvedor Full Stack apaixonado por tecnologia e inovação. Compartilho conhecimento sobre React, Node.js e boas práticas de programação.',
-  avatarUrl: 'https://i.pravatar.cc/300?img=12',
-  tipoContá: 'Premium',
-  membroDesde: '20 jan 2025'
-};
+import { authService, userService } from '../lib/api';
 
 export default function ProfileSettings() {
-  const [nome, setNome] = useState(MOCK_USER.nome);
-  const [email, setEmail] = useState(MOCK_USER.email);
-  const [bio, setBio] = useState(MOCK_USER.bio);
-  const [avatarUrl, setAvatarUrl] = useState(MOCK_USER.avatarUrl);
+  const navigate = useNavigate();
+  const [nome, setNome] = useState('');
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+  const [bio, setBio] = useState('');
+  const [avatar, setAvatar] = useState<File | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState('');
   const [loading, setLoading] = useState(false);
+  const [loadingData, setLoadingData] = useState(true);
+  const [stats, setStats] = useState<any>(null);
+  const [createdAt, setCreatedAt] = useState('');
 
   const maxBioLength = 500;
   const bioLength = bio.length;
+
+  useEffect(() => {
+    loadUserData();
+    loadUserStats();
+  }, []);
+
+  const loadUserData = async () => {
+    setLoadingData(true);
+    try {
+      const user = await authService.getCurrentUser();
+      setNome(user.nome);
+      setEmail(user.email);
+      setBio(user.bio || '');
+      setAvatarUrl(user.avatar || '');
+      setCreatedAt(user.createdAt);
+    } catch (error: any) {
+      console.error('Erro ao carregar dados do usuário:', error);
+      if (error.message.includes('token') || error.message.includes('autenticação')) {
+        alert('Sessão expirada. Faça login novamente.');
+        navigate('/login');
+      }
+    } finally {
+      setLoadingData(false);
+    }
+  };
+
+  const loadUserStats = async () => {
+    try {
+      const userStats = await userService.getStats();
+      setStats(userStats);
+    } catch (error) {
+      console.error('Erro ao carregar estatísticas:', error);
+    }
+  };
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setAvatar(e.target.files[0]);
+      // Criar preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarUrl(reader.result as string);
+      };
+      reader.readAsDataURL(e.target.files[0]);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      // Simulação de salvamento (substituir com chamada à API)
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Validações
+      if (nome.length < 3 || nome.length > 100) {
+        throw new Error('O nome deve ter entre 3 e 100 caracteres');
+      }
+
+      if (bio.length > 500) {
+        throw new Error('A bio deve ter no máximo 500 caracteres');
+      }
+
+      if (senha && senha.length < 6) {
+        throw new Error('A senha deve ter pelo menos 6 caracteres');
+      }
+
+      const formData = new FormData();
+      formData.append('nome', nome);
+      formData.append('email', email);
+      
+      if (senha) {
+        formData.append('senha', senha);
+      }
+      
+      if (bio) {
+        formData.append('bio', bio);
+      }
+      
+      if (avatar) {
+        formData.append('avatar', avatar);
+      }
+
+      await userService.updateProfile(formData);
       
       alert('Dados atualizados! ✅');
+      setSenha(''); // Limpar campo de senha
+      setAvatar(null); // Limpar arquivo de avatar
       
-      // TODO: Integrar com API
-      // await api.put('/users/me', { nome, email, bio, avatarUrl });
+      // Recarregar dados
+      await loadUserData();
       
-    } catch (error) {
-      alert('Erro ao salvar alterações. Tente novamente.');
+    } catch (error: any) {
+      console.error('Erro ao salvar:', error);
+      alert(error.message || 'Erro ao salvar alterações. Tente novamente.');
     } finally {
       setLoading(false);
     }
@@ -46,11 +120,37 @@ export default function ProfileSettings() {
 
   // Preview do avatar com fallback
   const getAvatarPreview = () => {
-    if (!avatarUrl) {
-      return `https://ui-avatars.com/api/?name=${encodeURIComponent(nome)}&size=200&background=06b6d4&color=fff`;
+    if (avatarUrl) {
+      // Se é uma URL local (File), mostrar direto
+      if (avatarUrl.startsWith('data:')) {
+        return avatarUrl;
+      }
+      // Se é uma URL do servidor
+      if (avatarUrl.startsWith('http')) {
+        return avatarUrl;
+      }
+      // Se é apenas o nome do arquivo
+      return `http://localhost:3001/uploads/${avatarUrl}`;
     }
-    return avatarUrl;
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(nome)}&size=200&background=06b6d4&color=fff`;
   };
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('pt-BR');
+  };
+
+  if (loadingData) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block w-8 h-8 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-slate-400">Carregando...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 text-white flex flex-col">
@@ -90,27 +190,24 @@ export default function ProfileSettings() {
                     e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(nome)}&size=200&background=06b6d4&color=fff`;
                   }}
                 />
-                <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <label
+                  htmlFor="avatarFile"
+                  className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                >
                   <Camera className="w-6 h-6 text-white" />
-                </div>
-              </div>
-
-              <div className="w-full max-w-md">
-                <label htmlFor="avatarUrl" className="block text-sm font-medium text-slate-300 mb-2">
-                  Foto de Perfil
                 </label>
                 <input
-                  id="avatarUrl"
-                  type="url"
-                  value={avatarUrl}
-                  onChange={(e) => setAvatarUrl(e.target.value)}
-                  placeholder="https://exemplo.com/avatar.jpg"
-                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-cyan-500 transition-colors"
+                  id="avatarFile"
+                  type="file"
+                  accept="image/jpeg,image/png,image/gif,image/webp"
+                  onChange={handleAvatarChange}
+                  className="hidden"
                 />
-                <p className="mt-2 text-xs text-slate-500">
-                  Adicione uma imagem ou deixe em branco para usar o avatar padrão
-                </p>
               </div>
+
+              <p className="text-sm text-slate-400 text-center max-w-sm">
+                Clique na imagem para alterar seu avatar. Formatos aceitos: JPG, PNG, GIF, WEBP (máx 5MB)
+              </p>
             </div>
 
             {/* Campos do Formulário */}
@@ -145,6 +242,27 @@ export default function ProfileSettings() {
                 />
               </div>
 
+              {/* Nova Senha */}
+              <div>
+                <label htmlFor="senha" className="block text-sm font-medium text-slate-300 mb-2">
+                  Nova Senha (opcional)
+                </label>
+                <input
+                  id="senha"
+                  type="password"
+                  value={senha}
+                  onChange={(e) => setSenha(e.target.value)}
+                  placeholder="Deixe em branco para manter a senha atual"
+                  minLength={6}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-cyan-500 transition-colors"
+                />
+                {senha && (
+                  <p className="mt-1 text-xs text-slate-500">
+                    Mínimo de 6 caracteres
+                  </p>
+                )}
+              </div>
+
               {/* Bio */}
               <div>
                 <label htmlFor="bio" className="block text-sm font-medium text-slate-300 mb-2">
@@ -176,20 +294,41 @@ export default function ProfileSettings() {
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <p className="text-sm text-slate-500 mb-1">Tipo de conta</p>
-                  <p className="text-slate-300 font-medium flex items-center gap-2">
-                    {MOCK_USER.tipoContá}
-                    <span className="inline-block bg-cyan-500/20 text-cyan-400 text-xs px-2 py-1 rounded-full">
-                      Ativo
-                    </span>
-                  </p>
-                </div>
-                <div>
                   <p className="text-sm text-slate-500 mb-1">Membro desde</p>
-                  <p className="text-slate-300 font-medium">{MOCK_USER.membroDesde}</p>
+                  <p className="text-slate-300 font-medium">{formatDate(createdAt)}</p>
                 </div>
               </div>
             </div>
+
+            {/* Estatísticas do Usuário */}
+            {stats && (
+              <div className="pt-8 border-t border-slate-800">
+                <div className="flex items-center gap-2 mb-4">
+                  <BarChart3 className="w-5 h-5 text-cyan-500" />
+                  <h3 className="text-lg font-semibold text-white">
+                    Suas Estatísticas
+                  </h3>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="bg-slate-950 border border-slate-800 rounded-lg p-4">
+                    <p className="text-sm text-slate-500 mb-1">Artigos</p>
+                    <p className="text-2xl font-bold text-white">{stats.totalArticles || 0}</p>
+                  </div>
+                  <div className="bg-slate-950 border border-slate-800 rounded-lg p-4">
+                    <p className="text-sm text-slate-500 mb-1">Visualizações</p>
+                    <p className="text-2xl font-bold text-cyan-400">{stats.totalViews || 0}</p>
+                  </div>
+                  <div className="bg-slate-950 border border-slate-800 rounded-lg p-4">
+                    <p className="text-sm text-slate-500 mb-1">Curtidas</p>
+                    <p className="text-2xl font-bold text-pink-400">{stats.totalLikes || 0}</p>
+                  </div>
+                  <div className="bg-slate-950 border border-slate-800 rounded-lg p-4">
+                    <p className="text-sm text-slate-500 mb-1">Comentários</p>
+                    <p className="text-2xl font-bold text-green-400">{stats.totalComments || 0}</p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Botão de Salvar */}
             <button

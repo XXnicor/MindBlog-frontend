@@ -1,126 +1,73 @@
-import { useState } from 'react';
-import { Search, LayoutGrid, List, Clock, Eye } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Search, LayoutGrid, List, Clock, Eye, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { Article } from '../components/ArticleCard';
+import { articleService } from '../lib/api';
+import { getImageUrl } from '../lib/imageUtils';
 
 type ViewMode = 'grid' | 'list';
 
-// Mock Data para testes visuais
-const MOCK_ARTICLES: Article[] = [
-  {
-    id: '1',
-    title: 'Introdução ao React 19: Novidades e Recursos',
-    summary: 'Explore as novidades do React 19, incluindo Server Components, Actions e melhorias de performance que revolucionam o desenvolvimento web.',
-    category: 'Desenvolvimento web',
-    author: 'Ana Silva',
-    readTime: '8 min',
-    date: '20 jan 2025',
-    image: 'https://placehold.co/600x400/1e293b/cyan?text=React+19',
-    views: 1250
-  },
-  {
-    id: '2',
-    title: 'DevOps: Do Zero ao Deploy Automatizado',
-    summary: 'Aprenda a configurar pipelines de CI/CD com GitHub Actions, Docker e Kubernetes para automatizar seus deploys de forma profissional.',
-    category: 'DevOps',
-    author: 'Carlos Santos',
-    readTime: '12 min',
-    date: '18 jan 2025',
-    image: 'https://placehold.co/600x400/1e293b/pink?text=DevOps',
-    views: 890
-  },
-  {
-    id: '3',
-    title: 'Machine Learning com Python: Primeiros Passos',
-    summary: 'Descubra como começar sua jornada em ML utilizando Python, pandas, scikit-learn e técnicas fundamentais de análise de dados.',
-    category: 'AI',
-    author: 'Maria Oliveira',
-    readTime: '15 min',
-    date: '15 jan 2025',
-    image: 'https://placehold.co/600x400/1e293b/orange?text=Machine+Learning',
-    views: 2100,
-    highlight: true
-  },
-  {
-    id: '4',
-    title: 'TypeScript Avançado: Generics e Utility Types',
-    summary: 'Domine recursos avançados do TypeScript para criar código mais seguro, reutilizável e com melhor inferência de tipos.',
-    category: 'Desenvolvimento web',
-    author: 'Pedro Ferreira',
-    readTime: '10 min',
-    date: '12 jan 2025',
-    image: 'https://placehold.co/600x400/1e293b/blue?text=TypeScript',
-    views: 1580
-  },
-  {
-    id: '5',
-    title: 'Kubernetes na Prática: Escalando Aplicações',
-    summary: 'Aprenda a orquestrar containers com Kubernetes, desde conceitos básicos até estratégias avançadas de scaling e alta disponibilidade.',
-    category: 'DevOps',
-    author: 'João Costa',
-    readTime: '18 min',
-    date: '10 jan 2025',
-    image: 'https://placehold.co/600x400/1e293b/purple?text=Kubernetes',
-    views: 1720
-  },
-  {
-    id: '6',
-    title: 'ChatGPT e APIs: Integrando IA nos Seus Projetos',
-    summary: 'Veja como integrar a API do OpenAI em suas aplicações para criar chatbots inteligentes, assistentes virtuais e muito mais.',
-    category: 'AI',
-    author: 'Beatriz Lima',
-    readTime: '14 min',
-    date: '8 jan 2025',
-    image: 'https://placehold.co/600x400/1e293b/green?text=ChatGPT+API',
-    views: 3200
-  },
-  {
-    id: '7',
-    title: 'Clean Code: Princípios para Código Sustentável',
-    summary: 'Descubra os princípios fundamentais do Clean Code e como escrever código que seja fácil de manter, testar e escalar.',
-    category: 'Desenvolvimento web',
-    author: 'Rafael Souza',
-    readTime: '9 min',
-    date: '5 jan 2025',
-    image: 'https://placehold.co/600x400/1e293b/yellow?text=Clean+Code',
-    views: 1950
-  },
-  {
-    id: '8',
-    title: 'Docker Compose: Orquestrando Múltiplos Containers',
-    summary: 'Aprenda a usar Docker Compose para gerenciar aplicações multi-container de forma simples e eficiente.',
-    category: 'DevOps',
-    author: 'Luciana Mendes',
-    readTime: '11 min',
-    date: '3 jan 2025',
-    image: 'https://placehold.co/600x400/1e293b/red?text=Docker+Compose',
-    views: 1340
-  }
-];
+interface PaginationData {
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  itemsPerPage: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
 
 export default function AllArticles() {
-  const [articles] = useState<Article[]>(MOCK_ARTICLES);
+  const [articles, setArticles] = useState<Article[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState<PaginationData | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  // Filtragem client-side
-  const filteredArticles = articles.filter((article) => {
-    const matchesSearch = article.title
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase()) ||
-      article.summary.toLowerCase().includes(searchTerm.toLowerCase());
+  const itemsPerPage = 9;
+
+  // Carregar artigos da API
+  useEffect(() => {
+    loadArticles();
+  }, [currentPage, selectedCategory, searchTerm]);
+
+  const loadArticles = async () => {
+    setLoading(true);
+    setError('');
     
-    const matchesCategory = selectedCategory === 'all' || 
-      article.category.toLowerCase() === selectedCategory.toLowerCase();
+    try {
+      const filters: any = {};
+      if (selectedCategory !== 'all') {
+        filters.categoria = selectedCategory;
+      }
+      if (searchTerm) {
+        filters.search = searchTerm;
+      }
 
-    return matchesSearch && matchesCategory;
-  });
+      const response = await articleService.getAll(currentPage, itemsPerPage, filters);
+      
+      setArticles(response.articles || []);
+      setPagination(response.pagination || null);
+    } catch (err: any) {
+      console.error('Erro ao carregar artigos:', err);
+      setError(err.message || 'Erro ao carregar artigos');
+      // Manter dados anteriores em caso de erro
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Extrai categorias únicas dos artigos
-  const categories = ['all', ...Array.from(new Set(articles.map(a => a.category)))];
+  const categories = ['all', 'Dev', 'DevOps', 'IA'];
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <div className="min-h-screen bg-slate-950 text-white flex flex-col">
@@ -201,8 +148,16 @@ export default function AllArticles() {
 
             {/* Contador de Resultados */}
             <div className="mt-4 text-sm text-slate-400">
-              {filteredArticles.length} {filteredArticles.length === 1 ? 'artigo encontrado' : 'artigos encontrados'}
-              {searchTerm && ` para "${searchTerm}"`}
+              {loading ? (
+                'Carregando...'
+              ) : error ? (
+                <span className="text-red-400">{error}</span>
+              ) : (
+                <>
+                  {pagination?.totalItems || 0} {pagination?.totalItems === 1 ? 'artigo encontrado' : 'artigos encontrados'}
+                  {searchTerm && ` para "${searchTerm}"`}
+                </>
+              )}
             </div>
           </div>
         </section>
@@ -210,7 +165,24 @@ export default function AllArticles() {
         {/* Grid de Artigos */}
         <section className="py-16">
           <div className="max-w-7xl mx-auto px-4">
-            {filteredArticles.length === 0 ? (
+            {loading ? (
+              <div className="text-center py-20">
+                <div className="inline-block w-12 h-12 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+                <p className="text-slate-400">Carregando artigos...</p>
+              </div>
+            ) : error ? (
+              <div className="text-center py-20">
+                <div className="text-6xl mb-4">⚠️</div>
+                <h3 className="text-2xl font-bold mb-2">Erro ao carregar artigos</h3>
+                <p className="text-slate-400 mb-4">{error}</p>
+                <button
+                  onClick={loadArticles}
+                  className="px-6 py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold rounded-lg transition-colors"
+                >
+                  Tentar novamente
+                </button>
+              </div>
+            ) : articles.length === 0 ? (
               <div className="text-center py-20">
                 <div className="text-6xl mb-4">📭</div>
                 <h3 className="text-2xl font-bold mb-2">Nenhum artigo encontrado</h3>
@@ -221,7 +193,7 @@ export default function AllArticles() {
             ) : viewMode === 'grid' ? (
               // MODO GRID: 3 colunas
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredArticles.map((article) => (
+                {articles.map((article) => (
                   <Link key={article.id} to={`/artigo/${article.id}`}>
                     <article
                       className={`bg-slate-900 border ${
@@ -230,11 +202,17 @@ export default function AllArticles() {
                     >
                     {/* Imagem no Topo */}
                     <div className="h-48 bg-gradient-to-br from-pink-300 to-sky-200 flex items-center justify-center">
-                      {article.image ? (
+                      {getImageUrl(article.image) ? (
                         <img
-                          src={article.image}
+                          src={getImageUrl(article.image)!}
                           alt={article.title}
                           className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            if (e.currentTarget.parentElement) {
+                              e.currentTarget.parentElement.innerHTML = '<div class="text-slate-900 font-extrabold text-2xl p-6">Lorem<br />ipsum</div>';
+                            }
+                          }}
                         />
                       ) : (
                         <div className="text-slate-900 font-extrabold text-2xl p-6">
@@ -276,7 +254,7 @@ export default function AllArticles() {
             ) : (
               // MODO LISTA: Cards Horizontais
               <div className="flex flex-col gap-4">
-                {filteredArticles.map((article) => (
+                {articles.map((article) => (
                   <Link key={article.id} to={`/artigo/${article.id}`}>
                     <article
                       className={`bg-slate-900 border ${
@@ -285,11 +263,17 @@ export default function AllArticles() {
                     >
                     {/* Imagem à Esquerda (Desktop) / Topo (Mobile) */}
                     <div className="md:w-48 h-48 md:h-auto bg-gradient-to-br from-pink-300 to-sky-200 flex items-center justify-center flex-shrink-0">
-                      {article.image ? (
+                      {getImageUrl(article.image) ? (
                         <img
-                          src={article.image}
+                          src={getImageUrl(article.image)!}
                           alt={article.title}
                           className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            if (e.currentTarget.parentElement) {
+                              e.currentTarget.parentElement.innerHTML = '<div class="text-slate-900 font-extrabold text-2xl p-6">Lorem<br />ipsum</div>';
+                            }
+                          }}
                         />
                       ) : (
                         <div className="text-slate-900 font-extrabold text-2xl p-6">
@@ -345,6 +329,57 @@ export default function AllArticles() {
                   </article>
                   </Link>
                 ))}
+              </div>
+            )}
+
+            {/* Paginação */}
+            {!loading && !error && pagination && pagination.totalPages > 1 && (
+              <div className="mt-12 flex items-center justify-center gap-2">
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={!pagination.hasPreviousPage}
+                  className="p-2 bg-slate-900 border border-slate-800 rounded-lg text-white hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  title="Página anterior"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+
+                <div className="flex items-center gap-2">
+                  {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((page) => {
+                    // Mostrar apenas algumas páginas ao redor da atual
+                    if (
+                      page === 1 ||
+                      page === pagination.totalPages ||
+                      (page >= currentPage - 1 && page <= currentPage + 1)
+                    ) {
+                      return (
+                        <button
+                          key={page}
+                          onClick={() => handlePageChange(page)}
+                          className={`px-4 py-2 rounded-lg transition-colors ${
+                            page === currentPage
+                              ? 'bg-cyan-500 text-slate-900 font-bold'
+                              : 'bg-slate-900 border border-slate-800 text-white hover:bg-slate-800'
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      );
+                    } else if (page === currentPage - 2 || page === currentPage + 2) {
+                      return <span key={page} className="text-slate-500">...</span>;
+                    }
+                    return null;
+                  })}
+                </div>
+
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={!pagination.hasNextPage}
+                  className="p-2 bg-slate-900 border border-slate-800 rounded-lg text-white hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  title="Próxima página"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
               </div>
             )}
           </div>
