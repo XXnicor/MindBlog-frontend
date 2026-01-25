@@ -1,0 +1,179 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* small helpers to match design */
+html,body{height:100%}
+body{@apply bg-slate-950 text-white}
+
+.line-clamp-3{display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden}
+
+/* Site Header */
+.site-header {
+  @apply border-b border-slate-800 bg-slate-950;
+}
+
+.header-inner {
+  @apply flex items-center justify-between py-4;
+}
+
+.logo {
+  @apply text-2xl font-bold text-blue-400;
+}
+
+.nav {
+  @apply flex items-center gap-6;
+}
+
+.nav a {
+  @apply text-slate-300 hover:text-white transition-colors;
+}
+
+/* Buttons */
+.btn-primary {
+  @apply bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors;
+}
+
+.btn-cta {
+  @apply bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-lg font-semibold transition-colors;
+}
+
+.btn-ghost {
+  @apply border border-slate-700 hover:border-slate-600 text-white px-6 py-3 rounded-lg text-lg transition-colors;
+}
+
+/* Hero Section */
+.hero {
+  @apply py-20 bg-gradient-to-b from-slate-900 to-slate-950;
+}
+
+.hero-inner {
+  @apply text-center max-w-4xl mx-auto;
+}
+
+.hero h1 {
+  @apply text-5xl md:text-6xl font-bold mb-6;
+}
+
+.accent {
+  @apply text-blue-400;
+}
+
+.subtitle {
+  @apply text-xl text-slate-400 mb-8;
+}
+
+.hero-cta {
+  @apply flex gap-4 justify-center flex-wrap;
+}
+
+/* Container */
+.container {
+  @apply max-w-7xl mx-auto px-4;
+}
+
+/* Section */
+.section {
+  @apply py-16;
+}
+
+.section-header {
+  @apply flex justify-between items-center mb-8;
+}
+
+.section-header h2 {
+  @apply text-3xl font-bold;
+}
+
+.link-muted {
+  @apply text-slate-400 hover:text-white transition-colors;
+}
+
+/* Cards Grid */
+.cards-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6;
+}
+
+.card {
+  @apply bg-slate-900 rounded-lg overflow-hidden border border-slate-800 hover:border-slate-700 transition-colors;
+}
+
+.card.highlight {
+  @apply md:col-span-2 lg:row-span-2;
+}
+
+.card-image {
+  @apply bg-gradient-to-br from-blue-500 to-purple-600 aspect-video flex items-center justify-center text-2xl font-bold;
+}
+
+.card.highlight .card-image {
+  @apply text-4xl aspect-auto h-full min-h-[300px];
+}
+
+.card-body {
+  @apply p-4;
+}
+
+.tag {
+  @apply inline-block bg-blue-600/20 text-blue-400 px-3 py-1 rounded-full text-sm mb-2;
+}
+
+.card h3 {
+  @apply font-semibold mb-2 line-clamp-2;
+}
+
+.meta {
+  @apply text-sm text-slate-500;
+}
+
+/* Dark Block */
+.dark-block {
+  @apply bg-slate-900 rounded-lg p-8 text-center;
+}
+
+.dark-block h2 {
+  @apply text-3xl font-bold mb-4;
+}
+
+.muted {
+  @apply text-slate-400 mb-6;
+}
+
+/* Newsletter Form */
+.newsletter {
+  @apply flex gap-3 max-w-md mx-auto flex-wrap justify-center;
+}
+
+.newsletter input {
+  @apply flex-1 min-w-[250px] bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-600;
+}
+
+/* Footer CTA */
+.footer-cta {
+  @apply text-center;
+}
+
+.footer-cta h3 {
+  @apply text-2xl font-bold mb-4;
+}
+
+/* Site Footer */
+.site-footer {
+  @apply border-t border-slate-800 bg-slate-950 py-8;
+}
+
+.footer-inner {
+  @apply flex flex-col md:flex-row justify-between items-center gap-4;
+}
+
+.brand {
+  @apply text-lg font-semibold text-slate-400;
+}
+
+.footer-nav {
+  @apply flex gap-6;
+}
+
+.footer-nav a {
+  @apply text-slate-400 hover:text-white transition-colors;
+}

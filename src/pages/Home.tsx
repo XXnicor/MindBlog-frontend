@@ -1,0 +1,116 @@
+import React, { useEffect, useState } from 'react'
+import Navbar from '../components/Navbar'
+import Footer from '../components/Footer'
+import ArticleCard, { Article } from '../components/ArticleCard'
+import { api } from '../lib/api'
+import { Mail } from 'lucide-react'
+
+const mockArticles: Article[] = [
+  {
+    id: '1',
+    title: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
+    summary: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in augue ligula. Donec sed eros vel lacus condimentum sollicitudin.',
+    category: 'Desenvolvimento web',
+    author: 'John Doe',
+    readTime: '6min',
+    views: 122,
+    highlight: true,
+    date: '4 out 2025'
+  },
+  {
+    id: '2',
+    title: 'Explorando IA e aprendizado de máquina no frontend',
+    summary: 'Um guia prático para integrar modelos leves no navegador e melhorar a experiência do usuário.',
+    category: 'IA',
+    author: 'Jane Roe',
+    readTime: '8min',
+    views: 98,
+  },
+  {
+    id: '3',
+    title: 'DevOps moderno: pipelines que importam',
+    summary: 'Como montar pipelines resilientes para entregas rápidas e confiáveis usando ferramentas atuais.',
+    category: 'DevOps',
+    author: 'Carlos Silva',
+    readTime: '7min',
+    views: 54,
+  },
+  {
+    id: '4',
+    title: 'Boas práticas em CSS moderno',
+    summary: 'Organize seu CSS com arquitetura, performance e acessibilidade em mente.',
+    category: 'Frontend',
+    author: 'Ana Lima',
+    readTime: '5min',
+    views: 32,
+  }
+]
+
+export default function Home(){
+  const [articles, setArticles] = useState<Article[]>([])
+
+  useEffect(()=>{
+    let mounted = true
+    ;(async ()=>{
+      try{
+        const res = await api.get('/api/articles')
+        if(mounted && Array.isArray(res.data)) setArticles(res.data)
+      }catch(err){
+        if(mounted) setArticles(mockArticles)
+      }
+    })()
+    return ()=>{ mounted = false }
+  },[])
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-gray-100">
+      <Navbar />
+
+      <main className="max-w-6xl mx-auto px-6">
+        <section className="text-center py-24">
+          <h1 className="text-4xl md:text-5xl font-extrabold">Explore o Futuro da <span className="text-cyan-500">Tecnologia</span></h1>
+          <p className="text-gray-400 mt-4 max-w-2xl mx-auto">Artigos sobre IA, desenvolvimento, DevOps e as últimas tendências tecnológicas</p>
+          <div className="mt-8 flex justify-center gap-4">
+            <button className="bg-cyan-500 hover:bg-cyan-600 text-slate-900 px-6 py-2 rounded-md font-semibold">Explorar Artigos</button>
+            <button className="border border-slate-800 text-white px-6 py-2 rounded-md">Começar a Escrever</button>
+          </div>
+        </section>
+
+        <section className="py-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-semibold text-white">Artigos em Destaque</h2>
+            <a href="#" className="text-cyan-500">Ver todos →</a>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {articles.map(a => (
+              <ArticleCard key={a.id} article={a} />
+            ))}
+          </div>
+        </section>
+
+        <section className="bg-slate-900 border border-slate-800 rounded-md p-8 mt-12 text-center">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-6">
+            <Mail className="text-cyan-500" />
+            <div>
+              <h3 className="text-white text-xl font-semibold">Newsletter Semanal</h3>
+              <p className="text-gray-400">Receba os melhores artigos de tecnologia diretamente no seu email. Sem spam, apenas conteúdo de qualidade.</p>
+            </div>
+            <form className="flex gap-2 mt-4 md:mt-0">
+              <input type="email" placeholder="exemplo@email.com" className="px-4 py-2 rounded-md bg-slate-800 border border-slate-700 text-gray-100" />
+              <button className="bg-cyan-500 hover:bg-cyan-600 text-slate-900 px-4 py-2 rounded-md font-medium">Inscrever</button>
+            </form>
+          </div>
+        </section>
+
+        <section className="mt-12 text-center">
+          <h3 className="text-white text-lg font-semibold">Compartilhe Seu Conhecimento</h3>
+          <p className="text-gray-400 mt-2">Junte-se à nossa comunidade de escritores e compartilhe suas experiências e conhecimentos em tecnologia</p>
+          <div className="mt-4"><button className="bg-cyan-500 hover:bg-cyan-600 text-slate-900 px-4 py-2 rounded-md">Criar Conta Gratuita</button></div>
+        </section>
+      </main>
+
+      <Footer />
+    </div>
+  )
+}
