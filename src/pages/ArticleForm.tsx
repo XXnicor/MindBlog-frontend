@@ -1,0 +1,385 @@
+import { useState, useEffect, FormEvent, ChangeEvent, KeyboardEvent } from 'react';
+import { ArrowLeft, Upload, X, Plus } from 'lucide-react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { api } from '../lib/api';
+
+export default function ArticleForm() {
+  const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+  const isEditMode = Boolean(id);
+  
+  // Estados do formulário
+  const [title, setTitle] = useState('');
+  const [summary, setSummary] = useState('');
+  const [category, setCategory] = useState('Dev');
+  const [content, setContent] = useState('');
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState('');
+  const [image, setImage] = useState<File | null>(null);
+  const [existingImageUrl, setExistingImageUrl] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Limites de caracteres
+  const SUMMARY_MAX = 120;
+  const CONTENT_MAX = 8000;
+  const WORDS_PER_MINUTE = 200;
+
+  // Carrega dados do artigo se estiver em modo edição
+  useEffect(() => {
+    if (isEditMode && id) {
+      loadArticleData(id);
+    }
+  }, [isEditMode, id]);
+
+  // Simula busca de dados (MOCK DATA)
+  const loadArticleData = async (articleId: string) => {
+    setIsLoading(true);
+    try {
+      // TODO: Substituir por chamada real à API
+      // const response = await api.get(`/articles/${articleId}`);
+      // const article = response.data;
+      
+      // MOCK DATA para demonstração
+      const mockArticle = {
+        titulo: 'Como a Inteligência Artificial está Revolucionando o Desenvolvimento',
+        resumo: 'Descubra as principais ferramentas de IA que estão transformando a forma como desenvolvemos software em 2026.',
+        categoria: 'IA',
+        conteudo: `# Introdução
+
+A inteligência artificial está mudando radicalmente a forma como desenvolvemos software. Neste artigo, vou explorar as principais ferramentas e técnicas que todo desenvolvedor deveria conhecer.
+
+## Ferramentas de IA para Desenvolvimento
+
+1. **GitHub Copilot** - Assistente de código baseado em IA
+2. **ChatGPT** - Para resolução de problemas e documentação
+3. **Tabnine** - Autocomplete inteligente
+
+## Impacto na Produtividade
+
+Estudos recentes mostram que desenvolvedores que utilizam ferramentas de IA são até 40% mais produtivos. Isso não significa que a IA vai substituir desenvolvedores, mas sim que ela se tornará uma ferramenta essencial no dia a dia.
+
+## Conclusão
+
+A IA está aqui para ficar. Aproveite essas ferramentas para se tornar um desenvolvedor mais eficiente e focado em resolver problemas complexos.`,
+        tags: ['IA', 'Produtividade', 'Desenvolvimento', 'ChatGPT'],
+        imagem_url: 'uploads/2026/01/inteligencia_artigo.png'
+      };
+
+      setTitle(mockArticle.titulo);
+      setSummary(mockArticle.resumo);
+      setCategory(mockArticle.categoria);
+      setContent(mockArticle.conteudo);
+      setTags(mockArticle.tags);
+      setExistingImageUrl(mockArticle.imagem_url);
+    } catch (error) {
+      console.error('Erro ao carregar artigo:', error);
+      alert('Erro ao carregar artigo para edição.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Calcula tempo de leitura estimado
+  const calculateReadingTime = (text: string): number => {
+    const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+    return Math.max(1, Math.ceil(words / WORDS_PER_MINUTE));
+  };
+
+  // Calcula número de palavras
+  const countWords = (text: string): number => {
+    return text.trim().split(/\s+/).filter(w => w.length > 0).length;
+  };
+
+  // Manipula upload de imagem
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setImage(e.target.files[0]);
+    }
+  };
+
+  // Adiciona tag
+  const handleAddTag = () => {
+    const trimmedTag = tagInput.trim();
+    if (trimmedTag && !tags.includes(trimmedTag)) {
+      setTags([...tags, trimmedTag]);
+      setTagInput('');
+    }
+  };
+
+  // Adiciona tag ao pressionar Enter
+  const handleTagKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleAddTag();
+    }
+  };
+
+  // Remove tag
+  const handleRemoveTag = (tagToRemove: string) => {
+    setTags(tags.filter(tag => tag !== tagToRemove));
+  };
+
+  // Envia o formulário
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      // Cria FormData para envio
+      const formData = new FormData();
+      formData.append('titulo', title);
+      formData.append('resumo', summary);
+      formData.append('categoria', category);
+      formData.append('conteudo', content);
+      formData.append('tags', JSON.stringify(tags));
+      
+      if (image) {
+        formData.append('imagem', image);
+      }
+
+      // Envia para API (PUT para edição, POST para criação)
+      if (isEditMode && id) {
+        await api.put(`/articles/${id}`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+      } else {
+        await api.post('/articles', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+      }
+
+      // Redireciona para dashboard após sucesso
+      navigate('/dashboard');
+    } catch (error) {
+      console.error(`Erro ao ${isEditMode ? 'editar' : 'criar'} artigo:`, error);
+      alert(`Erro ao ${isEditMode ? 'editar' : 'criar'} artigo. Tente novamente.`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const readingTime = calculateReadingTime(content);
+  const wordCount = countWords(content);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block w-8 h-8 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-slate-400">Carregando
+            {isEditMode ? 'Editar Artigo' : 'Criar Novo Artigo'}
+          </h1>
+          <p className="text-slate-400">
+            {isEditMode 
+              ? 'Atualize as informações do seu artigo' 
+              : 'Compartilhe seu conhecimento com a comunidade'
+            }
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-white">
+      <div className="max-w-3xl mx-auto px-4 py-8">
+        {/* Topo - Link voltar */}
+        <Link
+          to="/dashboard"
+          className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-6"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Voltar ao Dashboard</span>
+        </Link>
+
+        {/* Título da página */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">Criar Novo Artigo</h1>
+          <p className="text-slate-400">
+            Compartilhe seu conhecimento com a comunidade
+          </p>
+        </div>
+
+        {/* Formulário */}
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Título do Artigo */}
+          <div>
+            <label htmlFor="title" className="block text-white font-medium mb-2">
+              Título do Artigo
+            </label>
+            <input
+              id="title"
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Digite o título do seu artigo..."
+              required
+              className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
+            />
+          </div>
+
+          {/* Resumo */}
+          <div>
+            <label htmlFor="summary" className="block text-white font-medium mb-2">
+              Resumo
+            </label>
+            <textarea
+              id="summary"
+              value={summary}
+              onChange={(e) => setSummary(e.target.value.slice(0, SUMMARY_MAX))}
+              placeholder="Escreva um breve resumo do artigo..."
+              required
+              rows={3}
+              className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors resize-none"
+            />
+            <div className="mt-1 text-right text-sm text-slate-400">
+              {summary.length}/{SUMMARY_MAX}
+            </div>
+          </div>
+
+          {/* Categoria */}
+          <div>
+            <label htmlFor="category" className="block text-white font-medium mb-2">
+              Categoria
+            </label>
+            <select
+              id="category"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              required
+              className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-cyan-500 transition-colors"
+            >
+              <option value="Dev">Desenvolvimento</option>
+              <option value="DevOps">DevOps</option>
+              <option value="IA">Inteligência Artificial</option>
+            </select>
+          </div>
+
+          {/* Upload de Imagem */}
+          <div>
+            <label htmlFor="image" className="block text-white font-medium mb-2">
+              Imagem de Capa
+            </label>
+            <div className="relative">
+              <input
+                id="image"
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="hidden"
+              />
+              <label
+                htmlFor="
+                    ? image.name 
+                    : existingImageUrl 
+                      ? existingImageUrl 
+                      : 'Clique para fazer upload da imagem'
+                  }
+                </span>
+              </label>
+            </div>
+            {existingImageUrl && !image && (
+              <p className="mt-1 text-xs text-slate-500">
+                Imagem atual: {existingImageUrl}
+              </p>
+            )}pload className="w-5 h-5" />
+                <span>
+                  {image ? image.name : 'Clique para fazer upload da imagem'}
+                </span>
+              </label>
+            </div>
+          </div>
+
+          {/* Tags */}
+          <div>
+            <label htmlFor="tagInput" className="block text-white font-medium mb-2">
+              Tags
+            </label>
+            <div className="flex gap-2 mb-3">
+              <input
+                id="tagInput"
+                type="text"
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyDown={handleTagKeyDown}
+                placeholder="Digite uma tag e pressione Enter..."
+                className="flex-1 px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
+              />
+              <button
+                type="button"
+                onClick={handleAddTag}
+                className="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white hover:bg-slate-700 transition-colors flex items-center gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                Adicionar
+              </button>
+            </div>
+            {/* Lista de Tags */}
+            {tags.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="inline-flex items-center gap-2 px-3 py-1 bg-slate-800 border border-slate-700 rounded-full text-sm text-slate-300"
+                  >
+                    {tag}
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveTag(tag)}
+                      className="hover:text-red-400 transition-colors"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>.slice(0, CONTENT_MAX))}
+              placeholder="Escreva o conteúdo completo do seu artigo... Você pode usar Markdown."
+              required
+              rows={16}
+              className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors resize-none font-mono text-sm"
+            />
+            <div className="mt-2 flex justify-between text-sm text-slate-400">
+              <span>
+                {content.length}/{CONTENT_MAX} caracteres • {wordCount} palavras • {readingTime} {readingTime === 1 ? 'minuto' : 'minutos'} de leitura
+              
+            <label htmlFor="content" className="block text-white font-medium mb-2">
+              Conteúdo do Artigo
+            </label>
+            <textarea
+              id="content"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="Escreva o conteúdo completo do seu artigo... Você pode usar Markdown."
+              required
+              rows={16}
+              className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors resize-none font-mono text-sm"
+            />
+            <div className="mt-2 flex justify-between text-sm text-slate-400">
+              <span>{content.length} caracteres</span>
+              <span>~{readin
+                ? (isEditMode ? 'Salvando...' : 'Publicando...') 
+                : (isEditMode ? 'Salvar Alterações' : 'Publicar Artigo')
+              
+            </div>
+          </div>
+
+          {/* Botões de Ação */}
+          <div className="flex gap-4 pt-4">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="flex-1 px-6 py-3 bg-cyan-500 hover:bg-cyan-600 disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors"
+            >
+              {isSubmitting ? 'Publicando...' : 'Publicar Artigo'}
+            </button>
+            <Link
+              to="/dashboard"
+              className="px-6 py-3 bg-transparent border border-slate-700 hover:border-slate-500 text-white rounded-lg transition-colors text-center"
+            >
+              Cancelar
+            </Link>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}

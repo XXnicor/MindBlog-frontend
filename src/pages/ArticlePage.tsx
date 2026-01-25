@@ -298,6 +298,19 @@ export default function ArticlePage() {
   const ARTICLE_DATA = MOCK_ARTICLES_DATA[id || '1'] || MOCK_ARTICLES_DATA['1'];
   const [likesCount, setLikesCount] = useState(ARTICLE_DATA.likes);
 
+  // Estados para comentários
+  const [comments, setComments] = useState(MOCK_COMMENTS);
+  const [newComment, setNewComment] = useState('');
+  
+  // Simula usuário logado (substitua por useAuth() quando disponível)
+  const user = {
+    nome: 'João Silva',
+    avatar: 'https://i.pravatar.cc/150?img=33',
+    email: 'joao@example.com'
+  };
+  // Para testar sem login, comente o objeto user acima e descomente abaixo:
+  // const user = null;
+
   const handleLike = () => {
     if (isLiked) {
       setLikesCount(likesCount - 1);
@@ -305,6 +318,25 @@ export default function ArticlePage() {
       setLikesCount(likesCount + 1);
     }
     setIsLiked(!isLiked);
+  };
+
+  // Adiciona novo comentário
+  const handleAddComment = () => {
+    if (!newComment.trim()) return;
+    
+    const newCommentObj = {
+      id: String(comments.length + 1),
+      author: {
+        name: user?.nome || 'Usuário',
+        avatar: user?.avatar || 'https://i.pravatar.cc/150?img=1'
+      },
+      date: 'Agora',
+      text: newComment,
+      likes: 0
+    };
+    
+    setComments([newCommentObj, ...comments]);
+    setNewComment('');
   };
 
   return (
@@ -454,20 +486,65 @@ export default function ArticlePage() {
         {/* Seção de Comentários */}
         <section className="mt-16 border-t border-slate-800 pt-8">
           <h2 className="text-2xl font-bold text-white mb-6">
-            Comentários ({MOCK_COMMENTS.length})
+            Comentários ({comments.length})
           </h2>
 
-          {/* Caixa de Login para Comentar */}
-          <div className="mb-8 bg-slate-900 border border-slate-800 rounded-lg p-6 text-center">
-            <p className="text-slate-400 mb-4">Faça login para participar da discussão</p>
-            <button className="bg-cyan-500 hover:bg-cyan-600 text-slate-900 font-semibold px-6 py-2 rounded-lg transition-colors">
-              Fazer Login
-            </button>
-          </div>
+          {/* Formulário de Comentário (apenas se logado) */}
+          {user ? (
+            <div className="mb-8 bg-slate-900 border border-slate-800 rounded-lg p-6">
+              <div className="flex items-start gap-4">
+                {/* Avatar do usuário */}
+                <div className="flex-shrink-0">
+                  {user.avatar ? (
+                    <img
+                      src={user.avatar}
+                      alt={user.nome}
+                      className="w-10 h-10 rounded-full border-2 border-slate-700"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-cyan-500 flex items-center justify-center text-slate-900 font-bold">
+                      {user.nome.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                </div>
+
+                {/* Campo de texto */}
+                <div className="flex-1">
+                  <textarea
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    placeholder="Escreva seu comentário..."
+                    rows={4}
+                    className="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors resize-none"
+                  />
+                  <div className="mt-3 flex justify-end">
+                    <button
+                      onClick={handleAddComment}
+                      disabled={!newComment.trim()}
+                      className="bg-cyan-500 hover:bg-cyan-600 disabled:bg-slate-700 disabled:cursor-not-allowed text-slate-900 font-semibold px-6 py-2 rounded-lg transition-colors"
+                    >
+                      Publicar Comentário
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* Caixa de Login para Comentar */
+            <div className="mb-8 bg-slate-900 border border-slate-800 rounded-lg p-6 text-center">
+              <p className="text-slate-400 mb-4">Faça login para participar da discussão</p>
+              <Link
+                to="/login"
+                className="inline-block bg-cyan-500 hover:bg-cyan-600 text-slate-900 font-semibold px-6 py-2 rounded-lg transition-colors"
+              >
+                Fazer Login
+              </Link>
+            </div>
+          )}
 
           {/* Lista de Comentários */}
           <div className="space-y-6">
-            {MOCK_COMMENTS.map((comment) => (
+            {comments.map((comment) => (
               <div
                 key={comment.id}
                 className="bg-slate-900 border border-slate-800 rounded-lg p-6 hover:border-slate-700 transition-colors"
