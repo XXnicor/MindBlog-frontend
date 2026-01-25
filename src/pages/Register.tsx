@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { UserPlus, Loader2 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import { authService } from '../lib/api';
 
 export default function Register() {
   const navigate = useNavigate();
@@ -24,6 +25,11 @@ export default function Register() {
         throw new Error('Preencha todos os campos');
       }
 
+      // Validação de nome
+      if (nome.length < 3 || nome.length > 100) {
+        throw new Error('O nome deve ter entre 3 e 100 caracteres');
+      }
+
       // Validação de senha
       if (senha.length < 6) {
         throw new Error('A senha deve ter pelo menos 6 caracteres');
@@ -40,32 +46,15 @@ export default function Register() {
         throw new Error('Email inválido');
       }
 
-      // Simulação de cadastro (substituir com chamada real à API)
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      // Simulando erro de email duplicado (remover quando integrar API real)
-      // if (email === 'teste@email.com') {
-      //   throw new Error('Este email já está cadastrado');
-      // }
+      // Chamar API de registro
+      await authService.register({ nome, email, senha });
 
       // Sucesso
       alert('Conta criada com sucesso! 🎉');
       navigate('/login');
 
-      // TODO: Quando integrar com API real, usar:
-      // const response = await api.post('/users', { nome, email, senha });
-      // if (response.status === 201) {
-      //   alert('Conta criada com sucesso! 🎉');
-      //   navigate('/login');
-      // }
-
     } catch (err: any) {
-      // Tratamento de erros específicos da API
-      if (err.response?.status === 400) {
-        setError('Este email já está cadastrado');
-      } else {
-        setError(err.message || 'Erro ao criar conta. Tente novamente.');
-      }
+      setError(err.message || 'Erro ao criar conta. Tente novamente.');
     } finally {
       setLoading(false);
     }
