@@ -43,7 +43,7 @@ export default function ArticleForm() {
       setCategory(article.categoria);
       setContent(article.conteudo);
       setTags(article.tags || []);
-      setExistingImageUrl(article.imagem || '');
+      setExistingImageUrl(article.imagem_banner_url || article.imagem || '');
     } catch (error) {
       console.error('Erro ao carregar artigo:', error);
       alert('Erro ao carregar artigo para edição.');

@@ -60,6 +60,7 @@ const mapArticle = (article: any) => ({
   readTime: article.tempoLeitura || article.readTime || '5min',
   views: article.visualizacoes || article.views || 0,
   image: article.imagem || article.image,
+  imagem_banner_url: article.imagem_banner_url,
   date: article.criadoEm || article.createdAt || article.date,
   highlight: article.destaque || article.highlight || false
 });

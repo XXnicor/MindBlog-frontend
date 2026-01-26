@@ -12,12 +12,13 @@ export type Article = {
   readTime: string
   views: number
   image?: string
+  imagem_banner_url?: string
   highlight?: boolean
   date?: string
 }
 
 export default function ArticleCard({ article }: { article: Article }){
-  const imageUrl = getImageUrl(article.image);
+  const imageUrl = article.imagem_banner_url || getImageUrl(article.image);
   
   return (
     <Link to={`/artigo/${article.id}`}>

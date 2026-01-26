@@ -82,7 +82,7 @@ export default function ArticlePage() {
     );
   }
 
-  const imageUrl = getImageUrl(article.imagem || article.image);
+  const imageUrl = article.imagem_banner_url || getImageUrl(article.imagem || article.image);
 
   // Formatar data
   const formatDate = (dateString: string) => {

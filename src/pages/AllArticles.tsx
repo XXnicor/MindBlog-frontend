@@ -202,9 +202,9 @@ export default function AllArticles() {
                     >
                     {/* Imagem no Topo */}
                     <div className="h-48 bg-gradient-to-br from-pink-300 to-sky-200 flex items-center justify-center">
-                      {getImageUrl(article.image) ? (
+                      {(article.imagem_banner_url || getImageUrl(article.image)) ? (
                         <img
-                          src={getImageUrl(article.image)!}
+                          src={article.imagem_banner_url || getImageUrl(article.image)!}
                           alt={article.title}
                           className="w-full h-full object-cover"
                           onError={(e) => {
@@ -263,9 +263,9 @@ export default function AllArticles() {
                     >
                     {/* Imagem à Esquerda (Desktop) / Topo (Mobile) */}
                     <div className="md:w-48 h-48 md:h-auto bg-gradient-to-br from-pink-300 to-sky-200 flex items-center justify-center flex-shrink-0">
-                      {getImageUrl(article.image) ? (
+                      {(article.imagem_banner_url || getImageUrl(article.image)) ? (
                         <img
-                          src={getImageUrl(article.image)!}
+                          src={article.imagem_banner_url || getImageUrl(article.image)!}
                           alt={article.title}
                           className="w-full h-full object-cover"
                           onError={(e) => {
