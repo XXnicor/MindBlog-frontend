@@ -11,8 +11,8 @@ export default function ProfileSettings() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [bio, setBio] = useState('');
-  const [avatar, setAvatar] = useState<File | null>(null);
-  const [avatarUrl, setAvatarUrl] = useState('');
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState('');
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
   const [stats, setStats] = useState<any>(null);
@@ -26,6 +26,15 @@ export default function ProfileSettings() {
     loadUserStats();
   }, []);
 
+  // Cleanup da URL do preview para evitar memory leak
+  useEffect(() => {
+    return () => {
+      if (avatarPreview && avatarPreview.startsWith('blob:')) {
+        URL.revokeObjectURL(avatarPreview);
+      }
+    };
+  }, [avatarPreview]);
+
   const loadUserData = async () => {
     setLoadingData(true);
     try {
@@ -33,7 +42,7 @@ export default function ProfileSettings() {
       setNome(user.nome);
       setEmail(user.email);
       setBio(user.bio || '');
-      setAvatarUrl(user.avatar || '');
+      setAvatarPreview(user.avatar || '');
       setCreatedAt(user.createdAt);
     } catch (error: any) {
       console.error('Erro ao carregar dados do usuário:', error);
@@ -57,13 +66,19 @@ export default function ProfileSettings() {
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setAvatar(e.target.files[0]);
-      // Criar preview
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setAvatarUrl(reader.result as string);
-      };
-      reader.readAsDataURL(e.target.files[0]);
+      const file = e.target.files[0];
+      
+      // Validar tamanho do arquivo (máx 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('A imagem deve ter no máximo 5MB');
+        return;
+      }
+      
+      setAvatarFile(file);
+      
+      // Gerar preview imediato usando URL.createObjectURL
+      const previewUrl = URL.createObjectURL(file);
+      setAvatarPreview(previewUrl);
     }
   };
 
@@ -97,15 +112,15 @@ export default function ProfileSettings() {
         formData.append('bio', bio);
       }
       
-      if (avatar) {
-        formData.append('avatar', avatar);
+      if (avatarFile) {
+        formData.append('avatar', avatarFile);
       }
 
       await userService.updateProfile(formData);
       
       alert('Dados atualizados! ✅');
       setSenha(''); // Limpar campo de senha
-      setAvatar(null); // Limpar arquivo de avatar
+      setAvatarFile(null); // Limpar arquivo de avatar
       
       // Recarregar dados
       await loadUserData();
@@ -120,17 +135,25 @@ export default function ProfileSettings() {
 
   // Preview do avatar com fallback
   const getAvatarPreview = () => {
-    if (avatarUrl) {
-      // Se é uma URL local (File), mostrar direto
-      if (avatarUrl.startsWith('data:')) {
-        return avatarUrl;
+    if (avatarPreview) {
+      // Se é uma URL local (blob: ou data:)
+      if (avatarPreview.startsWith('blob:') || avatarPreview.startsWith('data:')) {
+        return avatarPreview;
       }
-      // Se é uma URL do servidor
-      if (avatarUrl.startsWith('http')) {
-        return avatarUrl;
+      // Se é uma URL completa do servidor
+      if (avatarPreview.startsWith('http://') || avatarPreview.startsWith('https://')) {
+        return avatarPreview;
       }
-      // Se é apenas o nome do arquivo
-      return `http://localhost:3001/uploads/${avatarUrl}`;
+      // Se começa com /uploads/, construir URL completa
+      if (avatarPreview.startsWith('/uploads/')) {
+        return `http://localhost:3001${avatarPreview}`;
+      }
+      // Se é apenas o nome do arquivo, adicionar /uploads/
+      if (!avatarPreview.includes('/')) {
+        return `http://localhost:3001/uploads/${avatarPreview}`;
+      }
+      // Fallback: tentar construir URL
+      return `http://localhost:3001/${avatarPreview.replace(/^\//, '')}`;
     }
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(nome)}&size=200&background=06b6d4&color=fff`;
   };
@@ -187,6 +210,7 @@ export default function ProfileSettings() {
                   alt="Avatar"
                   className="w-24 h-24 rounded-full object-cover border-4 border-slate-700"
                   onError={(e) => {
+                    console.error('Erro ao carregar avatar:', getAvatarPreview());
                     e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(nome)}&size=200&background=06b6d4&color=fff`;
                   }}
                 />
