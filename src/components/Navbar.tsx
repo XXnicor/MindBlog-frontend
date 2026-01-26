@@ -1,17 +1,16 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import React from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { Moon } from 'lucide-react'
 import UserMenu from './UserMenu'
+import { useAuth } from '../contexts/AuthContext'
 
 export default function Navbar(){
-  // Simula usuário logado (substituir com contexto de autenticação real)
-  const [user] = useState<{name: string; email: string; avatar?: string} | null>(null);
-  //Para testar o menu, descomente a linha abaixo:
-   //const [user] = useState({ name: 'João Silva', email: 'joao@email.com' });
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const handleSignOut = () => {
-    console.log('Logout realizado');
-    // TODO: Implementar lógica de logout com contexto de autenticação
+    logout();
+    navigate('/login');
   };
 
   return (

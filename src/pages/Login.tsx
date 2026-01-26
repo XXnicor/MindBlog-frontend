@@ -3,10 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Loader2 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { authService, auth } from '../lib/api';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -27,13 +28,8 @@ export default function Login() {
         throw new Error('Senha deve ter pelo menos 6 caracteres');
       }
 
-      // Fazer login com o backend
-      const response = await authService.login({ email, senha: password });
-      
-      // Salvar token no localStorage
-      if (response.token) {
-        auth.setToken(response.token);
-      }
+      // Fazer login através do contexto
+      await login(email, password);
 
       // Sucesso - redireciona para dashboard
       navigate('/dashboard');
