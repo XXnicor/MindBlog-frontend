@@ -1,270 +1,43 @@
-import { useState } from 'react';
-import { ArrowLeft, Heart, Bookmark, Share2, Eye, MessageCircle } from 'lucide-react';
-import { Link, useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { ArrowLeft, Heart, Bookmark, Share2, Eye, MessageCircle, Loader2 } from 'lucide-react';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import CommentSection from '../components/CommentSection';
-
-// Mock Data - Múltiplos artigos
-const MOCK_ARTICLES_DATA: Record<string, any> = {
-  '1': {
-    id: '1',
-    category: 'Desenvolvimento web',
-    title: 'Introdução ao React 19: Novidades e Recursos',
-    subtitle: 'Explore as novidades do React 19, incluindo Server Components, Actions e melhorias de performance',
-    author: {
-      name: 'Ana Silva',
-      avatar: 'https://i.pravatar.cc/150?img=5',
-      bio: 'Desenvolvedora Frontend'
-    },
-    date: '20 jan 2025',
-    readTime: '8 min',
-    views: 1250,
-    likes: 89,
-    commentsCount: 12,
-    image: 'https://placehold.co/1200x600/1e293b/cyan?text=React+19',
-    tags: ['React', 'JavaScript', 'Frontend', 'Web Development'],
-    content: [
-      {
-        type: 'paragraph',
-        text: 'O React 19 chegou com mudanças significativas que prometem revolucionar a forma como desenvolvemos aplicações web. Neste artigo, vamos explorar as principais novidades e como elas podem melhorar seus projetos.'
-      },
-      {
-        type: 'heading',
-        text: 'Server Components'
-      },
-      {
-        type: 'paragraph',
-        text: 'Uma das maiores adições ao React 19 são os Server Components, que permitem renderizar componentes no servidor, reduzindo o tamanho do bundle JavaScript enviado ao cliente e melhorando significativamente a performance inicial da aplicação.'
-      },
-      {
-        type: 'paragraph',
-        text: 'Com Server Components, você pode buscar dados diretamente no servidor, sem a necessidade de fazer requisições adicionais no cliente. Isso resulta em uma experiência mais rápida para o usuário final.'
-      },
-      {
-        type: 'heading',
-        text: 'Actions e Melhorias de Performance'
-      },
-      {
-        type: 'paragraph',
-        text: 'As Actions no React 19 simplificam o gerenciamento de estado de formulários e operações assíncronas. Você pode agora manipular submissões de formulários de forma mais declarativa e com melhor feedback de loading.'
-      },
-      {
-        type: 'paragraph',
-        text: 'Além disso, melhorias no compilador do React resultam em código mais otimizado e menor uso de memória, tornando suas aplicações mais eficientes.'
-      }
-    ]
-  },
-  '2': {
-    id: '2',
-    category: 'DevOps',
-    title: 'DevOps: Do Zero ao Deploy Automatizado',
-    subtitle: 'Aprenda a configurar pipelines de CI/CD com GitHub Actions, Docker e Kubernetes',
-    author: {
-      name: 'Carlos Santos',
-      avatar: 'https://i.pravatar.cc/150?img=12',
-      bio: 'DevOps Engineer'
-    },
-    date: '18 jan 2025',
-    readTime: '12 min',
-    views: 890,
-    likes: 67,
-    commentsCount: 8,
-    image: 'https://placehold.co/1200x600/1e293b/pink?text=DevOps',
-    tags: ['DevOps', 'CI/CD', 'Docker', 'Kubernetes', 'Automation'],
-    content: [
-      {
-        type: 'paragraph',
-        text: 'DevOps não é apenas uma metodologia, é uma cultura que une desenvolvimento e operações para entregar software de qualidade de forma contínua e eficiente.'
-      },
-      {
-        type: 'heading',
-        text: 'O Que é CI/CD?'
-      },
-      {
-        type: 'paragraph',
-        text: 'CI/CD (Continuous Integration/Continuous Deployment) é a prática de automatizar a integração de código e o deploy de aplicações. Com pipelines bem configurados, cada commit pode ser automaticamente testado, validado e deployado em produção.'
-      },
-      {
-        type: 'heading',
-        text: 'Containerização com Docker'
-      },
-      {
-        type: 'paragraph',
-        text: 'Docker revolucionou a forma como empacotamos e distribuímos aplicações. Com containers, você garante que sua aplicação roda da mesma forma em desenvolvimento, teste e produção.'
-      }
-    ]
-  },
-  '3': {
-    id: '3',
-    category: 'AI',
-    title: 'Machine Learning com Python: Primeiros Passos',
-    subtitle: 'Descubra como começar sua jornada em ML utilizando Python e bibliotecas essenciais',
-    author: {
-      name: 'Maria Oliveira',
-      avatar: 'https://i.pravatar.cc/150?img=9',
-      bio: 'Data Scientist'
-    },
-    date: '15 jan 2025',
-    readTime: '15 min',
-    views: 2100,
-    likes: 145,
-    commentsCount: 23,
-    image: 'https://placehold.co/1200x600/1e293b/orange?text=Machine+Learning',
-    tags: ['Machine Learning', 'Python', 'AI', 'Data Science'],
-    content: [
-      {
-        type: 'paragraph',
-        text: 'Machine Learning está transformando indústrias inteiras, desde saúde até finanças. Python, com seu ecossistema rico de bibliotecas, é a linguagem perfeita para começar.'
-      },
-      {
-        type: 'heading',
-        text: 'Bibliotecas Essenciais'
-      },
-      {
-        type: 'paragraph',
-        text: 'Pandas, NumPy e scikit-learn formam a base de qualquer projeto de ML em Python. Pandas para manipulação de dados, NumPy para computação numérica e scikit-learn para algoritmos de ML.'
-      }
-    ]
-  },
-  '4': {
-    id: '4',
-    category: 'Desenvolvimento web',
-    title: 'TypeScript Avançado: Generics e Utility Types',
-    subtitle: 'Domine recursos avançados do TypeScript para criar código mais seguro e reutilizável',
-    author: {
-      name: 'Pedro Ferreira',
-      avatar: 'https://i.pravatar.cc/150?img=33',
-      bio: 'TypeScript Expert'
-    },
-    date: '12 jan 2025',
-    readTime: '10 min',
-    views: 1580,
-    likes: 92,
-    commentsCount: 15,
-    image: 'https://placehold.co/1200x600/1e293b/blue?text=TypeScript',
-    tags: ['TypeScript', 'JavaScript', 'Programming', 'Web Dev'],
-    content: [
-      {
-        type: 'paragraph',
-        text: 'TypeScript eleva o JavaScript a outro nível com seu sistema de tipos robusto. Neste artigo, exploramos Generics e Utility Types.'
-      },
-      {
-        type: 'heading',
-        text: 'Entendendo Generics'
-      },
-      {
-        type: 'paragraph',
-        text: 'Generics permitem criar componentes reutilizáveis que funcionam com múltiplos tipos, mantendo a segurança de tipos.'
-      }
-    ]
-  },
-  '5': {
-    id: '5',
-    category: 'DevOps',
-    title: 'Kubernetes na Prática: Escalando Aplicações',
-    subtitle: 'Aprenda a orquestrar containers com Kubernetes de forma profissional',
-    author: {
-      name: 'João Costa',
-      avatar: 'https://i.pravatar.cc/150?img=15',
-      bio: 'Cloud Architect'
-    },
-    date: '10 jan 2025',
-    readTime: '18 min',
-    views: 1720,
-    likes: 110,
-    commentsCount: 19,
-    image: 'https://placehold.co/1200x600/1e293b/purple?text=Kubernetes',
-    tags: ['Kubernetes', 'DevOps', 'Containers', 'Cloud'],
-    content: [
-      {
-        type: 'paragraph',
-        text: 'Kubernetes se tornou o padrão para orquestração de containers. Aprenda a escalar suas aplicações de forma eficiente.'
-      }
-    ]
-  },
-  '6': {
-    id: '6',
-    category: 'AI',
-    title: 'ChatGPT e APIs: Integrando IA nos Seus Projetos',
-    subtitle: 'Veja como integrar a API do OpenAI em suas aplicações',
-    author: {
-      name: 'Beatriz Lima',
-      avatar: 'https://i.pravatar.cc/150?img=20',
-      bio: 'AI Developer'
-    },
-    date: '8 jan 2025',
-    readTime: '14 min',
-    views: 3200,
-    likes: 200,
-    commentsCount: 31,
-    image: 'https://placehold.co/1200x600/1e293b/green?text=ChatGPT+API',
-    tags: ['ChatGPT', 'OpenAI', 'AI', 'APIs'],
-    content: [
-      {
-        type: 'paragraph',
-        text: 'A API do ChatGPT abre possibilidades infinitas para criar aplicações inteligentes. Veja como começar.'
-      }
-    ]
-  },
-  '7': {
-    id: '7',
-    category: 'Desenvolvimento web',
-    title: 'Clean Code: Princípios para Código Sustentável',
-    subtitle: 'Descubra os princípios fundamentais do Clean Code',
-    author: {
-      name: 'Rafael Souza',
-      avatar: 'https://i.pravatar.cc/150?img=8',
-      bio: 'Software Engineer'
-    },
-    date: '5 jan 2025',
-    readTime: '9 min',
-    views: 1950,
-    likes: 88,
-    commentsCount: 14,
-    image: 'https://placehold.co/1200x600/1e293b/yellow?text=Clean+Code',
-    tags: ['Clean Code', 'Best Practices', 'Programming'],
-    content: [
-      {
-        type: 'paragraph',
-        text: 'Código limpo não é um luxo, é uma necessidade. Aprenda os princípios que tornam código legível e manutenível.'
-      }
-    ]
-  },
-  '8': {
-    id: '8',
-    category: 'DevOps',
-    title: 'Docker Compose: Orquestrando Múltiplos Containers',
-    subtitle: 'Aprenda a usar Docker Compose para gerenciar aplicações multi-container',
-    author: {
-      name: 'Luciana Mendes',
-      avatar: 'https://i.pravatar.cc/150?img=25',
-      bio: 'DevOps Specialist'
-    },
-    date: '3 jan 2025',
-    readTime: '11 min',
-    views: 1340,
-    likes: 75,
-    commentsCount: 10,
-    image: 'https://placehold.co/1200x600/1e293b/red?text=Docker+Compose',
-    tags: ['Docker', 'Docker Compose', 'Containers', 'DevOps'],
-    content: [
-      {
-        type: 'paragraph',
-        text: 'Docker Compose simplifica o gerenciamento de aplicações com múltiplos containers. Veja como usar.'
-      }
-    ]
-  }
-};
+import { articleService } from '../lib/api';
+import { getImageUrl } from '../lib/imageUtils';
 
 export default function ArticlePage() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const [article, setArticle] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [isLiked, setIsLiked] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
-  
-  // Busca o artigo pelo ID ou usa o primeiro como fallback
-  const ARTICLE_DATA = MOCK_ARTICLES_DATA[id || '1'] || MOCK_ARTICLES_DATA['1'];
-  const [likesCount, setLikesCount] = useState(ARTICLE_DATA.likes);
+  const [likesCount, setLikesCount] = useState(0);
+
+  useEffect(() => {
+    if (id) {
+      loadArticle(id);
+    }
+  }, [id]);
+
+  const loadArticle = async (articleId: string) => {
+    try {
+      setLoading(true);
+      setError('');
+      const data = await articleService.getById(articleId);
+      console.log('[ArticlePage] Artigo carregado:', data);
+      setArticle(data);
+      setLikesCount(data.curtidas || data.likes || 0);
+    } catch (err: any) {
+      console.error('[ArticlePage] Erro ao carregar artigo:', err);
+      setError(err.message || 'Erro ao carregar artigo');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLike = () => {
     if (isLiked) {
@@ -274,6 +47,52 @@ export default function ArticlePage() {
     }
     setIsLiked(!isLiked);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-white">
+        <Navbar />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <Loader2 className="w-12 h-12 text-cyan-500 animate-spin mx-auto mb-4" />
+            <p className="text-slate-400">Carregando artigo...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !article) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-white">
+        <Navbar />
+        <div className="max-w-4xl mx-auto px-4 py-8">
+          <div className="text-center py-12">
+            <p className="text-red-400 mb-4">{error || 'Artigo não encontrado'}</p>
+            <Link
+              to="/artigos"
+              className="inline-flex items-center gap-2 text-cyan-500 hover:text-cyan-400"
+            >
+              <ArrowLeft size={20} />
+              Voltar aos artigos
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const imageUrl = getImageUrl(article.imagem || article.image);
+
+  // Formatar data
+  const formatDate = (dateString: string) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
+  };
+
+  // Extrair conteúdo em parágrafos
+  const contentParagraphs = article.conteudo?.split('\n\n').filter((p: string) => p.trim()) || [];
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
@@ -294,33 +113,35 @@ export default function ArticlePage() {
           {/* Badge de Categoria */}
           <div className="mb-4">
             <span className="inline-block bg-orange-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
-              {ARTICLE_DATA.category}
+              {article.categoria || article.category}
             </span>
           </div>
 
           {/* Título */}
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 leading-tight">
-            {ARTICLE_DATA.title}
+            {article.titulo || article.title}
           </h1>
 
-          {/* Subtítulo */}
-          <p className="text-lg text-slate-400 mb-6">
-            {ARTICLE_DATA.subtitle}
-          </p>
+          {/* Resumo */}
+          {(article.resumo || article.summary) && (
+            <p className="text-lg text-slate-400 mb-6">
+              {article.resumo || article.summary}
+            </p>
+          )}
 
           {/* Metadados */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
             {/* Autor */}
             <div className="flex items-center gap-3">
-              <img
-                src={ARTICLE_DATA.author.avatar}
-                alt={ARTICLE_DATA.author.name}
-                className="w-12 h-12 rounded-full border-2 border-slate-700"
-              />
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-purple-600 flex items-center justify-center text-white font-bold">
+                {(article.autor?.nome || article.author?.nome || article.author || 'A')[0].toUpperCase()}
+              </div>
               <div>
-                <div className="text-white font-medium">{ARTICLE_DATA.author.name}</div>
+                <div className="text-white font-medium">
+                  {article.autor?.nome || article.author?.nome || article.author || 'Autor'}
+                </div>
                 <div className="text-sm text-slate-400">
-                  {ARTICLE_DATA.date} • {ARTICLE_DATA.readTime} de leitura
+                  {formatDate(article.criadoEm || article.createdAt || article.date)} • {article.tempoLeitura || article.readTime || '5min'} de leitura
                 </div>
               </div>
             </div>
@@ -366,62 +187,70 @@ export default function ArticlePage() {
             </div>
             <div className="flex items-center gap-2">
               <Eye size={16} />
-              <span>{ARTICLE_DATA.views} visualizações</span>
+              <span>{article.visualizacoes || article.views || 0} visualizações</span>
             </div>
             <div className="flex items-center gap-2">
               <MessageCircle size={16} />
-              <span>{ARTICLE_DATA.commentsCount} comentários</span>
+              <span>{article.comentarios?.length || 0} comentários</span>
             </div>
           </div>
         </header>
 
         {/* Banner Principal */}
-        <div className="mb-8 rounded-xl overflow-hidden">
-          <img
-            src={ARTICLE_DATA.image}
-            alt={ARTICLE_DATA.title}
-            className="w-full aspect-video object-cover"
-          />
-        </div>
+        {imageUrl && (
+          <div className="mb-8 rounded-xl overflow-hidden">
+            <img
+              src={imageUrl}
+              alt={article.titulo || article.title}
+              className="w-full aspect-video object-cover"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+          </div>
+        )}
 
         {/* Corpo do Texto */}
         <article className="prose prose-invert prose-slate max-w-none mb-12">
           <div className="space-y-6">
-            {ARTICLE_DATA.content.map((block: any, index: number) => {
-              if (block.type === 'heading') {
+            {contentParagraphs.map((paragraph: string, index: number) => {
+              // Detectar se é um título (começa com # ou é curto e em maiúsculas)
+              if (paragraph.startsWith('#')) {
                 return (
                   <h2 key={index} className="text-2xl font-bold text-white mt-8 mb-4">
-                    {block.text}
+                    {paragraph.replace(/^#+\s*/, '')}
                   </h2>
                 );
               }
               return (
-                <p key={index} className="text-slate-300 leading-relaxed text-lg">
-                  {block.text}
+                <p key={index} className="text-slate-300 leading-relaxed text-lg whitespace-pre-wrap">
+                  {paragraph}
                 </p>
               );
             })}
           </div>
 
           {/* Tags */}
-          <div className="mt-12 pt-8 border-t border-slate-800">
-            <h3 className="text-sm font-semibold text-slate-400 mb-3">Tags:</h3>
-            <div className="flex flex-wrap gap-2">
-              {ARTICLE_DATA.tags.map((tag: string) => (
-                <span
-                  key={tag}
-                  className="px-3 py-1 bg-slate-800 text-slate-300 text-sm rounded-full hover:bg-slate-700 transition-colors cursor-pointer"
-                >
-                  {tag}
-                </span>
-              ))}
+          {article.tags && article.tags.length > 0 && (
+            <div className="mt-12 pt-8 border-t border-slate-800">
+              <h3 className="text-sm font-semibold text-slate-400 mb-3">Tags:</h3>
+              <div className="flex flex-wrap gap-2">
+                {article.tags.map((tag: string) => (
+                  <span
+                    key={tag}
+                    className="px-3 py-1 bg-slate-800 text-slate-300 text-sm rounded-full hover:bg-slate-700 transition-colors cursor-pointer"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </article>
 
         {/* Seção de Comentários */}
         <section className="mt-16">
-          <CommentSection articleId={id || '1'} />
+          <CommentSection articleId={id || ''} />
         </section>
       </main>
 

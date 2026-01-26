@@ -2,7 +2,9 @@
  * Utilitários para trabalhar com imagens do backend
  */
 
-const UPLOADS_BASE_URL = 'http://localhost:3001/uploads';
+// Usar a mesma base URL da API, mas sem o /api
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const UPLOADS_BASE_URL = API_BASE.replace('/api', '/uploads');
 
 /**
  * Converte o nome/caminho do arquivo para URL completa
@@ -20,7 +22,9 @@ export const getImageUrl = (imagePath: string | null | undefined): string | null
     ? imagePath.substring(8) 
     : imagePath;
   
-  return `${UPLOADS_BASE_URL}/${cleanPath}`;
+  const fullUrl = `${UPLOADS_BASE_URL}/${cleanPath}`;
+  console.log('[ImageUtils] Imagem URL:', { original: imagePath, clean: cleanPath, full: fullUrl });
+  return fullUrl;
 };
 
 /**

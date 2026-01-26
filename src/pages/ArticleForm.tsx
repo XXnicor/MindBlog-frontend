@@ -128,8 +128,9 @@ export default function ArticleForm() {
         formData.append('imagem', image);
       }
 
+      let result;
       if (isEditMode && id) {
-        await articleService.update(id, formData);
+        result = await articleService.update(id, formData);
       } else {
         console.log('[ArticleForm] Criando artigo com dados:', {
           titulo: title,
@@ -137,13 +138,23 @@ export default function ArticleForm() {
           resumo: summary,
           tags: tags,
           temImagem: !!image,
+          nomeImagem: image?.name,
           tamanhoConteudo: content.length
         });
-        await articleService.create(formData);
+        result = await articleService.create(formData);
+        console.log('[ArticleForm] Resposta da criação:', result);
       }
       
       alert(`Artigo ${isEditMode ? 'editado' : 'criado'} com sucesso!`);
-      navigate('/dashboard');
+      
+      // Se criou um artigo novo e retornou o ID, redirecionar para o artigo
+      if (!isEditMode && result && (result._id || result.id)) {
+        const articleId = result._id || result.id;
+        console.log('[ArticleForm] Redirecionando para artigo:', articleId);
+        navigate(`/artigo/${articleId}`);
+      } else {
+        navigate('/dashboard');
+      }
       
     } catch (error: any) {
       console.error(`[ArticleForm] Erro completo:`, {
@@ -276,16 +287,34 @@ export default function ArticleForm() {
                   {image 
                     ? image.name 
                     : existingImageUrl 
-                      ? existingImageUrl 
+                      ? 'Imagem existente (clique para alterar)' 
                       : 'Clique para fazer upload da imagem'
                   }
                 </span>
               </label>
             </div>
+            
+            {/* Preview da imagem */}
+            {image && (
+              <div className="mt-3">
+                <img 
+                  src={URL.createObjectURL(image)} 
+                  alt="Preview" 
+                  className="w-full h-48 object-cover rounded-lg border border-slate-700"
+                />
+                <p className="mt-1 text-xs text-slate-400">Preview: {image.name}</p>
+              </div>
+            )}
+            
             {existingImageUrl && !image && (
-              <p className="mt-1 text-xs text-slate-500">
-                Imagem atual: {existingImageUrl}
-              </p>
+              <div className="mt-3">
+                <img 
+                  src={existingImageUrl} 
+                  alt="Imagem atual" 
+                  className="w-full h-48 object-cover rounded-lg border border-slate-700"
+                />
+                <p className="mt-1 text-xs text-slate-400">Imagem atual</p>
+              </div>
             )}
           </div>
 

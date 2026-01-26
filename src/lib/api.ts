@@ -87,15 +87,18 @@ export const articleService = {
   // Buscar artigo por ID
   async getById(id: string) {
     const article = await apiRequest(`/articles/${id}`);
-    return mapArticle(article);
+    // Retornar dados completos sem mapear (necessário para ArticlePage)
+    return article;
   },
 
   // Criar artigo
   async create(formData: FormData) {
-    return apiRequest('/articles', {
+    const response = await apiRequest('/articles', {
       method: 'POST',
       body: formData
     });
+    console.log('[API] Artigo criado:', response);
+    return response;
   },
 
   // Atualizar artigo
