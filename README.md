@@ -2,6 +2,30 @@
 
 Interface moderna e responsiva para plataforma de blog técnico, desenvolvida com React, Vite e Tailwind CSS. Oferece uma experiência de usuário fluida com autenticação completa, dashboard administrativo e editor de artigos com suporte a Markdown e upload de imagens.
 
+---
+
+## 🎬 Demonstração
+
+### 🚀 Tour pelo Blog
+https://github.com/user-attachments/assets/tour-pelo-blog.mp4
+
+### 📝 Criação e Salvamento de Imagem
+https://github.com/user-attachments/assets/criacao-salvamento-img.mp4
+
+### 📋 Cadastro
+https://github.com/user-attachments/assets/cadastro.mp4
+
+### 🔐 Login
+https://github.com/user-attachments/assets/login.mp4
+
+### ✏️ Atualizar Artigo
+https://github.com/user-attachments/assets/atualizar-artigo.mp4
+
+### 🗑️ Excluir Artigo
+https://github.com/user-attachments/assets/excluir-artigo.mp4
+
+---
+
 ## 🚀 Tecnologias
 
 Este projeto foi desenvolvido com as seguintes tecnologias:
