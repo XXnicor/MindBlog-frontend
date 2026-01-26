@@ -1,4 +1,3 @@
-import React from 'react'
 import { Link } from 'react-router-dom'
 import { Clock, Eye } from 'lucide-react'
 import { getImageUrl } from '../lib/imageUtils'

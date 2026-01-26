@@ -6,7 +6,6 @@ import Footer from '../components/Footer';
 import { articleService, userService } from '../lib/api';
 import { getImageUrl } from '../lib/imageUtils';
 
-// Mock Data - Atividades recentes
 const RECENT_ACTIVITY = [
   {
     id: 1,
@@ -50,7 +49,6 @@ export default function Dashboard() {
   const [articleToDelete, setArticleToDelete] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-  // Carregar artigos e estatísticas ao montar o componente
   useEffect(() => {
     loadDashboardData();
   }, []);
@@ -58,21 +56,10 @@ export default function Dashboard() {
   const loadDashboardData = async () => {
     setLoading(true);
     try {
-      // Carregar artigos e estatísticas em paralelo
       const [articlesData, statsData] = await Promise.all([
         articleService.getMyArticles(1, 50),
         userService.getStats()
       ]);
-      
-      console.log('[Dashboard] Artigos carregados:', articlesData.articles?.length || 0);
-      if (articlesData.articles && articlesData.articles.length > 0) {
-        console.log('[Dashboard] Primeiro artigo:', {
-          id: articlesData.articles[0].id,
-          title: articlesData.articles[0].title,
-          author: articlesData.articles[0].author,
-          authorId: articlesData.articles[0].authorId
-        });
-      }
       
       setArticles(articlesData.articles || []);
       setStats(statsData || null);
@@ -98,19 +85,15 @@ export default function Dashboard() {
     if (articleToDelete !== null) {
       setDeleting(true);
       try {
-        console.log('[Dashboard] Tentando deletar artigo:', articleToDelete);
         await articleService.delete(articleToDelete);
-        console.log(`[Dashboard] Artigo ${articleToDelete} deletado com sucesso`);
         setArticles(articles.filter(article => article.id !== articleToDelete));
         handleCloseDeleteModal();
-        // Recarregar estatísticas
         const statsData = await userService.getStats();
         setStats(statsData || null);
         alert('Artigo deletado com sucesso!');
       } catch (error: any) {
         console.error('[Dashboard] Erro ao deletar artigo:', error);
         
-        // Mensagem de erro específica para problema de permissão
         if (error.message.includes('permissão')) {
           alert(
             '❌ Erro de Permissão\n\n' +
@@ -135,7 +118,6 @@ export default function Dashboard() {
       <Navbar />
 
       <main className="flex-1 max-w-7xl mx-auto px-4 py-12 w-full">
-        {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
           <div>
             <h1 className="text-4xl font-bold text-white mb-2">
@@ -163,10 +145,8 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {loading ? (
-            // Loading skeleton
             Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="bg-slate-900 border border-slate-800 rounded-lg p-6 animate-pulse">
                 <div className="h-4 bg-slate-800 rounded w-1/2 mb-3"></div>
@@ -207,15 +187,12 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* Main Layout: 2 Columns */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column: My Articles (2/3) */}
           <div className="lg:col-span-2">
             <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
               <h2 className="text-2xl font-bold text-white mb-6">Meus Artigos</h2>
               
               {loading ? (
-                // Loading state
                 <div className="flex items-center justify-center py-12">
                   <Loader2 className="w-8 h-8 text-cyan-500 animate-spin" />
                 </div>
@@ -238,7 +215,6 @@ export default function Dashboard() {
                       key={article.id}
                       className="flex gap-4 p-4 bg-slate-950 border border-slate-800 rounded-lg hover:border-slate-700 transition-colors"
                     >
-                      {/* Image */}
                       <img
                         src={getImageUrl(article.image || article.imagem_banner_url) || 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=300&h=200&fit=crop'}
                         alt={article.title}
@@ -248,7 +224,6 @@ export default function Dashboard() {
                         }}
                       />
 
-                      {/* Content */}
                       <div className="flex-1 min-w-0">
                         <h3 className="text-lg font-semibold text-white mb-1 truncate">
                           {article.title}
@@ -268,7 +243,6 @@ export default function Dashboard() {
                         </div>
                       </div>
 
-                      {/* Actions */}
                       <div className="flex flex-col gap-2 flex-shrink-0">
                         <Link
                           to={`/artigos/editar/${article.id}`}
@@ -292,7 +266,6 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Right Column: Recent Activity (1/3) */}
           <div className="lg:col-span-1">
             <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
               <h2 className="text-xl font-bold text-white mb-6">Atividade Recente</h2>
@@ -300,14 +273,12 @@ export default function Dashboard() {
               <div className="space-y-4">
                 {RECENT_ACTIVITY.map((activity) => (
                   <div key={activity.id} className="flex gap-3">
-                    {/* Avatar */}
                     <img
                       src={activity.avatar}
                       alt={activity.user}
                       className="w-10 h-10 rounded-full flex-shrink-0"
                     />
 
-                    {/* Content */}
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-slate-300 mb-1">
                         <span className="font-semibold text-white">{activity.user}</span>
@@ -328,7 +299,6 @@ export default function Dashboard() {
 
       <Footer />
 
-      {/* Modal de Confirmação de Exclusão */}
       {deleteModalOpen && (
         <div
           className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 px-4"
@@ -338,7 +308,6 @@ export default function Dashboard() {
             className="bg-slate-900 border border-slate-800 rounded-lg p-6 max-w-md w-full"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header */}
             <h2 className="text-xl font-bold text-white mb-2">
               Excluir Artigo
             </h2>
@@ -346,7 +315,6 @@ export default function Dashboard() {
               Tem certeza que deseja excluir este artigo? Esta ação não pode ser desfeita.
             </p>
 
-            {/* Footer / Ações */}
             <div className="flex justify-end gap-3 mt-6">
               <button
                 onClick={handleCloseDeleteModal}

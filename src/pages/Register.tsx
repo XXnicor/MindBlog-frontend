@@ -71,20 +71,17 @@ export default function Register() {
 
       <main className="flex-1 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
-          {/* Cabeçalho */}
           <div className="text-center mb-8">
             <div className="text-4xl font-bold text-white mb-6 font-mono">&lt;M/&gt;</div>
             <h2 className="text-3xl font-bold text-white mb-2">
-              Crie sua Conta
+              Criar Nova Conta
             </h2>
             <p className="text-slate-400">
-              Preencha seus dados para começar a escrever
+              Junte-se à comunidade e comece a compartilhar
             </p>
           </div>
 
-          {/* Card de Cadastro */}
           <div className="bg-slate-900 border border-slate-800 rounded-lg p-8">
-            {/* Mensagem de Erro */}
             {error && (
               <div className="mb-6 bg-red-500/10 border border-red-500 text-red-500 px-4 py-3 rounded-lg text-sm">
                 {error}
@@ -92,7 +89,7 @@ export default function Register() {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Campo Nome Completo */}
+
               <div>
                 <label htmlFor="nome" className="block text-sm font-medium text-slate-300 mb-2">
                   Nome Completo
@@ -108,7 +105,6 @@ export default function Register() {
                 />
               </div>
 
-              {/* Campo Email */}
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
                   Email
@@ -124,7 +120,7 @@ export default function Register() {
                 />
               </div>
 
-              {/* Campo Senha */}
+
               <div>
                 <label htmlFor="senha" className="block text-sm font-medium text-slate-300 mb-2">
                   Senha
@@ -144,7 +140,7 @@ export default function Register() {
                 </p>
               </div>
 
-              {/* Campo Confirmar Senha */}
+
               <div>
                 <label htmlFor="confirmarSenha" className="block text-sm font-medium text-slate-300 mb-2">
                   Confirmar Senha
@@ -201,7 +197,6 @@ export default function Register() {
             </div>
           </div>
 
-          {/* Link Alternativo */}
           <div className="mt-6 text-center">
             <Link
               to="/"

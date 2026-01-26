@@ -28,11 +28,9 @@ export default function ArticlePage() {
       setLoading(true);
       setError('');
       const data = await articleService.getById(articleId);
-      console.log('[ArticlePage] Artigo carregado:', data);
       setArticle(data);
       setLikesCount(data.curtidas || data.likes || 0);
     } catch (err: any) {
-      console.error('[ArticlePage] Erro ao carregar artigo:', err);
       setError(err.message || 'Erro ao carregar artigo');
     } finally {
       setLoading(false);
@@ -91,7 +89,6 @@ export default function ArticlePage() {
     return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
   };
 
-  // Extrair conteúdo em parágrafos
   const contentParagraphs = article.conteudo?.split('\n\n').filter((p: string) => p.trim()) || [];
 
   return (
@@ -99,7 +96,6 @@ export default function ArticlePage() {
       <Navbar />
 
       <main className="max-w-4xl mx-auto px-4 py-8">
-        {/* Botão Voltar */}
         <Link
           to="/artigos"
           className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-8"
@@ -108,30 +104,24 @@ export default function ArticlePage() {
           <span>Voltar aos Artigos</span>
         </Link>
 
-        {/* Cabeçalho do Artigo */}
         <header className="mb-8">
-          {/* Badge de Categoria */}
           <div className="mb-4">
             <span className="inline-block bg-orange-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
               {article.categoria || article.category}
             </span>
           </div>
 
-          {/* Título */}
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 leading-tight">
             {article.titulo || article.title}
           </h1>
 
-          {/* Resumo */}
           {(article.resumo || article.summary) && (
             <p className="text-lg text-slate-400 mb-6">
               {article.resumo || article.summary}
             </p>
           )}
 
-          {/* Metadados */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
-            {/* Autor */}
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-purple-600 flex items-center justify-center text-white font-bold">
                 {(article.autor?.nome || article.author?.nome || article.author || 'A')[0].toUpperCase()}
@@ -146,7 +136,6 @@ export default function ArticlePage() {
               </div>
             </div>
 
-            {/* Ações */}
             <div className="flex items-center gap-3">
               <button
                 onClick={handleLike}
@@ -179,7 +168,6 @@ export default function ArticlePage() {
             </div>
           </div>
 
-          {/* Estatísticas */}
           <div className="flex items-center gap-6 mt-4 text-sm text-slate-400">
             <div className="flex items-center gap-2">
               <Heart size={16} />
@@ -196,7 +184,6 @@ export default function ArticlePage() {
           </div>
         </header>
 
-        {/* Banner Principal */}
         {imageUrl && (
           <div className="mb-8 rounded-xl overflow-hidden">
             <img

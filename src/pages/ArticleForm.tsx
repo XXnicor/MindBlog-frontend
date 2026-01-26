@@ -8,7 +8,6 @@ export default function ArticleForm() {
   const { id } = useParams<{ id: string }>();
   const isEditMode = Boolean(id);
   
-  // Estados do formulário
   const [title, setTitle] = useState('');
   const [summary, setSummary] = useState('');
   const [category, setCategory] = useState('Dev');
@@ -20,19 +19,16 @@ export default function ArticleForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Limites de caracteres
   const SUMMARY_MAX = 200;
   const CONTENT_MAX = 8000;
   const WORDS_PER_MINUTE = 200;
 
-  // Carrega dados do artigo se estiver em modo edição
   useEffect(() => {
     if (isEditMode && id) {
       loadArticleData(id);
     }
   }, [isEditMode, id]);
 
-  // Busca de dados da API
   const loadArticleData = async (articleId: string) => {
     setIsLoading(true);
     try {
@@ -52,25 +48,21 @@ export default function ArticleForm() {
     }
   };
 
-  // Calcula tempo de leitura estimado
   const calculateReadingTime = (text: string): number => {
     const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
     return Math.max(1, Math.ceil(words / WORDS_PER_MINUTE));
   };
 
-  // Calcula número de palavras
   const countWords = (text: string): number => {
     return text.trim().split(/\s+/).filter(w => w.length > 0).length;
   };
 
-  // Manipula upload de imagem
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setImage(e.target.files[0]);
     }
   };
 
-  // Adiciona tag
   const handleAddTag = () => {
     const trimmedTag = tagInput.trim();
     if (trimmedTag && !tags.includes(trimmedTag)) {
@@ -79,7 +71,6 @@ export default function ArticleForm() {
     }
   };
 
-  // Adiciona tag ao pressionar Enter
   const handleTagKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -87,18 +78,15 @@ export default function ArticleForm() {
     }
   };
 
-  // Remove tag
   const handleRemoveTag = (tagToRemove: string) => {
     setTags(tags.filter(tag => tag !== tagToRemove));
   };
 
-  // Envia o formulário
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
-      // Validações
       if (title.length < 5 || title.length > 200) {
         throw new Error('O título deve ter entre 5 e 200 caracteres');
       }
@@ -132,38 +120,19 @@ export default function ArticleForm() {
       if (isEditMode && id) {
         result = await articleService.update(id, formData);
       } else {
-        console.log('[ArticleForm] Criando artigo com dados:', {
-          titulo: title,
-          categoria: category,
-          resumo: summary,
-          tags: tags,
-          temImagem: !!image,
-          nomeImagem: image?.name,
-          tamanhoConteudo: content.length
-        });
         result = await articleService.create(formData);
-        console.log('[ArticleForm] Resposta da criação:', result);
       }
       
       alert(`Artigo ${isEditMode ? 'editado' : 'criado'} com sucesso!`);
       
-      // Se criou um artigo novo e retornou o ID, redirecionar para o artigo
       if (!isEditMode && result && (result._id || result.id)) {
         const articleId = result._id || result.id;
-        console.log('[ArticleForm] Redirecionando para artigo:', articleId);
         navigate(`/artigo/${articleId}`);
       } else {
         navigate('/dashboard');
       }
       
     } catch (error: any) {
-      console.error(`[ArticleForm] Erro completo:`, {
-        message: error.message,
-        stack: error.stack,
-        error: error
-      });
-      
-      // Mostrar mensagem de erro detalhada
       const errorMessage = error.message || `Erro ao ${isEditMode ? 'editar' : 'criar'} artigo. Tente novamente.`;
       alert(errorMessage);
     } finally {
@@ -188,7 +157,6 @@ export default function ArticleForm() {
   return (
     <div className="min-h-screen bg-slate-950 text-white">
       <div className="max-w-3xl mx-auto px-4 py-8">
-        {/* Topo - Link voltar */}
         <Link
           to="/dashboard"
           className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-6"
@@ -197,7 +165,6 @@ export default function ArticleForm() {
           <span>Voltar ao Dashboard</span>
         </Link>
 
-        {/* Título da página */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">
             {isEditMode ? 'Editar Artigo' : 'Criar Novo Artigo'}
@@ -210,9 +177,7 @@ export default function ArticleForm() {
           </p>
         </div>
 
-        {/* Formulário */}
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Título do Artigo */}
           <div>
             <label htmlFor="title" className="block text-white font-medium mb-2">
               Título do Artigo
@@ -294,7 +259,6 @@ export default function ArticleForm() {
               </label>
             </div>
             
-            {/* Preview da imagem */}
             {image && (
               <div className="mt-3">
                 <img 
@@ -342,7 +306,6 @@ export default function ArticleForm() {
                 Adicionar
               </button>
             </div>
-            {/* Lista de Tags */}
             {tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {tags.map((tag) => (
@@ -385,7 +348,6 @@ export default function ArticleForm() {
             </div>
           </div>
 
-          {/* Botões de Ação */}
           <div className="flex gap-4 pt-4">
             <button
               type="submit"

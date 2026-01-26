@@ -1,12 +1,9 @@
-// 1. URL base da sua API backend - ATUALIZADO
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
-// 2. Função para pegar o token de autenticação salvo
 const getAuthToken = (): string | null => {
   return localStorage.getItem('token');
 };
 
-// 3. Função auxiliar para fazer requisições
 const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
   const token = getAuthToken();
   
@@ -18,7 +15,6 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
     }
   };
 
-  // Não adicionar Content-Type para FormData (o browser define automaticamente)
   if (options.body && typeof options.body === 'object' && !(options.body instanceof FormData)) {
     (config.headers as any)['Content-Type'] = 'application/json';
     config.body = JSON.stringify(options.body);
@@ -26,31 +22,22 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
   
-  // Log para debug
-  console.log(`[API] ${options.method || 'GET'} ${API_BASE_URL}${endpoint}`, {
-    status: response.status,
-    ok: response.ok
-  });
-  
   // Verificar se a resposta é JSON
   const contentType = response.headers.get('content-type');
   if (!contentType || !contentType.includes('application/json')) {
     const textResponse = await response.text();
-    console.error('[API] Resposta não-JSON:', textResponse.substring(0, 200));
     throw new Error(`Erro ${response.status}: Servidor retornou HTML ao invés de JSON. Verifique as rotas do backend.`);
   }
 
   const result = await response.json();
 
   if (!response.ok) {
-    console.error('[API] Erro:', result);
     throw new Error(result.message || result.error || `Erro ${response.status}: ${response.statusText}`);
   }
 
   return result.data || result;
 };
 
-// Função para mapear artigos do backend para o formato do frontend
 const mapArticle = (article: any) => ({
   id: article._id || article.id,
   title: article.titulo || article.title,
@@ -66,9 +53,7 @@ const mapArticle = (article: any) => ({
   highlight: article.destaque || article.highlight || false
 });
 
-// 4. Serviço de Artigos
 export const articleService = {
-  // Listar com paginação e filtros
   async getAll(page = 1, limit = 10, filters: { categoria?: string; search?: string } = {}) {
     const params = new URLSearchParams({ 
       page: page.toString(), 
@@ -78,7 +63,6 @@ export const articleService = {
     });
     const response = await apiRequest(`/articles?${params}`);
     
-    // Mapear artigos se houver
     if (response.articles && Array.isArray(response.articles)) {
       response.articles = response.articles.map(mapArticle);
     }
@@ -86,37 +70,19 @@ export const articleService = {
     return response;
   },
 
-  // Buscar artigo por ID
   async getById(id: string) {
     const article = await apiRequest(`/articles/${id}`);
-    // Retornar dados completos sem mapear (necessário para ArticlePage)
     return article;
   },
 
-  // Criar artigo
   async create(formData: FormData) {
-    const token = getAuthToken();
-    console.log('[API] Criando artigo. Token presente:', !!token);
-    console.log('[API] Token (primeiros 20 chars):', token?.substring(0, 20));
-    
     const response = await apiRequest('/articles', {
       method: 'POST',
       body: formData
     });
-    console.log('[API] Artigo criado:', response);
-    
-    // Log do autor retornado
-    if (response.autor) {
-      console.log('[API] Autor do artigo criado:', {
-        id: response.autor._id || response.autor.id,
-        nome: response.autor.nome
-      });
-    }
-    
     return response;
   },
 
-  // Atualizar artigo
   async update(id: string, formData: FormData) {
     return apiRequest(`/articles/${id}`, {
       method: 'PUT',
@@ -124,19 +90,16 @@ export const articleService = {
     });
   },
 
-  // Deletar artigo
   async delete(id: string) {
     return apiRequest(`/articles/${id}`, {
       method: 'DELETE'
     });
   },
 
-  // Buscar comentários de um artigo
   async getComments(articleId: string) {
     return apiRequest(`/articles/${articleId}/comments`);
   },
 
-  // Criar comentário
   async createComment(articleId: string, text: string) {
     return apiRequest(`/articles/${articleId}/comments`, {
       method: 'POST',
@@ -144,39 +107,31 @@ export const articleService = {
     });
   },
 
-  // Buscar artigos do usuário logado
   async getMyArticles(page = 1, limit = 10) {
     const params = new URLSearchParams({ 
       page: page.toString(), 
       limit: limit.toString(),
-      myArticles: 'true' // Parâmetro para indicar que queremos apenas os artigos do usuário logado
+      myArticles: 'true'
     });
     
-    // Tentar primeiro o endpoint específico /users/my-articles
     try {
       const response = await apiRequest(`/users/my-articles?${params}`);
       
-      // Mapear artigos se houver
       if (response.articles && Array.isArray(response.articles)) {
         response.articles = response.articles.map(mapArticle);
       }
       
       return response;
     } catch (error: any) {
-      // Se o endpoint não existir, tentar via /articles com filtro de autor
-      console.log('[API] Endpoint /users/my-articles não disponível, tentando /articles com filtro...');
-      
-      // Buscar ID do usuário atual
       const currentUser = await authService.getCurrentUser();
       const params2 = new URLSearchParams({ 
         page: page.toString(), 
         limit: limit.toString(),
-        autor: currentUser.id || currentUser._id // Filtrar por ID do autor
+        autor: currentUser.id || currentUser._id
       });
       
       const response = await apiRequest(`/articles?${params2}`);
       
-      // Mapear artigos se houver
       if (response.articles && Array.isArray(response.articles)) {
         response.articles = response.articles.map(mapArticle);
       }
@@ -186,9 +141,7 @@ export const articleService = {
   }
 };
 
-// 5. Serviço de Autenticação
 export const authService = {
-  // Registro de usuário
   async register(data: { nome: string; email: string; senha: string }) {
     return apiRequest('/auth/register', {
       method: 'POST',
@@ -196,7 +149,6 @@ export const authService = {
     });
   },
 
-  // Login de usuário
   async login(credentials: { email: string; senha: string }) {
     return apiRequest('/auth/login', {
       method: 'POST',
@@ -204,15 +156,12 @@ export const authService = {
     });
   },
 
-  // Buscar dados do usuário atual
   async getCurrentUser() {
     return apiRequest('/auth/me');
   }
 };
 
-// 6. Serviço de Usuários
 export const userService = {
-  // Atualizar perfil do usuário
   async updateProfile(formData: FormData) {
     return apiRequest('/users/profile', {
       method: 'PUT',
@@ -220,15 +169,12 @@ export const userService = {
     });
   },
 
-  // Buscar estatísticas do usuário
   async getStats() {
     return apiRequest('/users/stats');
   }
 };
 
-// 7. Serviço de Comentários
 export const commentService = {
-  // Deletar comentário (apenas autor ou admin)
   async delete(commentId: string) {
     return apiRequest(`/comments/${commentId}`, {
       method: 'DELETE'
@@ -236,9 +182,7 @@ export const commentService = {
   }
 };
 
-// 8. API legado (mantido para compatibilidade)
 export const api = {
-  // GET - Buscar dados
   get: async (path: string, includeAuth = true) => {
     try {
       const token = includeAuth ? getAuthToken() : null;
@@ -268,7 +212,6 @@ export const api = {
     }
   },
 
-  // POST - Criar/Enviar dados
   post: async (path: string, body: any, options?: { headers?: HeadersInit }) => {
     try {
       const isFormData = body instanceof FormData;
@@ -300,7 +243,6 @@ export const api = {
     }
   },
 
-  // PUT - Atualizar dados
   put: async (path: string, body: any, options?: { headers?: HeadersInit }) => {
     try {
       const isFormData = body instanceof FormData;
@@ -332,7 +274,6 @@ export const api = {
     }
   },
 
-  // DELETE - Remover dados
   delete: async (path: string) => {
     try {
       const token = getAuthToken();
@@ -360,19 +301,15 @@ export const api = {
   },
 };
 
-// 9. Funções auxiliares para gerenciar autenticação
 export const auth = {
-  // Salvar token após login
   setToken: (token: string) => {
     localStorage.setItem('token', token);
   },
 
-  // Remover token ao fazer logout
   removeToken: () => {
     localStorage.removeItem('token');
   },
 
-  // Verificar se usuário está logado
   isAuthenticated: (): boolean => {
     return !!getAuthToken();
   },
