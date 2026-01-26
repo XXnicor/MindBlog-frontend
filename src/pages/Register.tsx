@@ -4,9 +4,11 @@ import { UserPlus, Loader2 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { authService } from '../lib/api';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Register() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
@@ -48,6 +50,9 @@ export default function Register() {
 
       // Chamar API de registro
       await authService.register({ nome, email, senha });
+      
+      // Fazer login automático após cadastro
+      await login(email, senha);
 
       // Sucesso
       alert('Conta criada com sucesso! 🎉');
