@@ -4,27 +4,53 @@ Interface moderna e responsiva para plataforma de blog técnico, desenvolvida co
 
 ---
 
-## 🎬 Demonstração
+## � Demonstração do Sistema
+
+<div align="center">
 
 ### 🚀 Tour pelo Blog
-https://github.com/user-attachments/assets/tour-pelo-blog.mp4
+<img src="docs/gifs/tour pelo blog.mp4" alt="Tour pelo Blog" width="800px">
 
-### 📝 Criação e Salvamento de Imagem
-https://github.com/user-attachments/assets/criacao-salvamento-img.mp4
-
-### 📋 Cadastro
-https://github.com/user-attachments/assets/cadastro.mp4
-
-### 🔐 Login
-https://github.com/user-attachments/assets/login.mp4
-
-### ✏️ Atualizar Artigo
-https://github.com/user-attachments/assets/atualizar-artigo.mp4
-
-### 🗑️ Excluir Artigo
-https://github.com/user-attachments/assets/excluir-artigo.mp4
+*Navegação completa pela interface, listagem de artigos e exploração das funcionalidades principais*
 
 ---
+
+### 🔐 Login
+<img src="docs/gifs/login.mp4" alt="Login" width="800px">
+
+*Autenticação de usuários com validação de credenciais e feedback visual*
+
+---
+
+### 📋 Cadastro de Usuário
+<img src="docs/gifs/cadastro.mp4" alt="Cadastro" width="800px">
+
+*Criação de nova conta com validação de formulário e confirmação de registro*
+
+---
+
+### ✍️ Criação de Artigo com Upload de Imagem
+<img src="docs/gifs/criação e salvamento de img.mp4" alt="Criar Artigo" width="800px">
+
+*Editor completo com upload de banner, formatação de conteúdo e publicação de artigos*
+
+---
+
+### ✏️ Atualizar Artigo
+<img src="docs/gifs/atualizar artigo.mp4" alt="Editar Artigo" width="800px">
+
+*Edição de artigos existentes com atualização de conteúdo e imagens*
+
+---
+
+### 🗑️ Excluir Artigo
+<img src="docs/gifs/exluir artigo.mp4" alt="Deletar Artigo" width="800px">
+
+*Remoção de artigos com confirmação e feedback de sucesso*
+
+---
+
+</div>
 
 ## 🚀 Tecnologias
 
