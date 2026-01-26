@@ -1,50 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import ArticleCard, { Article } from '../components/ArticleCard'
 import { articleService } from '../lib/api'
 import { Mail } from 'lucide-react'
-
-const mockArticles: Article[] = [
-  {
-    id: '1',
-    title: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
-    summary: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in augue ligula. Donec sed eros vel lacus condimentum sollicitudin.',
-    category: 'Desenvolvimento web',
-    author: 'John Doe',
-    readTime: '6min',
-    views: 122,
-    highlight: true,
-    date: '4 out 2025'
-  },
-  {
-    id: '2',
-    title: 'Explorando IA e aprendizado de máquina no frontend',
-    summary: 'Um guia prático para integrar modelos leves no navegador e melhorar a experiência do usuário.',
-    category: 'IA',
-    author: 'Jane Roe',
-    readTime: '8min',
-    views: 98,
-  },
-  {
-    id: '3',
-    title: 'DevOps moderno: pipelines que importam',
-    summary: 'Como montar pipelines resilientes para entregas rápidas e confiáveis usando ferramentas atuais.',
-    category: 'DevOps',
-    author: 'Carlos Silva',
-    readTime: '7min',
-    views: 54,
-  },
-  {
-    id: '4',
-    title: 'Boas práticas em CSS moderno',
-    summary: 'Organize seu CSS com arquitetura, performance e acessibilidade em mente.',
-    category: 'Frontend',
-    author: 'Ana Lima',
-    readTime: '5min',
-    views: 32,
-  }
-]
 
 export default function Home(){
   const [articles, setArticles] = useState<Article[]>([])
@@ -57,7 +17,6 @@ export default function Home(){
         if(mounted && res.articles) setArticles(res.articles)
       }catch(err){
         console.error('Erro ao carregar artigos:', err)
-        if(mounted) setArticles(mockArticles)
       }
     })()
     return ()=>{ mounted = false }
@@ -72,15 +31,15 @@ export default function Home(){
           <h1 className="text-4xl md:text-5xl font-extrabold">Explore o Futuro da <span className="text-cyan-500">Tecnologia</span></h1>
           <p className="text-gray-400 mt-4 max-w-2xl mx-auto">Artigos sobre IA, desenvolvimento, DevOps e as últimas tendências tecnológicas</p>
           <div className="mt-8 flex justify-center gap-4">
-            <button className="bg-cyan-500 hover:bg-cyan-600 text-slate-900 px-6 py-2 rounded-md font-semibold">Explorar Artigos</button>
-            <button className="border border-slate-800 text-white px-6 py-2 rounded-md">Começar a Escrever</button>
+            <Link to="/artigos" className="bg-cyan-500 hover:bg-cyan-600 text-slate-900 px-6 py-2 rounded-md font-semibold">Explorar Artigos</Link>
+            <Link to="/register" className="border border-slate-800 text-white px-6 py-2 rounded-md hover:border-slate-600 transition-colors">Começar a Escrever</Link>
           </div>
         </section>
 
         <section className="py-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-semibold text-white">Artigos em Destaque</h2>
-            <a href="#" className="text-cyan-500">Ver todos →</a>
+            <Link to="/artigos" className="text-cyan-500 hover:text-cyan-400 transition-colors">Ver todos →</Link>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -107,7 +66,7 @@ export default function Home(){
         <section className="mt-12 text-center">
           <h3 className="text-white text-lg font-semibold">Compartilhe Seu Conhecimento</h3>
           <p className="text-gray-400 mt-2">Junte-se à nossa comunidade de escritores e compartilhe suas experiências e conhecimentos em tecnologia</p>
-          <div className="mt-4"><button className="bg-cyan-500 hover:bg-cyan-600 text-slate-900 px-4 py-2 rounded-md">Criar Conta Gratuita</button></div>
+          <div className="mt-4"><Link to="/register" className="inline-block bg-cyan-500 hover:bg-cyan-600 text-slate-900 px-4 py-2 rounded-md font-semibold">Criar Conta Gratuita</Link></div>
         </section>
       </main>
 
