@@ -42,7 +42,17 @@ export default function ProfileSettings() {
       setNome(user.nome);
       setEmail(user.email);
       setBio(user.bio || '');
-      setAvatarPreview(user.avatar || '');
+      
+      // Adicionar timestamp para forçar atualização da imagem
+      if (user.avatar) {
+        const avatarUrl = user.avatar.includes('?') 
+          ? `${user.avatar}&t=${Date.now()}` 
+          : `${user.avatar}?t=${Date.now()}`;
+        setAvatarPreview(avatarUrl);
+      } else {
+        setAvatarPreview('');
+      }
+      
       setCreatedAt(user.createdAt);
     } catch (error: any) {
       console.error('Erro ao carregar dados do usuário:', error);
@@ -119,10 +129,19 @@ export default function ProfileSettings() {
       await userService.updateProfile(formData);
       
       alert('Dados atualizados! ✅');
-      setSenha(''); // Limpar campo de senha
-      setAvatarFile(null); // Limpar arquivo de avatar
       
-      // Recarregar dados
+      // Limpar campos temporários
+      setSenha(''); 
+      
+      // Revogar URL blob antes de limpar
+      if (avatarPreview && avatarPreview.startsWith('blob:')) {
+        URL.revokeObjectURL(avatarPreview);
+      }
+      
+      setAvatarFile(null);
+      setAvatarPreview(''); // Limpar preview para forçar atualização
+      
+      // Recarregar dados do servidor
       await loadUserData();
       
     } catch (error: any) {
