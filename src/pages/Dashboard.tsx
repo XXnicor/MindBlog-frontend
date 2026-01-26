@@ -1,38 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FileText, MessageCircle, Heart, TrendingUp, Settings, Plus, Edit, Trash } from 'lucide-react';
+import { FileText, MessageCircle, Heart, TrendingUp, Settings, Plus, Edit, Trash, Loader2, Eye } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-
-// Mock Data - Estatísticas
-const STATS = [
-  { id: 1, title: 'Total de Artigos', value: '2', icon: FileText, color: 'text-cyan-500' },
-  { id: 2, title: 'Engajamento', value: '4', icon: MessageCircle, color: 'text-green-500' },
-  { id: 3, title: 'Curtidas', value: '20', icon: Heart, color: 'text-red-500' },
-  { id: 4, title: 'Tempo médio de leitura', value: '8 min', icon: TrendingUp, color: 'text-purple-500' },
-];
-
-// Mock Data - Artigos do usuário
-const INITIAL_ARTICLES = [
-  {
-    id: 1,
-    title: 'O Futuro da Inteligência Artificial',
-    excerpt: 'Explorando as tendências e inovações que moldarão o futuro da IA nos próximos anos.',
-    image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=300&h=200&fit=crop',
-    date: '20 jan 2026',
-    comments: 8,
-    likes: 45,
-  },
-  {
-    id: 2,
-    title: 'Guia Completo de TypeScript',
-    excerpt: 'Aprenda TypeScript do zero com exemplos práticos e dicas avançadas.',
-    image: 'https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=300&h=200&fit=crop',
-    date: '18 jan 2026',
-    comments: 12,
-    likes: 67,
-  },
-];
+import { articleService, userService } from '../lib/api';
+import { getImageUrl } from '../lib/imageUtils';
 
 // Mock Data - Atividades recentes
 const RECENT_ACTIVITY = [
@@ -71,11 +43,48 @@ const RECENT_ACTIVITY = [
 ];
 
 export default function Dashboard() {
-  const [articles, setArticles] = useState(INITIAL_ARTICLES);
+  const [articles, setArticles] = useState<any[]>([]);
+  const [stats, setStats] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [articleToDelete, setArticleToDelete] = useState<number | null>(null);
+  const [articleToDelete, setArticleToDelete] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
-  const handleOpenDeleteModal = (id: number) => {
+  // Carregar artigos e estatísticas ao montar o componente
+  useEffect(() => {
+    loadDashboardData();
+  }, []);
+
+  const loadDashboardData = async () => {
+    setLoading(true);
+    try {
+      // Carregar artigos e estatísticas em paralelo
+      const [articlesData, statsData] = await Promise.all([
+        articleService.getMyArticles(1, 50),
+        userService.getStats()
+      ]);
+      
+      console.log('[Dashboard] Artigos carregados:', articlesData.articles?.length || 0);
+      if (articlesData.articles && articlesData.articles.length > 0) {
+        console.log('[Dashboard] Primeiro artigo:', {
+          id: articlesData.articles[0].id,
+          title: articlesData.articles[0].title,
+          author: articlesData.articles[0].author,
+          authorId: articlesData.articles[0].authorId
+        });
+      }
+      
+      setArticles(articlesData.articles || []);
+      setStats(statsData || null);
+    } catch (error: any) {
+      console.error('Erro ao carregar dados do dashboard:', error);
+      alert('Erro ao carregar dados: ' + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOpenDeleteModal = (id: string) => {
     setArticleToDelete(id);
     setDeleteModalOpen(true);
   };
@@ -85,11 +94,39 @@ export default function Dashboard() {
     setArticleToDelete(null);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (articleToDelete !== null) {
-      console.log(`Artigo ${articleToDelete} deletado`);
-      setArticles(articles.filter(article => article.id !== articleToDelete));
-      handleCloseDeleteModal();
+      setDeleting(true);
+      try {
+        console.log('[Dashboard] Tentando deletar artigo:', articleToDelete);
+        await articleService.delete(articleToDelete);
+        console.log(`[Dashboard] Artigo ${articleToDelete} deletado com sucesso`);
+        setArticles(articles.filter(article => article.id !== articleToDelete));
+        handleCloseDeleteModal();
+        // Recarregar estatísticas
+        const statsData = await userService.getStats();
+        setStats(statsData || null);
+        alert('Artigo deletado com sucesso!');
+      } catch (error: any) {
+        console.error('[Dashboard] Erro ao deletar artigo:', error);
+        
+        // Mensagem de erro específica para problema de permissão
+        if (error.message.includes('permissão')) {
+          alert(
+            '❌ Erro de Permissão\n\n' +
+            'O backend não reconheceu você como autor deste artigo.\n\n' +
+            'Possíveis causas:\n' +
+            '1. O artigo foi criado com outro usuário\n' +
+            '2. O backend não está associando o autor corretamente ao criar artigos\n' +
+            '3. Há um problema na verificação de permissões no backend\n\n' +
+            'Verifique o console do backend para mais detalhes.'
+          );
+        } else {
+          alert('Erro ao deletar artigo: ' + error.message);
+        }
+      } finally {
+        setDeleting(false);
+      }
     }
   };
 
@@ -128,18 +165,46 @@ export default function Dashboard() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {STATS.map((stat) => {
-            const Icon = stat.icon;
-            return (
-              <div key={stat.id} className="bg-slate-900 border border-slate-800 rounded-lg p-6">
-                <div className="flex items-start justify-between mb-3">
-                  <h3 className="text-slate-400 text-sm">{stat.title}</h3>
-                  <Icon className={`w-6 h-6 ${stat.color}`} />
-                </div>
-                <p className="text-3xl font-bold text-white">{stat.value}</p>
+          {loading ? (
+            // Loading skeleton
+            Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="bg-slate-900 border border-slate-800 rounded-lg p-6 animate-pulse">
+                <div className="h-4 bg-slate-800 rounded w-1/2 mb-3"></div>
+                <div className="h-8 bg-slate-800 rounded w-3/4"></div>
               </div>
-            );
-          })}
+            ))
+          ) : (
+            <>
+              <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
+                <div className="flex items-start justify-between mb-3">
+                  <h3 className="text-slate-400 text-sm">Total de Artigos</h3>
+                  <FileText className="w-6 h-6 text-cyan-500" />
+                </div>
+                <p className="text-3xl font-bold text-white">{stats?.totalArticles || 0}</p>
+              </div>
+              <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
+                <div className="flex items-start justify-between mb-3">
+                  <h3 className="text-slate-400 text-sm">Visualizações</h3>
+                  <Eye className="w-6 h-6 text-purple-500" />
+                </div>
+                <p className="text-3xl font-bold text-white">{stats?.totalViews || 0}</p>
+              </div>
+              <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
+                <div className="flex items-start justify-between mb-3">
+                  <h3 className="text-slate-400 text-sm">Curtidas</h3>
+                  <Heart className="w-6 h-6 text-red-500" />
+                </div>
+                <p className="text-3xl font-bold text-white">{stats?.totalLikes || 0}</p>
+              </div>
+              <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
+                <div className="flex items-start justify-between mb-3">
+                  <h3 className="text-slate-400 text-sm">Comentários</h3>
+                  <MessageCircle className="w-6 h-6 text-green-500" />
+                </div>
+                <p className="text-3xl font-bold text-white">{stats?.totalComments || 0}</p>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Main Layout: 2 Columns */}
@@ -149,7 +214,12 @@ export default function Dashboard() {
             <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
               <h2 className="text-2xl font-bold text-white mb-6">Meus Artigos</h2>
               
-              {articles.length === 0 ? (
+              {loading ? (
+                // Loading state
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="w-8 h-8 text-cyan-500 animate-spin" />
+                </div>
+              ) : articles.length === 0 ? (
                 <div className="text-center py-12">
                   <FileText className="w-16 h-16 text-slate-700 mx-auto mb-4" />
                   <p className="text-slate-400">Você ainda não tem artigos publicados</p>
@@ -170,9 +240,12 @@ export default function Dashboard() {
                     >
                       {/* Image */}
                       <img
-                        src={article.image}
+                        src={getImageUrl(article.image || article.imagem_banner_url) || 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=300&h=200&fit=crop'}
                         alt={article.title}
                         className="w-24 h-24 rounded-lg object-cover flex-shrink-0"
+                        onError={(e) => {
+                          e.currentTarget.src = 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=300&h=200&fit=crop';
+                        }}
                       />
 
                       {/* Content */}
@@ -181,17 +254,16 @@ export default function Dashboard() {
                           {article.title}
                         </h3>
                         <p className="text-sm text-slate-400 mb-3 line-clamp-2">
-                          {article.excerpt}
+                          {article.summary}
                         </p>
                         <div className="flex items-center gap-4 text-xs text-slate-500">
-                          <span>{article.date}</span>
+                          <span>{new Date(article.date).toLocaleDateString('pt-BR')}</span>
                           <span className="flex items-center gap-1">
-                            <MessageCircle size={14} />
-                            {article.comments}
+                            <Eye size={14} />
+                            {article.views || 0}
                           </span>
-                          <span className="flex items-center gap-1">
-                            <Heart size={14} />
-                            {article.likes}
+                          <span className="px-2 py-0.5 bg-cyan-500/10 text-cyan-400 rounded">
+                            {article.category}
                           </span>
                         </div>
                       </div>
@@ -278,15 +350,24 @@ export default function Dashboard() {
             <div className="flex justify-end gap-3 mt-6">
               <button
                 onClick={handleCloseDeleteModal}
-                className="px-4 py-2 border border-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors"
+                disabled={deleting}
+                className="px-4 py-2 border border-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleConfirmDelete}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors"
+                disabled={deleting}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Excluir
+                {deleting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Excluindo...
+                  </>
+                ) : (
+                  'Excluir'
+                )}
               </button>
             </div>
           </div>

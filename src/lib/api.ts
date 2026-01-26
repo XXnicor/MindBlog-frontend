@@ -57,6 +57,7 @@ const mapArticle = (article: any) => ({
   summary: article.resumo || article.summary || '',
   category: article.categoria || article.category,
   author: article.autor?.nome || article.author?.nome || article.author || 'Autor Desconhecido',
+  authorId: article.autor?._id || article.autor?.id || article.author?._id || article.author?.id,
   readTime: article.tempoLeitura || article.readTime || '5min',
   views: article.visualizacoes || article.views || 0,
   image: article.imagem || article.image,
@@ -94,11 +95,24 @@ export const articleService = {
 
   // Criar artigo
   async create(formData: FormData) {
+    const token = getAuthToken();
+    console.log('[API] Criando artigo. Token presente:', !!token);
+    console.log('[API] Token (primeiros 20 chars):', token?.substring(0, 20));
+    
     const response = await apiRequest('/articles', {
       method: 'POST',
       body: formData
     });
     console.log('[API] Artigo criado:', response);
+    
+    // Log do autor retornado
+    if (response.autor) {
+      console.log('[API] Autor do artigo criado:', {
+        id: response.autor._id || response.autor.id,
+        nome: response.autor.nome
+      });
+    }
+    
     return response;
   },
 
@@ -128,6 +142,47 @@ export const articleService = {
       method: 'POST',
       body: { text }
     });
+  },
+
+  // Buscar artigos do usuário logado
+  async getMyArticles(page = 1, limit = 10) {
+    const params = new URLSearchParams({ 
+      page: page.toString(), 
+      limit: limit.toString(),
+      myArticles: 'true' // Parâmetro para indicar que queremos apenas os artigos do usuário logado
+    });
+    
+    // Tentar primeiro o endpoint específico /users/my-articles
+    try {
+      const response = await apiRequest(`/users/my-articles?${params}`);
+      
+      // Mapear artigos se houver
+      if (response.articles && Array.isArray(response.articles)) {
+        response.articles = response.articles.map(mapArticle);
+      }
+      
+      return response;
+    } catch (error: any) {
+      // Se o endpoint não existir, tentar via /articles com filtro de autor
+      console.log('[API] Endpoint /users/my-articles não disponível, tentando /articles com filtro...');
+      
+      // Buscar ID do usuário atual
+      const currentUser = await authService.getCurrentUser();
+      const params2 = new URLSearchParams({ 
+        page: page.toString(), 
+        limit: limit.toString(),
+        autor: currentUser.id || currentUser._id // Filtrar por ID do autor
+      });
+      
+      const response = await apiRequest(`/articles?${params2}`);
+      
+      // Mapear artigos se houver
+      if (response.articles && Array.isArray(response.articles)) {
+        response.articles = response.articles.map(mapArticle);
+      }
+      
+      return response;
+    }
   }
 };
 
