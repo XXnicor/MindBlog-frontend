@@ -103,7 +103,10 @@ export const articleService = {
   async createComment(articleId: string, text: string) {
     return apiRequest(`/articles/${articleId}/comments`, {
       method: 'POST',
-      body: { text }
+      body: JSON.stringify({ text }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
     });
   },
 
@@ -145,14 +148,20 @@ export const authService = {
   async register(data: { nome: string; email: string; senha: string }) {
     return apiRequest('/auth/register', {
       method: 'POST',
-      body: data
+      body: JSON.stringify(data),
+      headers: {
+        'Content-Type': 'application/json'
+      }
     });
   },
 
   async login(credentials: { email: string; senha: string }) {
     return apiRequest('/auth/login', {
       method: 'POST',
-      body: credentials
+      body: JSON.stringify(credentials),
+      headers: {
+        'Content-Type': 'application/json'
+      }
     });
   },
 
