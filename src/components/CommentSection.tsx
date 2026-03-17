@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { MessageCircle, Trash2, Loader2 } from 'lucide-react';
 import { articleService, commentService, authService } from '../lib/api';
+import { getImageUrl } from '../lib/imageUtils';
 
 interface Comment {
   id: number;
@@ -116,12 +117,7 @@ export default function CommentSection({ articleId }: CommentSectionProps) {
     return date.toLocaleDateString('pt-BR');
   };
 
-  const getAvatarUrl = (avatar?: string) => {
-    if (avatar) {
-      return `http://localhost:3001/uploads/${avatar}`;
-    }
-    return null;
-  };
+  const getAvatarUrl = (avatar?: string) => getImageUrl(avatar) || null;
 
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-lg p-8">

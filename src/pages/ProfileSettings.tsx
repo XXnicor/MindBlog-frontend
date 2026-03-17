@@ -4,6 +4,7 @@ import { ArrowLeft, Camera, Loader2, BarChart3 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { authService, userService } from '../lib/api';
+import { getImageUrl } from '../lib/imageUtils';
 
 export default function ProfileSettings() {
   const navigate = useNavigate();
@@ -163,16 +164,10 @@ export default function ProfileSettings() {
       if (avatarPreview.startsWith('http://') || avatarPreview.startsWith('https://')) {
         return avatarPreview;
       }
-      // Se começa com /uploads/, construir URL completa
-      if (avatarPreview.startsWith('/uploads/')) {
-        return `http://localhost:3001${avatarPreview}`;
+      const imageUrl = getImageUrl(avatarPreview);
+      if (imageUrl) {
+        return imageUrl;
       }
-      // Se é apenas o nome do arquivo, adicionar /uploads/
-      if (!avatarPreview.includes('/')) {
-        return `http://localhost:3001/uploads/${avatarPreview}`;
-      }
-      // Fallback: tentar construir URL
-      return `http://localhost:3001/${avatarPreview.replace(/^\//, '')}`;
     }
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(nome)}&size=200&background=06b6d4&color=fff`;
   };
