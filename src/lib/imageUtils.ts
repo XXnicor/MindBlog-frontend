@@ -3,8 +3,8 @@
  */
 
 // Usar a mesma base URL da API, mas sem o /api
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
-const UPLOADS_BASE_URL = API_BASE.replace('/api', '/uploads');
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const UPLOADS_BASE_URL = `${API_BASE}/uploads`;
 
 /**
  * Converte o nome/caminho do arquivo para URL completa

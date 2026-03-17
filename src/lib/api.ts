@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 const getAuthToken = (): string | null => {
   return localStorage.getItem('token');
@@ -20,7 +20,7 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
     config.body = JSON.stringify(options.body);
   }
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+  const response = await fetch(`${API_BASE_URL}/api${endpoint}`, config);
   
   // Verificar se a resposta é JSON
   const contentType = response.headers.get('content-type');
@@ -194,7 +194,7 @@ export const api = {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const res = await fetch(`${API_BASE_URL}${path}`, {
+      const res = await fetch(`${API_BASE_URL}/api${path}`, {
         method: 'GET',
         headers,
       });
@@ -224,7 +224,7 @@ export const api = {
             ...options?.headers 
           };
 
-      const res = await fetch(`${API_BASE_URL}${path}`, {
+      const res = await fetch(`${API_BASE_URL}/api${path}`, {
         method: 'POST',
         headers,
         body: isFormData ? body : JSON.stringify(body),
@@ -255,7 +255,7 @@ export const api = {
             ...options?.headers 
           };
 
-      const res = await fetch(`${API_BASE_URL}${path}`, {
+      const res = await fetch(`${API_BASE_URL}/api${path}`, {
         method: 'PUT',
         headers,
         body: isFormData ? body : JSON.stringify(body),
@@ -282,7 +282,7 @@ export const api = {
         ...(token && { 'Authorization': `Bearer ${token}` })
       };
 
-      const res = await fetch(`${API_BASE_URL}${path}`, {
+      const res = await fetch(`${API_BASE_URL}/api${path}`, {
         method: 'DELETE',
         headers,
       });

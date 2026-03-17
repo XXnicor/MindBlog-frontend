@@ -131,6 +131,86 @@ Ou criar um arquivo `.env` na raiz do projeto:
 VITE_API_URL=http://localhost:3001/api
 ```
 
+## 🚀 Deploy do Frontend + conexão com backend pronto
+
+Se você já tem o backend pronto em `MindBlog-backend`, o fluxo recomendado é:
+
+1. **Deploy do backend** (Render/Railway/Fly.io/Heroku)
+2. **Liberar CORS** no backend para o domínio do frontend
+3. **Deploy do frontend** (Vercel/Netlify)
+4. **Configurar a variável `VITE_API_URL`** no frontend apontando para a URL pública do backend
+
+### 1) Suba o backend primeiro
+
+Use o repositório: `https://github.com/XXnicor/MindBlog-backend`
+
+Ao final do deploy, você deve ter uma URL pública, por exemplo:
+
+```txt
+https://mindblog-backend.onrender.com
+```
+
+Se as rotas do backend já usam o prefixo `/api`, a URL da API para o frontend ficará:
+
+```txt
+https://mindblog-backend.onrender.com/api
+```
+
+### 2) Configure CORS no backend
+
+No backend, permita requisições do domínio do frontend. Exemplo de origens válidas:
+
+- `http://localhost:3000` (desenvolvimento local com Vite neste projeto)
+- `https://seu-projeto.vercel.app` (produção)
+
+> Sem CORS correto, login/cadastro e demais requisições vão falhar no navegador.
+
+### 3) Deploy do frontend (Vercel - recomendado)
+
+1. Faça fork/import deste repositório no GitHub.
+2. Na Vercel, escolha **New Project** e conecte o repositório.
+3. Configure:
+   - **Build Command:** `npm run build`
+   - **Output Directory:** `dist`
+4. Em **Environment Variables**, adicione:
+
+```env
+VITE_API_URL=https://mindblog-backend.onrender.com/api
+```
+
+5. Faça o deploy.
+
+### 4) Deploy do frontend (Netlify - alternativa)
+
+No Netlify, use:
+
+- **Build command:** `npm run build`
+- **Publish directory:** `dist`
+- **Environment variable:** `VITE_API_URL=https://mindblog-backend.onrender.com/api`
+
+### 5) Rodando local com backend remoto
+
+Se quiser testar localmente usando o backend já publicado, crie um `.env`:
+
+```env
+VITE_API_URL=https://mindblog-backend.onrender.com/api
+```
+
+Depois execute:
+
+```bash
+npm install
+npm run dev
+```
+
+### 6) Checklist rápido de integração
+
+- `VITE_API_URL` termina com `/api`
+- Backend responde JSON nas rotas esperadas
+- CORS permite seu domínio frontend
+- Token JWT está sendo salvo no `localStorage` (chave `token`)
+- Login e listagem de artigos funcionando após deploy
+
 ## 🎯 Como Rodar
 
 Após instalar as dependências e garantir que o backend está rodando:
