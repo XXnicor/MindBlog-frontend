@@ -1,13 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Settings, LogOut, ChevronDown } from 'lucide-react';
+import { User } from '../types/article';
 
 interface UserMenuProps {
-  user: {
-    name: string;
-    email: string;
-    avatar?: string;
-  };
+  user: User;
   onSignOut?: () => void;
 }
 
@@ -43,7 +40,7 @@ export default function UserMenu({ user, onSignOut }: UserMenuProps) {
   };
 
   // Avatar padrão caso não tenha imagem
-  const avatarUrl = user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=06b6d4&color=fff`;
+  const avatarUrl = user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.nome)}&background=06b6d4&color=fff`;
 
   return (
     <div className="relative" ref={menuRef}>
@@ -55,7 +52,7 @@ export default function UserMenu({ user, onSignOut }: UserMenuProps) {
       >
         <img
           src={avatarUrl}
-          alt={user.name}
+          alt={user.nome}
           className="w-8 h-8 rounded-full border-2 border-slate-700 object-cover"
         />
         <ChevronDown
@@ -73,12 +70,12 @@ export default function UserMenu({ user, onSignOut }: UserMenuProps) {
             <div className="flex items-center gap-3">
               <img
                 src={avatarUrl}
-                alt={user.name}
+                alt={user.nome}
                 className="w-10 h-10 rounded-full border-2 border-slate-700 object-cover"
               />
               <div className="flex-1 min-w-0">
                 <p className="text-white font-semibold text-sm truncate">
-                  {user.name}
+                  {user.nome}
                 </p>
                 <p className="text-slate-400 text-xs truncate">
                   {user.email}

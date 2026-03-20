@@ -43,7 +43,7 @@ export default function ProfileSettings() {
       const user = await authService.getCurrentUser();
       setNome(user.nome);
       setEmail(user.email);
-      setBio(user.bio || '');
+      setBio(user.bio ?? '');
       
       // Adicionar timestamp para forçar atualização da imagem
       if (user.avatar) {
@@ -55,7 +55,12 @@ export default function ProfileSettings() {
         setAvatarPreview('');
       }
       
-      setCreatedAt(user.createdAt);
+      // Garantir que createdAt seja uma string
+      if (user.createdAt) {
+        setCreatedAt(user.createdAt);
+      } else {
+        setCreatedAt('');
+      }
     } catch (error: any) {
       console.error('Erro ao carregar dados do usuário:', error);
       if (error.message.includes('token') || error.message.includes('autenticação')) {

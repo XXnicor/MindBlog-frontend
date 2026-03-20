@@ -1,49 +1,71 @@
-export interface Author {
-  _id?: string;
-  id?: number | string;
-  nome?: string;
-  name?: string;
-  avatar?: string;
-  bio?: string;
-  email?: string;
+// Tipos exatos baseados na resposta do backend
+export interface Autor {
+  id: number;
+  nome: string;
+  email: string;
+  avatar: string | null;
+  bio: string | null;
 }
 
 export interface Article {
-  id: string;
-  _id?: string;
-  title: string;
-  titulo?: string;
-  summary: string;
-  resumo?: string;
-  category: string;
-  categoria?: string;
-  autor?: Author;
-  author?: Author | string;
-  authorId?: string;
-  authorName?: string;
-  readTime: string;
-  tempoLeitura?: string;
-  views: number;
-  visualizacoes?: number;
-  image?: string;
-  imagem?: string;
-  imagem_banner_url?: string;
+  id: number;
+  titulo: string;
+  title?: string; // alternativo
+  conteudo: string;
+  resumo?: string | null;
+  summary?: string | null; // alternativo
+  categoria?: string | null;
+  category?: string | null; // alternativo
+  tags?: string[] | null;
+  imagem_banner_url: string | null;
+  imagem?: string | null; // alternativo
+  image?: string | null; // alternativo
   highlight?: boolean;
-  destaque?: boolean;
-  date?: string;
-  criadoEm?: string;
-  createdAt?: string;
-  curtidas?: number;
-  likes?: number;
-  tags?: string[];
-  conteudo?: string;
-  comentarios?: Comment[];
+  destaque?: boolean; // alternativo
+  views: number;
+  visualizacoes?: number; // alternativo
+  likes: number;
+  curtidas?: number; // alternativo
+  data_publicacao: string;
+  data_alteracao?: string | null;
+  createdAt?: string; // alternativo
+  date?: string; // alternativo
+  criadoEm?: string; // alternativo
+  autor: Autor;
+  author?: Autor | string; // alternativo
+  authorId?: string; // alternativo
+  authorName?: string; // alternativo
+  readTime?: string; // alternativo
+  tempoLeitura?: string; // alternativo
+  comentarios?: Comment[]; // comentários do artigo
+}
+
+// Para listas paginadas
+export interface ArticleListResponse {
+  data: Article[];
+  pagination?: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
+// Para my-articles
+export interface MyArticlesResponse {
+  articles: Article[];
+  pagination?: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
 }
 
 export interface Comment {
   id: number;
   text: string;
-  autor?: {
+  autor: {
     id: number;
     nome: string;
     avatar?: string;
@@ -52,13 +74,11 @@ export interface Comment {
 }
 
 export interface User {
-  id: string;
-  _id?: string;
-  name: string;
-  nome?: string;
+  id: number | string;
+  nome: string;
   email: string;
-  avatar?: string;
-  bio?: string;
+  avatar?: string | null;
+  bio?: string | null;
   createdAt?: string;
 }
 

@@ -2,14 +2,12 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import { authService, auth, setUnauthorizedCallback } from '../lib/api';
 import { User as UserType } from '../types/article';
 
-interface User extends UserType {}
-
 interface AuthContextType {
-  user: User | null;
+  user: UserType | null;
   loading: boolean;
   login: (email: string, senha: string) => Promise<void>;
   logout: () => void;
-  updateUser: (userData: Partial<User>) => void;
+  updateUser: (userData: Partial<UserType>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -33,10 +31,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (auth.isAuthenticated()) {
         const userData = await authService.getCurrentUser();
         setUser({
-          id: userData._id || userData.id,
-          name: userData.nome || userData.name,
+          id: userData.id,
+          nome: userData.nome || '',
           email: userData.email,
-          avatar: userData.avatar
+          avatar: userData.avatar,
+          bio: userData.bio
         });
       }
     } catch (error) {
@@ -56,10 +55,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Carregar dados do usuário
       const userData = await authService.getCurrentUser();
       setUser({
-        id: userData._id || userData.id,
-        name: userData.nome || userData.name,
+        id: userData.id,
+        nome: userData.nome || '',
         email: userData.email,
-        avatar: userData.avatar
+        avatar: userData.avatar,
+        bio: userData.bio
       });
     }
   };
@@ -73,7 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     logout();
   };
 
-  const updateUser = (userData: Partial<User>) => {
+  const updateUser = (userData: Partial<UserType>) => {
     setUser(prev => prev ? { ...prev, ...userData } : null);
   };
 

@@ -3,61 +3,56 @@ import { Search, LayoutGrid, List, Clock, Eye, ChevronLeft, ChevronRight } from 
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { Article, PaginationData } from '../types/article';
-import { articleService } from '../lib/api';
+import { useArticles } from '../hooks/useArticles';
+import { ArticleCardSkeleton, ArticleListItemSkeleton } from '../components/ui/Skeleton';
+import ArticleCard from '../components/ArticleCard';
 import { getImageUrl } from '../lib/imageUtils';
+import { Article } from '../types/article';
 
 type ViewMode = 'grid' | 'list';
 
 export default function AllArticles() {
-  const [articles, setArticles] = useState<Article[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [currentPage, setCurrentPage] = useState(1);
-  const [pagination, setPagination] = useState<PaginationData | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
-  const itemsPerPage = 9;
+  const { articles, loading, error, pagination } = useArticles(currentPage, 9, {
+    categoria: selectedCategory !== 'all' ? selectedCategory : undefined,
+    search: searchTerm || undefined
+  });
 
-  // Carregar artigos da API
-  useEffect(() => {
-    loadArticles();
-  }, [currentPage, selectedCategory, searchTerm]);
-
-  const loadArticles = async () => {
-    setLoading(true);
-    setError('');
-    
-    try {
-      const filters: any = {};
-      if (selectedCategory !== 'all') {
-        filters.categoria = selectedCategory;
-      }
-      if (searchTerm) {
-        filters.search = searchTerm;
-      }
-
-      const response = await articleService.getAll(currentPage, itemsPerPage, filters);
-      
-      setArticles(response.articles || []);
-      setPagination(response.pagination || null);
-    } catch (err: any) {
-      console.error('Erro ao carregar artigos:', err);
-      setError(err.message || 'Erro ao carregar artigos');
-      // Manter dados anteriores em caso de erro
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Extrai categorias únicas dos artigos
   const categories = ['all', 'Dev', 'DevOps', 'IA'];
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Função para obter nome do autor de forma segura
+  const getAuthorName = (article: Article): string => {
+    if (article?.autor?.nome) {
+      return article.autor.nome;
+    }
+    if (typeof article.author === 'string') {
+      return article.author;
+    }
+    if (article.authorName) {
+      return article.authorName;
+    }
+    return 'Autor Desconhecido';
+  };
+
+  // Calcular tempo de leitura
+  const getReadTime = (article: Article): string => {
+    if (article.tempoLeitura) return article.tempoLeitura;
+    if (article.readTime) return article.readTime;
+    
+    // Calcular baseado no conteúdo
+    const content = article.conteudo || '';
+    const words = content.trim().split(/\s+/).filter(w => w.length > 0).length;
+    const minutes = Math.max(1, Math.ceil(words / 200));
+    return `${minutes}min`;
   };
 
   return (
@@ -157,21 +152,24 @@ export default function AllArticles() {
         <section className="py-16">
           <div className="max-w-7xl mx-auto px-4">
             {loading ? (
-              <div className="text-center py-20">
-                <div className="inline-block w-12 h-12 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-                <p className="text-slate-400">Carregando artigos...</p>
-              </div>
+              viewMode === 'grid' ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {Array.from({ length: 9 }).map((_, i) => (
+                    <ArticleCardSkeleton key={i} />
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col gap-4">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <ArticleListItemSkeleton key={i} />
+                  ))}
+                </div>
+              )
             ) : error ? (
               <div className="text-center py-20">
                 <div className="text-6xl mb-4">⚠️</div>
                 <h3 className="text-2xl font-bold mb-2">Erro ao carregar artigos</h3>
                 <p className="text-slate-400 mb-4">{error}</p>
-                <button
-                  onClick={loadArticles}
-                  className="px-6 py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold rounded-lg transition-colors"
-                >
-                  Tentar novamente
-                </button>
               </div>
             ) : articles.length === 0 ? (
               <div className="text-center py-20">
@@ -185,61 +183,7 @@ export default function AllArticles() {
               // MODO GRID: 3 colunas
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {articles.map((article) => (
-                  <Link key={article.id} to={`/artigo/${article.id}`}>
-                    <article
-                      className={`bg-slate-900 border ${
-                        article.highlight ? 'border-cyan-500' : 'border-slate-800'
-                      } rounded-lg overflow-hidden hover:border-slate-700 transition-colors cursor-pointer`}
-                    >
-                    {/* Imagem no Topo */}
-                    <div className="h-48 bg-gradient-to-br from-pink-300 to-sky-200 flex items-center justify-center">
-                      {(article.imagem_banner_url || getImageUrl(article.image)) ? (
-                        <img
-                          src={article.imagem_banner_url || getImageUrl(article.image)!}
-                          alt={article.title}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none';
-                            if (e.currentTarget.parentElement) {
-                              e.currentTarget.parentElement.innerHTML = '<div class="text-slate-900 font-extrabold text-2xl p-6">Lorem<br />ipsum</div>';
-                            }
-                          }}
-                        />
-                      ) : (
-                        <div className="text-slate-900 font-extrabold text-2xl p-6">
-                          Lorem<br />ipsum
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Conteúdo */}
-                    <div className="p-4">
-                      <span className="inline-block bg-slate-800 text-slate-400 text-xs px-2 py-1 rounded">
-                        {article.category}
-                      </span>
-                      <h3 className="text-white font-semibold mt-3 line-clamp-2">
-                        {article.title}
-                      </h3>
-                      <p className="text-slate-400 mt-2 line-clamp-3 text-sm">
-                        {article.summary}
-                      </p>
-
-                      <div className="mt-4 flex items-center justify-between text-slate-400 text-sm">
-                        <div>{typeof article.authorName === 'string' ? article.authorName : (typeof article.author === 'string' ? article.author : 'Autor Desconhecido')}</div>
-                        <div className="flex items-center gap-3">
-                          <div className="flex items-center gap-1">
-                            <Clock size={14} />
-                            <span>{article.readTime}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Eye size={14} />
-                            <span>{article.views}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </article>
-                  </Link>
+                  <ArticleCard key={article.id} article={article} />
                 ))}
               </div>
             ) : (
@@ -247,77 +191,71 @@ export default function AllArticles() {
               <div className="flex flex-col gap-4">
                 {articles.map((article) => (
                   <Link key={article.id} to={`/artigo/${article.id}`}>
-                    <article
-                      className={`bg-slate-900 border ${
-                        article.highlight ? 'border-cyan-500' : 'border-slate-800'
-                      } rounded-lg overflow-hidden hover:border-slate-700 transition-colors cursor-pointer flex flex-col md:flex-row`}
-                    >
-                    {/* Imagem à Esquerda (Desktop) / Topo (Mobile) */}
-                    <div className="md:w-48 h-48 md:h-auto bg-gradient-to-br from-pink-300 to-sky-200 flex items-center justify-center flex-shrink-0">
-                      {(article.imagem_banner_url || getImageUrl(article.image)) ? (
-                        <img
-                          src={article.imagem_banner_url || getImageUrl(article.image)!}
-                          alt={article.title}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none';
-                            if (e.currentTarget.parentElement) {
-                              e.currentTarget.parentElement.innerHTML = '<div class="text-slate-900 font-extrabold text-2xl p-6">Lorem<br />ipsum</div>';
-                            }
-                          }}
-                        />
-                      ) : (
-                        <div className="text-slate-900 font-extrabold text-2xl p-6">
-                          Lorem<br />ipsum
-                        </div>
-                      )}
-                    </div>
+                    <article className="bg-slate-900 border border-slate-800 rounded-lg overflow-hidden hover:border-slate-700 transition-colors cursor-pointer flex flex-col md:flex-row">
+                      {/* Imagem à Esquerda (Desktop) / Topo (Mobile) */}
+                      <div className="md:w-48 h-48 md:h-auto bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center flex-shrink-0">
+                        {article.imagem_banner_url || getImageUrl(article.imagem || article.image) ? (
+                          <img
+                            src={article.imagem_banner_url || getImageUrl(article.imagem || article.image)!}
+                            alt={article.titulo || article.title || 'Imagem do artigo'}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                              if (e.currentTarget.parentElement) {
+                                e.currentTarget.parentElement.innerHTML = '<div class="w-full h-full flex items-center justify-center text-slate-600 text-2xl">M</div>';
+                              }
+                            }}
+                          />
+                        ) : (
+                          <div className="text-slate-600 text-2xl font-bold">M</div>
+                        )}
+                      </div>
 
-                    {/* Conteúdo à Direita */}
-                    <div className="p-6 flex-1 flex flex-col justify-between">
-                      <div>
-                        <div className="flex items-center gap-3 mb-3">
-                          <span className="inline-block bg-slate-800 text-slate-400 text-xs px-2 py-1 rounded">
-                            {article.category}
-                          </span>
-                          {article.highlight && (
-                            <span className="inline-block bg-cyan-500/20 text-cyan-400 text-xs px-2 py-1 rounded">
-                              Destaque
+                      {/* Conteúdo à Direita */}
+                      <div className="p-6 flex-1 flex flex-col justify-between">
+                        <div>
+                          <div className="flex items-center gap-3 mb-3">
+                            <span className="inline-block bg-slate-800 text-slate-400 text-xs px-2 py-1 rounded">
+                              {article.categoria ?? article.category ?? 'Sem categoria'}
                             </span>
-                          )}
+                            {article.highlight && (
+                              <span className="inline-block bg-cyan-500/20 text-cyan-400 text-xs px-2 py-1 rounded">
+                                Destaque
+                              </span>
+                            )}
+                          </div>
+                          
+                          <h3 className="text-white font-bold text-xl mb-2 line-clamp-2">
+                            {article.titulo || article.title || 'Sem título'}
+                          </h3>
+                          <p className="text-slate-400 text-sm leading-relaxed line-clamp-2">
+                            {article.resumo || article.summary || ''}
+                          </p>
                         </div>
-                        
-                        <h3 className="text-white font-bold text-xl mb-2">
-                          {article.title}
-                        </h3>
-                        <p className="text-slate-400 text-sm leading-relaxed line-clamp-2">
-                          {article.summary}
-                        </p>
-                      </div>
 
-                      <div className="mt-4 flex items-center justify-between text-slate-400 text-sm border-t border-slate-800 pt-4">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium text-slate-300">{typeof article.authorName === 'string' ? article.authorName : (typeof article.author === 'string' ? article.author : 'Autor Desconhecido')}</span>
-                          {article.date && (
-                            <>
-                              <span>•</span>
-                              <span>{article.date}</span>
-                            </>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-4">
-                          <div className="flex items-center gap-1">
-                            <Clock size={16} />
-                            <span>{article.readTime}</span>
+                        <div className="mt-4 flex items-center justify-between text-slate-400 text-sm border-t border-slate-800 pt-4">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-slate-300">{getAuthorName(article)}</span>
+                            {article.data_publicacao && (
+                              <>
+                                <span>•</span>
+                                <span>{new Date(article.data_publicacao).toLocaleDateString('pt-BR')}</span>
+                              </>
+                            )}
                           </div>
-                          <div className="flex items-center gap-1">
-                            <Eye size={16} />
-                            <span>{article.views}</span>
+                          <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-1">
+                              <Clock size={16} />
+                              <span>{getReadTime(article)}</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Eye size={16} />
+                              <span>{article.views || article.visualizacoes || 0}</span>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </article>
+                    </article>
                   </Link>
                 ))}
               </div>

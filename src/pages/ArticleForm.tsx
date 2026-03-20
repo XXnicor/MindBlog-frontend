@@ -35,10 +35,10 @@ export default function ArticleForm() {
     try {
       const article = await articleService.getById(articleId);
       
-      setTitle(article.titulo);
+      setTitle(article.titulo || '');
       setSummary(article.resumo || '');
-      setCategory(article.categoria);
-      setContent(article.conteudo);
+      setCategory(article.categoria || 'Dev');
+      setContent(article.conteudo || '');
       setTags(article.tags || []);
       setExistingImageUrl(article.imagem_banner_url || article.imagem || '');
     } catch (error) {
@@ -126,8 +126,8 @@ export default function ArticleForm() {
       
       alert(`Artigo ${isEditMode ? 'editado' : 'criado'} com sucesso!`);
       
-      if (!isEditMode && result && (result._id || result.id)) {
-        const articleId = result._id || result.id;
+      if (!isEditMode && result && result.id) {
+        const articleId = result.id;
         navigate(`/artigo/${articleId}`);
       } else {
         navigate('/dashboard');

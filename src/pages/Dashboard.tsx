@@ -48,8 +48,9 @@ export default function Dashboard() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [articleToDelete, setArticleToDelete] = useState<string | null>(null);
+  const [articleToDelete, setArticleToDelete] = useState<number | null>(null);
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
@@ -58,6 +59,7 @@ export default function Dashboard() {
 
   const loadDashboardData = async () => {
     setLoading(true);
+    setError(null);
     try {
       const [articlesData, statsData] = await Promise.all([
         articleService.getMyArticles(1, 50),
@@ -66,15 +68,15 @@ export default function Dashboard() {
       
       setArticles(articlesData.articles || []);
       setStats(statsData || null);
-    } catch (error: any) {
-      console.error('Erro ao carregar dados do dashboard:', error);
-      alert('Erro ao carregar dados: ' + error.message);
+    } catch (err: any) {
+      console.error('Erro ao carregar dados do dashboard:', err);
+      setError(err.message || 'Erro ao carregar dados');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleOpenDeleteModal = (id: string) => {
+  const handleOpenDeleteModal = (id: number) => {
     setArticleToDelete(id);
     setDeleteModalOpen(true);
   };
@@ -116,6 +118,34 @@ export default function Dashboard() {
     }
   };
 
+  // Helper para obter dados do artigo de forma segura
+  const getArticleTitle = (article: Article): string => {
+    return article.titulo || article.title || 'Sem título';
+  };
+
+  const getArticleSummary = (article: Article): string => {
+    return article.resumo || article.summary || '';
+  };
+
+  const getArticleCategory = (article: Article): string => {
+    return article.categoria || article.category || 'Sem categoria';
+  };
+
+  const getArticleDate = (article: Article): string => {
+    const date = article.data_publicacao || article.createdAt || article.date || article.criadoEm;
+    if (!date) return '';
+    return new Date(date).toLocaleDateString('pt-BR');
+  };
+
+  const getArticleImage = (article: Article): string => {
+    const imageUrl = article.imagem_banner_url || getImageUrl(article.imagem || article.image);
+    return imageUrl || 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=300&h=200&fit=crop';
+  };
+
+  const getArticleViews = (article: Article): number => {
+    return article.views || article.visualizacoes || 0;
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 text-white flex flex-col">
       <Navbar />
@@ -127,7 +157,7 @@ export default function Dashboard() {
               Dashboard
             </h1>
             <p className="text-slate-400">
-              Bem-vindo de volta, {user?.name || 'Usuário'}!
+              Bem-vindo de volta, {user?.nome || user?.nome || 'Usuário'}!
             </p>
           </div>
           <div className="flex gap-3">
@@ -147,6 +177,19 @@ export default function Dashboard() {
             </Link>
           </div>
         </div>
+
+        {error && (
+          <div className="mb-8 bg-red-500/10 border border-red-500 text-red-400 px-4 py-3 rounded-lg">
+            <p className="font-medium">Erro ao carregar dados</p>
+            <p className="text-sm mt-1">{error}</p>
+            <button 
+              onClick={loadDashboardData}
+              className="mt-2 px-4 py-1 bg-red-500/20 hover:bg-red-500/30 rounded text-sm transition-colors"
+            >
+              Tentar novamente
+            </button>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {loading ? (
@@ -219,8 +262,8 @@ export default function Dashboard() {
                       className="flex gap-4 p-4 bg-slate-950 border border-slate-800 rounded-lg hover:border-slate-700 transition-colors"
                     >
                       <img
-                        src={getImageUrl(article.image || article.imagem_banner_url) || 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=300&h=200&fit=crop'}
-                        alt={article.title}
+                        src={getArticleImage(article)}
+                        alt={getArticleTitle(article)}
                         className="w-24 h-24 rounded-lg object-cover flex-shrink-0"
                         onError={(e) => {
                           e.currentTarget.src = 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=300&h=200&fit=crop';
@@ -229,19 +272,19 @@ export default function Dashboard() {
 
                       <div className="flex-1 min-w-0">
                         <h3 className="text-lg font-semibold text-white mb-1 truncate">
-                          {article.title}
+                          {getArticleTitle(article)}
                         </h3>
                         <p className="text-sm text-slate-400 mb-3 line-clamp-2">
-                          {article.summary}
+                          {getArticleSummary(article)}
                         </p>
                         <div className="flex items-center gap-4 text-xs text-slate-500">
-                          <span>{article.date ? new Date(article.date).toLocaleDateString('pt-BR') : ''}</span>
+                          <span>{getArticleDate(article)}</span>
                           <span className="flex items-center gap-1">
                             <Eye size={14} />
-                            {article.views || 0}
+                            {getArticleViews(article)}
                           </span>
                           <span className="px-2 py-0.5 bg-cyan-500/10 text-cyan-400 rounded">
-                            {article.category}
+                            {getArticleCategory(article)}
                           </span>
                         </div>
                       </div>

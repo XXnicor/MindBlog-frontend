@@ -1,42 +1,27 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { ArrowLeft, Heart, Bookmark, Share2, Eye, MessageCircle, Loader2 } from 'lucide-react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import CommentSection from '../components/CommentSection';
-import { articleService } from '../lib/api';
+import { useArticle } from '../hooks/useArticle';
 import { getImageUrl } from '../lib/imageUtils';
-import { Article } from '../types/article';
 
 export default function ArticlePage() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const [article, setArticle] = useState<Article | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const { article, loading, error, refetch } = useArticle(id);
+
   const [isLiked, setIsLiked] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
 
+  // Atualizar likesCount quando o artigo carregar
   useEffect(() => {
-    if (id) {
-      loadArticle(id);
+    if (article) {
+      setLikesCount(article.curtidas || article.likes || 0);
     }
-  }, [id]);
-
-  const loadArticle = async (articleId: string) => {
-    try {
-      setLoading(true);
-      setError('');
-      const data = await articleService.getById(articleId) as Article;
-      setArticle(data);
-      setLikesCount(data.curtidas || data.likes || 0);
-    } catch (err: any) {
-      setError(err.message || 'Erro ao carregar artigo');
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [article]);
 
   const handleLike = () => {
     if (isLiked) {
@@ -73,7 +58,7 @@ export default function ArticlePage() {
               className="inline-flex items-center gap-2 text-cyan-500 hover:text-cyan-400"
             >
               <ArrowLeft size={20} />
-              Voltar aos artigos
+              Voltar aos Artigos
             </Link>
           </div>
         </div>
@@ -81,16 +66,31 @@ export default function ArticlePage() {
     );
   }
 
+  // Acesso seguro aos campos do artigo
+  const titulo = article.titulo || article.title || 'Sem título';
+  const resumo = article.resumo || article.summary || '';
+  const categoria = article.categoria || article.category || 'Sem categoria';
+  const conteudo = article.conteudo || '';
+  const tags = article.tags || [];
+  const views = article.views || article.visualizacoes || 0;
+  const readTime = article.tempoLeitura || article.readTime || '5min';
+  const dataPublicacao = article.data_publicacao || article.createdAt || article.date || article.criadoEm || '';
+  
+  // Acesso seguro ao autor
+  const autorNome = article?.autor?.nome ?? 'Autor Desconhecido';
+  const autorAvatar = article?.autor?.avatar ?? null;
+  const autorId = article?.autor?.id;
+
   const imageUrl = article.imagem_banner_url || getImageUrl(article.imagem || article.image);
 
   // Formatar data
-  const formatDate = (dateString: string | undefined) => {
+  const formatDate = (dateString: string) => {
     if (!dateString) return '';
     const date = new Date(dateString);
     return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
   };
 
-  const contentParagraphs = article.conteudo?.split('\n\n').filter((p: string) => p.trim()) || [];
+  const contentParagraphs = conteudo.split('\n\n').filter((p: string) => p.trim());
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
@@ -108,36 +108,31 @@ export default function ArticlePage() {
         <header className="mb-8">
           <div className="mb-4">
             <span className="inline-block bg-orange-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
-              {article.categoria || article.category}
+              {categoria}
             </span>
           </div>
 
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 leading-tight">
-            {article.titulo || article.title}
+            {titulo}
           </h1>
 
-          {(article.resumo || article.summary) && (
+          {resumo && (
             <p className="text-lg text-slate-400 mb-6">
-              {article.resumo || article.summary}
+              {resumo}
             </p>
           )}
 
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-purple-600 flex items-center justify-center text-white font-bold">
-                {(
-                  article.autor?.nome ||
-                  (typeof article.author === 'object' && article.author?.nome) ||
-                  (typeof article.author === 'string' ? article.author : '') ||
-                  'A'
-                )?.charAt(0)?.toUpperCase() || 'A'}
+                {autorNome?.charAt(0)?.toUpperCase() || 'A'}
               </div>
               <div>
                 <div className="text-white font-medium">
-                  {article.autor?.nome || (typeof article.author === 'object' ? article.author?.nome : '') || (typeof article.author === 'string' ? article.author : 'Autor')}
+                  {autorNome}
                 </div>
                 <div className="text-sm text-slate-400">
-                  {formatDate(article.criadoEm || article.createdAt || article.date)} • {article.tempoLeitura || article.readTime || '5min'} de leitura
+                  {formatDate(dataPublicacao)} • {readTime} de leitura
                 </div>
               </div>
             </div>
@@ -181,7 +176,7 @@ export default function ArticlePage() {
             </div>
             <div className="flex items-center gap-2">
               <Eye size={16} />
-              <span>{article.visualizacoes || article.views || 0} visualizações</span>
+              <span>{views} visualizações</span>
             </div>
             <div className="flex items-center gap-2">
               <MessageCircle size={16} />
@@ -194,7 +189,7 @@ export default function ArticlePage() {
           <div className="mb-8 rounded-xl overflow-hidden">
             <img
               src={imageUrl}
-              alt={article.titulo || article.title}
+              alt={titulo}
               className="w-full aspect-video object-cover"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
@@ -224,11 +219,11 @@ export default function ArticlePage() {
           </div>
 
           {/* Tags */}
-          {article.tags && article.tags.length > 0 && (
+          {tags && tags.length > 0 && (
             <div className="mt-12 pt-8 border-t border-slate-800">
               <h3 className="text-sm font-semibold text-slate-400 mb-3">Tags:</h3>
               <div className="flex flex-wrap gap-2">
-                {article.tags.map((tag: string) => (
+                {tags.map((tag: string) => (
                   <span
                     key={tag}
                     className="px-3 py-1 bg-slate-800 text-slate-300 text-sm rounded-full hover:bg-slate-700 transition-colors cursor-pointer"
