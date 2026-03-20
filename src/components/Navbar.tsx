@@ -32,9 +32,7 @@ export default function Navbar() {
 
   const navLinks = [
     { name: 'Home', path: '/' },
-    { name: 'AI', path: '/ai' },
-    { name: 'Engineering', path: '/artigos' },
-    { name: 'Architecture', path: '/categorias' }
+    { name: 'Development', path: '/artigos' }
   ];
 
   return (
