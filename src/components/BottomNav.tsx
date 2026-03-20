@@ -12,7 +12,7 @@ export default function BottomNav() {
   ];
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pt-2 pb-4 bg-stone-50/85 dark:bg-stone-950/85 backdrop-blur-xl border-t border-stone-200/20 dark:border-stone-800/20 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
+    <nav className="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pt-2 pb-4 bg-surface/85 backdrop-blur-xl border-t border-outline-variant/20 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
       {tabs.map((tab) => {
         const isActive = location.pathname === tab.path || (tab.label === 'Home' && location.pathname === '/');
         return (
@@ -21,8 +21,8 @@ export default function BottomNav() {
             to={tab.path} 
             className={`flex flex-col items-center justify-center rounded-xl px-3 py-1 mb-2 transition-all ${
               isActive 
-                ? 'text-orange-700 dark:text-orange-500 font-bold bg-orange-50/50 dark:bg-orange-900/20' 
-                : 'text-stone-500 dark:text-stone-400 hover:text-orange-600 dark:hover:text-orange-400'
+                ? 'text-primary font-bold bg-primary/10' 
+                : 'text-secondary hover:text-primary'
             }`}
           >
             <span className="material-symbols-outlined">{tab.icon}</span>

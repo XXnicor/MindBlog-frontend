@@ -53,27 +53,30 @@ export default function HeroArticle({ article }: HeroArticleProps) {
           </div>
         </div>
         
-        {/* Right Column: Image */}
-        <div className="lg:col-span-5 relative">
-          <div className="aspect-[4/5] bg-surface-container-high rounded-xl overflow-hidden relative group">
-            {imageUrl ? (
-              <>
-                <img 
-                  src={imageUrl} 
-                  alt={article.titulo}
-                  className="w-full h-full object-cover grayscale opacity-80 group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700" 
-                  loading="lazy"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                    e.currentTarget.parentElement!.innerHTML = '<div class="absolute inset-0 blueprint-grid opacity-40"></div>';
-                  }}
-                />
-                <div className="absolute inset-0 bg-primary/5 mix-blend-multiply pointer-events-none"></div>
-              </>
-            ) : (
-              <div className="absolute inset-0 blueprint-grid opacity-40"></div>
-            )}
-          </div>
+         {/* Right Column: Image */}
+         <div className="lg:col-span-5 relative">
+           <div className="aspect-[4/5] bg-surface-container-high rounded-xl overflow-hidden relative group">
+             {imageUrl ? (
+               <>
+                 <img 
+                   src={imageUrl} 
+                   alt={article.titulo}
+                   className="w-full h-full object-cover grayscale opacity-80 group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700" 
+                   loading="lazy"
+                   onError={(e) => {
+                     e.currentTarget.style.display = 'none';
+                     e.currentTarget.nextElementSibling?.removeAttribute('hidden');
+                   }}
+                 />
+                 <div className="absolute inset-0 hidden">
+                   <div className="absolute inset-0 blueprint-grid opacity-40"></div>
+                 </div>
+                 <div className="absolute inset-0 bg-primary/5 mix-blend-multiply pointer-events-none"></div>
+               </>
+             ) : (
+               <div className="absolute inset-0 blueprint-grid opacity-40"></div>
+             )}
+           </div>
           
           {/* Floating Element */}
           <div className="absolute -bottom-6 -left-12 hidden lg:block bg-surface-container-lowest p-6 shadow-xl rounded-xl border border-outline-variant/10 max-w-[240px]">

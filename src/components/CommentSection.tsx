@@ -126,11 +126,11 @@ export default function CommentSection({ articleId }: CommentSectionProps) {
   const getAvatarUrl = (avatar?: string) => getImageUrl(avatar) || null;
 
   return (
-    <div className="pt-16 pb-12 mt-16 border-t border-border">
+    <div className="pt-16 pb-12 mt-16 border-t border-outline-variant">
       {/* Cabeçalho */}
       <div className="flex items-center gap-3 mb-10">
-        <h3 className="font-display text-3xl font-bold text-ink flex items-center gap-3 tracking-tight">
-          Discussão <span className="text-ink-muted text-xl font-body font-normal">({comments.length})</span>
+        <h3 className="font-headline text-3xl font-bold text-on-surface flex items-center gap-3 tracking-tight">
+          Discussão <span className="text-secondary text-xl font-body font-normal">({comments.length})</span>
         </h3>
       </div>
 
@@ -143,17 +143,17 @@ export default function CommentSection({ articleId }: CommentSectionProps) {
               onChange={(e) => setNewComment(e.target.value.slice(0, MAX_COMMENT_LENGTH))}
               placeholder="Adicione um comentário à discussão..."
               rows={4}
-              className="w-full px-5 py-4 bg-paper-alt border border-border rounded-xl text-ink placeholder-ink-muted focus:outline-none focus:border-ink focus:ring-1 focus:ring-ink transition-all resize-none font-body text-[16px] leading-relaxed"
+              className="w-full px-5 py-4 bg-surface-container-low border border-outline-variant rounded-xl text-on-surface placeholder-secondary focus:outline-none focus:border-on-surface focus:ring-1 focus:ring-on-surface transition-all resize-none font-body text-[16px] leading-relaxed"
               required
             />
             <div className="absolute right-4 bottom-4 flex items-center gap-4">
-              <span className={`text-[12px] font-medium font-body ${newComment.length >= MAX_COMMENT_LENGTH * 0.9 ? 'text-[#DC2626]' : 'text-ink-muted'}`}>
+              <span className={`text-[12px] font-medium font-body ${newComment.length >= MAX_COMMENT_LENGTH * 0.9 ? 'text-error' : 'text-secondary'}`}>
                 {newComment.length}/{MAX_COMMENT_LENGTH}
               </span>
               <button
                 type="submit"
                 disabled={submitting || !newComment.trim()}
-                className="w-10 h-10 rounded-full bg-ink text-white flex items-center justify-center hover:bg-ink-light disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                className="w-10 h-10 rounded-full bg-on-surface text-on-primary flex items-center justify-center hover:bg-secondary disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 title="Enviar comentário"
               >
                 {submitting ? (
@@ -166,10 +166,10 @@ export default function CommentSection({ articleId }: CommentSectionProps) {
           </div>
         </form>
       ) : (
-        <div className="mb-14 p-8 bg-paper-alt border border-border rounded-xl text-center">
-          <MessageCircle className="w-8 h-8 text-ink-muted mx-auto mb-3" />
-          <p className="font-body text-[15px] text-ink-light">
-            <a href="/login" className="text-ink font-bold hover:text-accent underline decoration-border underline-offset-4 transition-colors">
+        <div className="mb-14 p-8 bg-surface-container-low border border-outline-variant rounded-xl text-center">
+          <MessageCircle className="w-8 h-8 text-secondary mx-auto mb-3" />
+          <p className="font-body text-[15px] text-secondary">
+            <a href="/login" className="text-on-surface font-bold hover:text-primary underline decoration-outline-variant underline-offset-4 transition-colors">
               Identifique-se
             </a>
             {' '}para participar da discussão.
@@ -180,29 +180,29 @@ export default function CommentSection({ articleId }: CommentSectionProps) {
       {/* Lista de comentários */}
       {loading ? (
         <div className="flex flex-col items-center justify-center py-12">
-          <Loader2 className="w-6 h-6 animate-spin text-ink-muted mb-3" />
-          <p className="font-body text-[14px] text-ink-muted">Carregando comentários...</p>
+          <Loader2 className="w-6 h-6 animate-spin text-secondary mb-3" />
+          <p className="font-body text-[14px] text-secondary">Carregando comentários...</p>
         </div>
       ) : error ? (
-        <div className="text-center py-10 bg-[#FEF2F2] border border-[#DC2626] rounded-xl text-[#DC2626]">
+        <div className="text-center py-10 bg-error/10 border border-error rounded-xl text-error">
           <p className="font-body text-[15px] font-bold mb-3">{error}</p>
           <button
             onClick={loadComments}
-            className="px-6 py-2 border border-[#DC2626] hover:bg-[#DC2626] hover:text-white font-body text-[13px] font-bold rounded-full transition-colors uppercase tracking-widest"
+            className="px-6 py-2 border border-error hover:bg-error hover:text-on-primary font-body text-[13px] font-bold rounded-full transition-colors uppercase tracking-widest"
           >
             Tentar novamente
           </button>
         </div>
       ) : comments.length === 0 ? (
         <div className="text-center py-16">
-          <p className="font-display text-xl text-ink-light italic">Seja o primeiro a compartilhar seus pensamentos.</p>
+          <p className="font-headline text-xl text-secondary italic">Seja o primeiro a compartilhar seus pensamentos.</p>
         </div>
       ) : (
         <div className="space-y-10">
           {comments.map((comment) => (
             <div
               key={comment.id}
-              className="group pb-10 border-b border-border last:border-0 last:pb-0"
+              className="group pb-10 border-b border-outline-variant last:border-0 last:pb-0"
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-4">
@@ -210,22 +210,22 @@ export default function CommentSection({ articleId }: CommentSectionProps) {
                     <img
                       src={getAvatarUrl(comment.autor.avatar)!}
                       alt={comment.autor.nome || 'Usuário'}
-                      className="w-12 h-12 rounded-full object-cover bg-paper-alt"
+                      className="w-12 h-12 rounded-full object-cover bg-surface-container-low"
                       onError={(e) => {
                         e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.autor?.nome || 'U')}&size=48&background=random&color=fff`;
                       }}
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-full bg-paper-alt border border-border flex items-center justify-center text-ink font-bold font-display text-lg">
+                    <div className="w-12 h-12 rounded-full bg-surface-container-low border border-outline-variant flex items-center justify-center text-on-surface font-bold font-headline text-lg">
                       {comment.autor?.nome?.charAt(0).toUpperCase() || '?'}
                     </div>
                   )}
 
                   <div>
-                    <p className="font-body font-bold text-[15px] text-ink mb-[2px]">
+                    <p className="font-body font-bold text-[15px] text-on-surface mb-[2px]">
                       {comment.autor?.nome || 'Usuário'}
                     </p>
-                    <p className="font-body text-[13px] text-ink-muted">
+                    <p className="font-body text-[13px] text-secondary">
                       {formatDate(comment.createdAt)}
                     </p>
                   </div>
@@ -234,7 +234,7 @@ export default function CommentSection({ articleId }: CommentSectionProps) {
                 {currentUser && comment.autor && currentUser.id === comment.autor.id && (
                   <button
                     onClick={() => handleDelete(comment.id)}
-                    className="p-2 text-ink-muted hover:text-[#DC2626] hover:bg-[#FEF2F2] rounded-full opacity-0 group-hover:opacity-100 transition-all focus:opacity-100"
+                    className="p-2 text-secondary hover:text-error hover:bg-error/10 rounded-full opacity-0 group-hover:opacity-100 transition-all focus:opacity-100"
                     title="Remover comentário"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -242,7 +242,7 @@ export default function CommentSection({ articleId }: CommentSectionProps) {
                 )}
               </div>
 
-              <p className="font-body text-[15px] text-ink leading-relaxed whitespace-pre-wrap ml-16">
+              <p className="font-body text-[15px] text-on-surface leading-relaxed whitespace-pre-wrap ml-16">
                 {comment.text}
               </p>
             </div>

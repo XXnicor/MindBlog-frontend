@@ -18,16 +18,24 @@ export default function ArticleCard({ article, variant = 'standard' }: ArticleCa
     <Link to={`/artigo/${article.id}`} className="group cursor-pointer flex flex-col h-full">
       <div className="aspect-video bg-surface-container mb-6 overflow-hidden rounded-xl relative group-hover:shadow-lg transition-shadow duration-500">
         {imageUrl ? (
-          <img 
-            src={imageUrl} 
-            alt={article.titulo}
-            className="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-500" 
-            loading="lazy"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-              e.currentTarget.parentElement!.innerHTML = '<div class="absolute inset-0 blueprint-grid opacity-40"></div><div class="absolute inset-0 flex items-center justify-center text-primary/30"><span class="material-symbols-outlined text-4xl">article</span></div>';
-            }}
-          />
+          <>
+            <img 
+              src={imageUrl} 
+              alt={article.titulo}
+              className="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-500" 
+              loading="lazy"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+                e.currentTarget.nextElementSibling?.removeAttribute('hidden');
+              }}
+            />
+            <div className="absolute inset-0 hidden">
+              <div className="absolute inset-0 blueprint-grid opacity-40"></div>
+              <div className="absolute inset-0 flex items-center justify-center text-primary/30">
+                <span className="material-symbols-outlined text-4xl">article</span>
+              </div>
+            </div>
+          </>
         ) : (
           <>
             <div className="absolute inset-0 blueprint-grid opacity-40"></div>

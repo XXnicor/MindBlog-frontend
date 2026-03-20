@@ -177,7 +177,7 @@ export default function AllArticles() {
               <div className="flex flex-col gap-8">
                 {articles.map((article) => (
                   <Link key={article.id} to={`/artigo/${article.id}`}>
-                    <article className="bg-surface-container-low border border-outline-variant/10 hover:border-primary/50 rounded-xl overflow-hidden transition-all group flex flex-col md:flex-row shadow-sm hover:shadow-md">
+                     <article className="bg-surface-container-low border border-outline-variant/10 hover:border-primary/50 rounded-xl overflow-hidden transition-all group flex flex-col md:flex-row shadow-sm hover:shadow-md">
                       <div className="md:w-64 h-64 md:h-auto overflow-hidden bg-surface-container relative">
                         <img
                           src={article.imagem_banner_url || getImageUrl(article.imagem || article.image) || ''}
@@ -185,12 +185,12 @@ export default function AllArticles() {
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                           onError={(e) => {
                             e.currentTarget.style.display = 'none';
-                            const parent = e.currentTarget.parentElement;
-                            if (parent) {
-                              parent.innerHTML = '<div class="absolute inset-0 flex items-center justify-center text-primary/20"><span class="material-symbols-outlined text-4xl">article</span></div>';
-                            }
+                            e.currentTarget.nextElementSibling?.removeAttribute('hidden');
                           }}
                         />
+                        <div className="absolute inset-0 hidden flex items-center justify-center text-primary/20">
+                          <span className="material-symbols-outlined text-4xl">article</span>
+                        </div>
                       </div>
 
                       <div className="p-8 flex-1 flex flex-col justify-between">

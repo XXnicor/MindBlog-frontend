@@ -69,10 +69,10 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: number) =
   return (
     <div className={`flex items-center gap-3 p-4 rounded-lg border ${styles[toast.type]} shadow-lg backdrop-blur-sm transition-all duration-300`}>
       {icons[toast.type]}
-      <p className="flex-1 text-sm text-white">{toast.message}</p>
+      <p className="flex-1 text-sm text-on-surface">{toast.message}</p>
       <button
         onClick={() => onRemove(toast.id)}
-        className="text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] transition-colors"
+        className="text-secondary hover:text-on-surface transition-colors"
       >
         <X className="w-4 h-4" />
       </button>

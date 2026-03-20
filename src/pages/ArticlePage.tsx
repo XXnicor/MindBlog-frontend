@@ -17,20 +17,21 @@ export default function ArticlePage() {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
-
+  
+  const categoria = article?.categoria || article?.category;
+  
   // Filtros seguros usando useMemo para evitar loop no useArticles
   const relatedFilters = useMemo(() => ({
-    categoria: article?.categoria || undefined
-  }), [article?.categoria]);
+    categoria: categoria || undefined
+  }), [categoria]);
   const { articles: relatedResults } = useArticles(1, 4, relatedFilters);
   const relatedArticles = relatedResults.filter(a => String(a.id) !== id).slice(0, 3);
 
-  // Atualizar contagens
+  // Atualizar contagens - usando valores primitivos
   useEffect(() => {
-    if (article) {
-      setLikesCount(article.curtidas || article.likes || 0);
-    }
-  }, [article]);
+    const likes = article?.curtidas || article?.likes || 0;
+    setLikesCount(likes);
+  }, [article?.curtidas, article?.likes]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -59,7 +60,7 @@ export default function ArticlePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background text-on-background flex flex-col">
+      <div className="min-h-screen bg-surface text-on-surface flex flex-col">
         <Navbar />
         <div className="flex-1 flex items-center justify-center pt-32 pb-24">
           <div className="flex flex-col items-center">
@@ -74,7 +75,7 @@ export default function ArticlePage() {
 
   if (error || !article) {
     return (
-      <div className="min-h-screen bg-background text-on-background flex flex-col">
+      <div className="min-h-screen bg-surface text-on-surface flex flex-col">
         <Navbar />
         <div className="max-w-[680px] mx-auto px-6 py-40 text-center flex-1">
           <p className="text-error font-medium mb-6 font-headline text-2xl">{error || 'Artigo não encontrado'}</p>
@@ -90,7 +91,6 @@ export default function ArticlePage() {
 
   const titulo = article.titulo || article.title || 'Sem título';
   const resumo = article.resumo || article.summary || '';
-  const categoria = article.categoria || article.category || 'Editorial';
   const conteudo = article.conteudo || '';
   const tags = article.tags || [];
   const views = article.views || article.visualizacoes || 0;
@@ -183,15 +183,15 @@ export default function ArticlePage() {
                   className="w-full aspect-video lg:aspect-[21/9] object-cover transition-transform duration-700 group-hover:scale-105" 
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
-                    const parent = e.currentTarget.parentElement;
-                    if (parent) {
-                      const placeholder = document.createElement('div');
-                      placeholder.className = "absolute inset-0 flex items-center justify-center text-primary/20";
-                      placeholder.innerHTML = '<span class="material-symbols-outlined text-6xl">article</span>';
-                      parent.appendChild(placeholder);
-                    }
+                    e.currentTarget.nextElementSibling?.removeAttribute('hidden');
                   }}
                 />
+                <div className="w-full aspect-video lg:aspect-[21/9] absolute inset-0 hidden">
+                  <div className="absolute inset-0 blueprint-grid opacity-40"></div>
+                  <div className="absolute inset-0 flex items-center justify-center text-primary/20">
+                    <span className="material-symbols-outlined text-6xl">article</span>
+                  </div>
+                </div>
               </>
             ) : (
               <div className="w-full aspect-video lg:aspect-[21/9] relative">

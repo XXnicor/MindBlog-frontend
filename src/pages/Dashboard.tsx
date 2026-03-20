@@ -271,7 +271,7 @@ export default function Dashboard() {
                     key={article.id}
                     className="group flex flex-col sm:flex-row gap-6 pb-8 border-b border-outline-variant/20 last:border-0 relative"
                   >
-                    <Link to={`/artigo/${article.id}`} className="shrink-0">
+                     <Link to={`/artigo/${article.id}`} className="shrink-0">
                       <div className="w-full sm:w-[200px] h-[140px] rounded-xl overflow-hidden bg-surface-container-low relative">
                         <img
                           src={getArticleImage(article)}
@@ -279,12 +279,12 @@ export default function Dashboard() {
                           className="w-full h-full object-cover group-hover:opacity-90 transition-opacity"
                           onError={(e) => {
                             e.currentTarget.style.display = 'none';
-                            const parent = e.currentTarget.parentElement;
-                            if (parent) {
-                              parent.innerHTML = '<div class="absolute inset-0 flex items-center justify-center text-primary/20"><span class="material-symbols-outlined text-4xl">article</span></div>';
-                            }
+                            e.currentTarget.nextElementSibling?.removeAttribute('hidden');
                           }}
                         />
+                        <div className="absolute inset-0 hidden flex items-center justify-center text-primary/20">
+                          <span className="material-symbols-outlined text-4xl">article</span>
+                        </div>
                       </div>
                     </Link>
 
@@ -379,21 +379,21 @@ export default function Dashboard() {
       {/* Modern Delete Modal */}
       {deleteModalOpen && (
         <div
-          className="fixed inset-0 bg-ink/40 backdrop-blur-sm flex items-center justify-center z-50 px-4"
+          className="fixed inset-0 bg-on-surface/40 backdrop-blur-sm flex items-center justify-center z-50 px-4"
           onClick={handleCloseDeleteModal}
         >
           <div
-            className="bg-paper border border-border rounded-2xl p-8 max-w-[400px] w-full shadow-2xl relative"
+            className="bg-surface border border-outline-variant rounded-2xl p-8 max-w-[400px] w-full shadow-2xl relative"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="w-12 h-12 rounded-full bg-[#FEF2F2] flex items-center justify-center text-[#DC2626] mb-5">
+            <div className="w-12 h-12 rounded-full bg-error/10 flex items-center justify-center text-error mb-5">
               <Trash size={20} />
             </div>
             
-            <h2 className="font-display text-2xl font-bold text-ink mb-2">
+            <h2 className="font-headline text-2xl font-bold text-on-surface mb-2">
               Excluir publicação?
             </h2>
-            <p className="font-body text-[15px] text-ink-light mb-8 leading-relaxed">
+            <p className="font-body text-[15px] text-secondary mb-8 leading-relaxed">
               Esta ação é permanente e não poderá ser desfeita. O artigo será removido do seu perfil e da plataforma.
             </p>
 
@@ -401,14 +401,14 @@ export default function Dashboard() {
               <button
                 onClick={handleCloseDeleteModal}
                 disabled={deleting}
-                className="px-6 py-2.5 font-body text-[14px] font-medium text-ink hover:bg-paper-alt border border-border rounded-full transition-all duration-200 disabled:opacity-50"
+                className="px-6 py-2.5 font-body text-[14px] font-medium text-on-surface hover:bg-surface-container-low border border-outline-variant rounded-full transition-all duration-200 disabled:opacity-50"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleConfirmDelete}
                 disabled={deleting}
-                className="px-6 py-2.5 flex items-center justify-center gap-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-body text-[14px] font-medium rounded-full transition-all duration-200 disabled:opacity-50 min-w-[100px]"
+                className="px-6 py-2.5 flex items-center justify-center gap-2 bg-error hover:bg-error/80 text-on-primary font-body text-[14px] font-medium rounded-full transition-all duration-200 disabled:opacity-50 min-w-[100px]"
               >
                 {deleting ? (
                   <Loader2 className="w-4 h-4 animate-spin" />

@@ -39,14 +39,14 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className={`fixed top-0 w-full z-50 bg-stone-50/85 dark:bg-stone-950/85 backdrop-blur-xl border-b border-stone-200/20 dark:border-stone-800/20 transition-all duration-300`}>
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center font-headline text-stone-900 dark:text-stone-100 antialiased">
+      <nav className={`fixed top-0 w-full z-50 bg-surface/85 dark:bg-inverse-surface/85 backdrop-blur-xl border-b border-outline-variant/20 transition-all duration-300`}>
+        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center font-headline text-on-surface antialiased">
           
           {/* ESQUERDA */}
           <div className="flex items-center gap-8">
             <Link 
               to="/" 
-              className="text-2xl font-bold tracking-tight text-stone-900 dark:text-stone-50 after:content-['.'] after:text-primary-container"
+              className="text-2xl font-bold tracking-tight text-on-surface after:content-['.'] after:text-primary-container"
             >
               MindBlog
             </Link>
@@ -60,8 +60,8 @@ export default function Navbar() {
                     to={link.path}
                     className={`transition-all duration-300 pb-1 font-semibold ${
                       isActive
-                        ? 'text-orange-700 dark:text-orange-500 border-b-2 border-orange-700 dark:border-orange-500'
-                        : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'
+                        ? 'text-primary border-b-2 border-primary'
+                        : 'text-secondary hover:text-on-surface'
                     }`}
                   >
                     {link.name}
@@ -73,13 +73,13 @@ export default function Navbar() {
 
           {/* DIREITA */}
           <div className="flex items-center gap-4">
-            <button className="hidden md:block p-2 text-stone-600 dark:text-stone-400 hover:bg-stone-100/50 dark:hover:bg-stone-800/50 transition-all duration-300 scale-95 active:scale-90 rounded-full">
+            <button className="hidden md:block p-2 text-secondary hover:bg-surface-container-low/50 transition-all duration-300 scale-95 active:scale-90 rounded-full">
               <span className="material-symbols-outlined block">search</span>
             </button>
             
             <button
               onClick={toggleTheme}
-              className="hidden md:block p-2 text-stone-600 dark:text-stone-400 hover:bg-stone-100/50 dark:hover:bg-stone-800/50 transition-all duration-300 scale-95 active:scale-90 rounded-full"
+              className="hidden md:block p-2 text-secondary hover:bg-surface-container-low/50 transition-all duration-300 scale-95 active:scale-90 rounded-full"
               title="Alternar tema"
             >
               {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
@@ -94,12 +94,12 @@ export default function Navbar() {
               </div>
             ) : (
               <div className="hidden md:flex items-center gap-4 ml-2">
-                <Link to="/login" className="font-label text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 transition-colors">
+                <Link to="/login" className="font-label text-sm font-medium text-secondary hover:text-on-surface transition-colors">
                   Sign In
                 </Link>
                 <Link to="/register">
                   <button className="bg-primary hover:bg-primary-container text-on-primary px-5 py-2 rounded-lg font-label text-sm font-bold tracking-wide transition-all duration-300 scale-95 active:scale-90 shadow-sm">
-                    Join the Network
+                    Join Network
                   </button>
                 </Link>
               </div>
@@ -109,13 +109,13 @@ export default function Navbar() {
             <div className="flex items-center gap-3 md:hidden">
               <button
                 onClick={toggleTheme}
-                className="text-stone-600 dark:text-stone-400 hover:bg-stone-100/50 dark:hover:bg-stone-800/50 p-2 rounded-full transition-colors"
+                className="text-secondary hover:bg-surface-container-low/50 p-2 rounded-full transition-colors"
                 title="Alternar tema"
               >
                 {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
               </button>
               <button 
-                className="text-stone-900 dark:text-stone-100 p-1"
+                className="text-on-surface p-1"
                 onClick={() => setIsMobileMenuOpen(true)}
                 aria-label="Abrir menu"
               >
@@ -128,20 +128,20 @@ export default function Navbar() {
 
       {/* Mobile Slide-out Menu */}
       <div 
-        className={`fixed inset-0 z-[60] bg-stone-900/40 backdrop-blur-sm transition-opacity duration-300 md:hidden ${
+        className={`fixed inset-0 z-[60] bg-on-surface/40 backdrop-blur-sm transition-opacity duration-300 md:hidden ${
           isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
         onClick={() => setIsMobileMenuOpen(false)}
       >
         <div 
-          className={`absolute right-0 top-0 bottom-0 w-[280px] bg-stone-50 dark:bg-stone-950 shadow-2xl p-6 transition-transform duration-300 ${
+          className={`absolute right-0 top-0 bottom-0 w-[280px] bg-surface shadow-2xl p-6 transition-transform duration-300 ${
             isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
           }`}
           onClick={e => e.stopPropagation()}
         >
           <div className="flex justify-between items-center mb-8">
-            <span className="font-headline text-xl font-bold text-stone-900 dark:text-stone-100">Menu</span>
-            <button onClick={() => setIsMobileMenuOpen(false)} className="text-stone-500 hover:text-stone-900 dark:hover:text-stone-100 transition-colors p-1 rounded-full">
+            <span className="font-headline text-xl font-bold text-on-surface">Menu</span>
+            <button onClick={() => setIsMobileMenuOpen(false)} className="text-secondary hover:text-on-surface transition-colors p-1 rounded-full">
               <X size={24} />
             </button>
           </div>
@@ -154,41 +154,41 @@ export default function Navbar() {
                 className={`font-headline text-lg transition-colors ${
                   location.pathname === link.path 
                     ? 'text-primary font-bold' 
-                    : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'
+                    : 'text-secondary hover:text-on-surface'
                 }`}
               >
                 {link.name}
               </Link>
             ))}
             
-            <hr className="border-stone-200 dark:border-stone-800 my-2" />
+            <hr className="border-outline-variant my-2" />
 
             {user ? (
               <div className="flex flex-col gap-4">
-                <Link to="/artigos/novo" className="font-label text-base text-stone-600 dark:text-stone-400 hover:text-primary transition-colors">
+                <Link to="/artigos/novo" className="font-label text-base text-secondary hover:text-primary transition-colors">
                   Write New Article
                 </Link>
-                <Link to="/dashboard" className="font-label text-base text-stone-600 dark:text-stone-400 hover:text-primary transition-colors">
+                <Link to="/dashboard" className="font-label text-base text-secondary hover:text-primary transition-colors">
                   My Articles
                 </Link>
-                <Link to="/settings" className="font-label text-base text-stone-600 dark:text-stone-400 hover:text-primary transition-colors">
+                <Link to="/settings" className="font-label text-base text-secondary hover:text-primary transition-colors">
                   Settings
                 </Link>
                 <button 
                   onClick={handleSignOut}
-                  className="text-left font-label text-base text-red-600 font-bold hover:text-red-700 transition-colors"
+                  className="text-left font-label text-base text-error font-bold hover:text-error transition-colors"
                 >
                   Sign Out
                 </button>
               </div>
             ) : (
               <div className="flex flex-col gap-4">
-                <Link to="/login" className="font-label text-base text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 transition-colors">
+                <Link to="/login" className="font-label text-base text-secondary hover:text-on-surface transition-colors">
                   Sign In
                 </Link>
                 <Link to="/register" className="mt-2">
                   <button className="bg-primary w-full text-on-primary px-5 py-3 rounded-lg font-label text-sm font-bold tracking-wide hover:bg-primary-container transition-colors shadow-sm">
-                    Join the Network
+                    Join Network
                   </button>
                 </Link>
               </div>
