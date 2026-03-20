@@ -43,36 +43,31 @@ export default function Register() {
     }
   };
 
-  const inputClasses = "w-full h-12 bg-paper-alt border-[1.5px] border-border rounded-lg px-4 font-body text-[15px] text-ink placeholder:text-ink-muted focus:bg-paper focus:border-ink focus:ring-[3px] focus:ring-ink/10 outline-none transition-all duration-200";
-  const inputErrorClasses = "w-full h-12 bg-[#FEF2F2] border-[1.5px] border-[#DC2626] rounded-lg px-4 font-body text-[15px] text-ink placeholder:text-[#DC2626]/60 focus:bg-white focus:border-[#DC2626] focus:ring-[3px] focus:ring-[#DC2626]/20 outline-none transition-all duration-200";
-  const labelClasses = "block font-body text-[13px] font-medium text-ink-light mb-[6px]";
-  const buttonClasses = "w-full h-12 bg-ink text-paper font-body text-[15px] font-medium rounded-lg hover:bg-[#2D2D2D] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed";
-
   const passwordMismatch = Boolean(confirmarSenha && senha !== confirmarSenha);
 
   return (
-    <div className="min-h-screen bg-paper-alt text-ink flex flex-col">
+    <div className="min-h-screen bg-[var(--color-paper-alt)] text-[var(--color-ink)] flex flex-col">
       <Navbar />
 
       <main className="flex-1 flex items-center justify-center px-4 py-16">
         <div className="w-full max-w-[420px]">
           {/* Header */}
           <div className="text-center mb-10">
-            <h1 className="font-display font-bold text-4xl text-ink mb-3 tracking-tight">Junte-se a nós<span className="text-accent">.</span></h1>
-            <p className="font-body text-[15px] text-ink-light">Crie sua conta para começar a publicar.</p>
+            <h1 className="font-display font-bold text-4xl text-[var(--color-ink)] mb-3 tracking-tight">Junte-se a nós<span className="text-[var(--color-accent)]">.</span></h1>
+            <p className="font-body text-[15px] text-[var(--color-ink-light)]">Crie sua conta para começar a publicar.</p>
           </div>
 
           {/* Form Card */}
-          <div className="bg-paper border border-border rounded-2xl p-8 sm:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+          <div className="bg-[var(--color-paper-raised)] border border-[var(--color-border)] rounded-2xl p-8 sm:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
             {error && (
-              <div className="mb-6 bg-[#FEF2F2] border-[1.5px] border-[#DC2626] text-[#DC2626] px-4 py-3 rounded-lg font-body text-[14px]">
+              <div className="mb-6 form-error-message p-3 bg-[#FEF2F2] border border-[var(--color-error)] rounded-lg text-center">
                 {error}
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label htmlFor="nome" className={labelClasses}>
+                <label htmlFor="nome" className="form-label block mb-[6px]">
                   Nome Completo
                 </label>
                 <input
@@ -82,12 +77,12 @@ export default function Register() {
                   onChange={(e) => setNome(e.target.value)}
                   placeholder="John Doe"
                   required
-                  className={inputClasses}
+                  className="form-input w-full"
                 />
               </div>
 
               <div>
-                <label htmlFor="email" className={labelClasses}>
+                <label htmlFor="email" className="form-label block mb-[6px]">
                   Email
                 </label>
                 <input
@@ -97,12 +92,12 @@ export default function Register() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="exemplo@email.com"
                   required
-                  className={inputClasses}
+                  className="form-input w-full"
                 />
               </div>
 
               <div>
-                <label htmlFor="senha" className={labelClasses}>
+                <label htmlFor="senha" className="form-label block mb-[6px]">
                   Senha
                 </label>
                 <input
@@ -113,12 +108,12 @@ export default function Register() {
                   placeholder="••••••••"
                   required
                   minLength={6}
-                  className={inputClasses}
+                  className="form-input w-full"
                 />
               </div>
 
               <div>
-                <label htmlFor="confirmarSenha" className={labelClasses}>
+                <label htmlFor="confirmarSenha" className="form-label block mb-[6px]">
                   Confirmar Senha
                 </label>
                 <input
@@ -128,10 +123,10 @@ export default function Register() {
                   onChange={(e) => setConfirmarSenha(e.target.value)}
                   placeholder="••••••••"
                   required
-                  className={passwordMismatch ? inputErrorClasses : inputClasses}
+                  className={`form-input w-full ${passwordMismatch ? '!border-[var(--color-error)] !bg-[#FEF2F2] focus:!ring-[var(--color-error)]' : ''}`}
                 />
                 {passwordMismatch && (
-                  <p className="mt-2 text-[12px] text-[#DC2626] font-body font-medium">
+                  <p className="form-error-message">
                     As senhas não coincidem
                   </p>
                 )}
@@ -140,7 +135,7 @@ export default function Register() {
               <button
                 type="submit"
                 disabled={loading || passwordMismatch}
-                className={`mt-2 ${buttonClasses}`}
+                className="btn-primary w-full mt-2 h-[44px]"
               >
                 {loading ? (
                   <>
@@ -153,16 +148,16 @@ export default function Register() {
               </button>
             </form>
 
-            <div className="mt-8 text-center font-body text-[14px] text-ink-light border-t border-border pt-6">
+          <div className="mt-8 text-center font-body text-[14px] text-[var(--color-ink-light)] border-t border-[var(--color-border)] pt-6">
               Já tem uma conta?{' '}
-              <Link to="/login" className="text-ink font-medium hover:text-accent transition-colors hover-underline pb-1">
+              <Link to="/login" className="text-[var(--color-ink)] font-medium hover:text-[var(--color-accent)] transition-colors hover-underline pb-1">
                 Fazer login
               </Link>
             </div>
           </div>
 
           <div className="mt-8 text-center">
-            <Link to="/" className="inline-flex items-center gap-2 font-body text-[14px] text-ink-muted hover:text-ink transition-colors font-medium">
+            <Link to="/" className="inline-flex items-center gap-2 font-body text-[14px] text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] transition-colors font-medium">
               <ArrowLeft size={16} />
               Voltar à página inicial
             </Link>
