@@ -56,35 +56,35 @@ export default function AllArticles() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex flex-col">
+    <div className="min-h-screen bg-[var(--color-paper)] text-[var(--color-ink)] flex flex-col">
       <Navbar />
 
       <main className="flex-1">
         {/* Cabeçalho da Página */}
-        <section className="bg-slate-950 py-16 border-b border-slate-800">
+        <section className="bg-[var(--color-paper-alt)] py-16 border-b border-[var(--color-border)]">
           <div className="max-w-7xl mx-auto px-4">
-            <h1 className="text-5xl font-bold mb-4">
-              Todos os <span className="text-blue-400">Artigos</span>
+            <h1 className="text-5xl font-display font-bold mb-4">
+              Todos os <span className="text-[var(--color-accent)]">Artigos</span>
             </h1>
-            <p className="text-xl text-slate-400">
+            <p className="text-xl text-[var(--color-ink-light)] font-body">
               Explore nossa coleção completa de artigos técnicos
             </p>
           </div>
         </section>
 
         {/* Barra de Controle (Search & Filter) */}
-        <section className="bg-slate-950 py-8 border-b border-slate-800">
+        <section className="bg-[var(--color-paper)] py-8 border-b border-[var(--color-border)]">
           <div className="max-w-7xl mx-auto px-4">
             <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
               {/* Input de Busca */}
               <div className="relative flex-1 w-full md:max-w-md">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-ink-muted)] w-5 h-5" />
                 <input
                   type="text"
                   placeholder="Buscar artigos..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-800 rounded-lg pl-10 pr-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-600 transition-colors"
+                  className="w-full bg-[var(--color-paper-alt)] border border-[var(--color-border)] rounded-lg pl-10 pr-4 py-3 text-[var(--color-ink)] placeholder-[var(--color-ink-muted)] focus:outline-none focus:border-[var(--color-accent)] transition-colors"
                 />
               </div>
 
@@ -94,7 +94,7 @@ export default function AllArticles() {
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="flex-1 md:flex-initial bg-slate-900 border border-slate-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-600 transition-colors cursor-pointer"
+                  className="flex-1 md:flex-initial bg-[var(--color-paper-alt)] border border-[var(--color-border)] rounded-lg px-4 py-3 text-[var(--color-ink)] focus:outline-none focus:border-[var(--color-accent)] transition-colors cursor-pointer"
                 >
                   <option value="all">Todas as Categorias</option>
                   {categories.slice(1).map((cat) => (
@@ -105,13 +105,13 @@ export default function AllArticles() {
                 </select>
 
                 {/* Botões de Visualização */}
-                <div className="flex bg-slate-900 border border-slate-800 rounded-lg p-1 gap-1">
+                <div className="flex bg-[var(--color-paper-alt)] border border-[var(--color-border)] rounded-lg p-1 gap-1">
                   <button
                     onClick={() => setViewMode('grid')}
                     className={`p-2 rounded transition-colors ${
                       viewMode === 'grid'
-                        ? 'bg-cyan-500 text-slate-900'
-                        : 'bg-transparent text-slate-400 hover:text-white'
+                        ? 'bg-[var(--color-accent)] text-[var(--color-paper)] shadow-sm'
+                        : 'bg-transparent text-[var(--color-ink-light)] hover:text-[var(--color-ink)]'
                     }`}
                     title="Visualização em Grid"
                   >
@@ -121,8 +121,8 @@ export default function AllArticles() {
                     onClick={() => setViewMode('list')}
                     className={`p-2 rounded transition-colors ${
                       viewMode === 'list'
-                        ? 'bg-cyan-500 text-slate-900'
-                        : 'bg-transparent text-slate-400 hover:text-white'
+                        ? 'bg-[var(--color-accent)] text-[var(--color-paper)] shadow-sm'
+                        : 'bg-transparent text-[var(--color-ink-light)] hover:text-[var(--color-ink)]'
                     }`}
                     title="Visualização em Lista"
                   >
@@ -133,11 +133,11 @@ export default function AllArticles() {
             </div>
 
             {/* Contador de Resultados */}
-            <div className="mt-4 text-sm text-slate-400">
+            <div className="mt-4 text-sm text-[var(--color-ink-light)]">
               {loading ? (
                 'Carregando...'
               ) : error ? (
-                <span className="text-red-400">{error}</span>
+                <span className="text-[var(--color-error)]">{error}</span>
               ) : (
                 <>
                   {pagination?.totalItems || 0} {pagination?.totalItems === 1 ? 'artigo encontrado' : 'artigos encontrados'}
@@ -168,14 +168,14 @@ export default function AllArticles() {
             ) : error ? (
               <div className="text-center py-20">
                 <div className="text-6xl mb-4">⚠️</div>
-                <h3 className="text-2xl font-bold mb-2">Erro ao carregar artigos</h3>
-                <p className="text-slate-400 mb-4">{error}</p>
+                <h3 className="text-2xl font-bold mb-2 text-[var(--color-ink)]">Erro ao carregar artigos</h3>
+                <p className="text-[var(--color-ink-light)] mb-4">{error}</p>
               </div>
             ) : articles.length === 0 ? (
               <div className="text-center py-20">
                 <div className="text-6xl mb-4">📭</div>
-                <h3 className="text-2xl font-bold mb-2">Nenhum artigo encontrado</h3>
-                <p className="text-slate-400">
+                <h3 className="text-2xl font-bold mb-2 text-[var(--color-ink)]">Nenhum artigo encontrado</h3>
+                <p className="text-[var(--color-ink-light)]">
                   Tente ajustar os filtros ou buscar por outros termos
                 </p>
               </div>
@@ -191,9 +191,9 @@ export default function AllArticles() {
               <div className="flex flex-col gap-4">
                 {articles.map((article) => (
                   <Link key={article.id} to={`/artigo/${article.id}`}>
-                    <article className="bg-slate-900 border border-slate-800 rounded-lg overflow-hidden hover:border-slate-700 transition-colors cursor-pointer flex flex-col md:flex-row">
+                    <article className="bg-[var(--color-paper)] border border-[var(--color-border)] hover:border-[var(--color-accent)] rounded-lg overflow-hidden transition-colors cursor-pointer flex flex-col md:flex-row">
                       {/* Imagem à Esquerda (Desktop) / Topo (Mobile) */}
-                      <div className="md:w-48 h-48 md:h-auto bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center flex-shrink-0">
+                      <div className="md:w-48 h-48 md:h-auto bg-[var(--color-paper-alt)] flex items-center justify-center flex-shrink-0">
                         {article.imagem_banner_url || getImageUrl(article.imagem || article.image) ? (
                           <img
                             src={article.imagem_banner_url || getImageUrl(article.imagem || article.image)!}
@@ -202,12 +202,12 @@ export default function AllArticles() {
                             onError={(e) => {
                               e.currentTarget.style.display = 'none';
                               if (e.currentTarget.parentElement) {
-                                e.currentTarget.parentElement.innerHTML = '<div class="w-full h-full flex items-center justify-center text-slate-600 text-2xl">M</div>';
+                                e.currentTarget.parentElement.innerHTML = '<div class="w-full h-full flex items-center justify-center text-[var(--color-ink-muted)] text-2xl">M</div>';
                               }
                             }}
                           />
                         ) : (
-                          <div className="text-slate-600 text-2xl font-bold">M</div>
+                          <div className="text-[var(--color-ink-muted)] text-2xl font-bold">M</div>
                         )}
                       </div>
 
@@ -215,27 +215,27 @@ export default function AllArticles() {
                       <div className="p-6 flex-1 flex flex-col justify-between">
                         <div>
                           <div className="flex items-center gap-3 mb-3">
-                            <span className="inline-block bg-slate-800 text-slate-400 text-xs px-2 py-1 rounded">
+                            <span className="badge">
                               {article.categoria ?? article.category ?? 'Sem categoria'}
                             </span>
                             {article.highlight && (
-                              <span className="inline-block bg-cyan-500/20 text-cyan-400 text-xs px-2 py-1 rounded">
+                              <span className="badge" style={{ backgroundColor: 'var(--color-accent)', color: 'var(--color-paper)' }}>
                                 Destaque
                               </span>
                             )}
                           </div>
                           
-                          <h3 className="text-white font-bold text-xl mb-2 line-clamp-2">
+                          <h3 className="text-[var(--color-ink)] font-display font-bold text-xl mb-2 line-clamp-2">
                             {article.titulo || article.title || 'Sem título'}
                           </h3>
-                          <p className="text-slate-400 text-sm leading-relaxed line-clamp-2">
+                          <p className="text-[var(--color-ink-light)] text-sm leading-relaxed line-clamp-2">
                             {article.resumo || article.summary || ''}
                           </p>
                         </div>
 
-                        <div className="mt-4 flex items-center justify-between text-slate-400 text-sm border-t border-slate-800 pt-4">
+                        <div className="mt-4 flex items-center justify-between text-[var(--color-ink-muted)] text-sm border-t border-[var(--color-border)] pt-4">
                           <div className="flex items-center gap-2">
-                            <span className="font-medium text-slate-300">{getAuthorName(article)}</span>
+                            <span className="font-medium text-[var(--color-ink-light)]">{getAuthorName(article)}</span>
                             {article.data_publicacao && (
                               <>
                                 <span>•</span>
@@ -243,7 +243,7 @@ export default function AllArticles() {
                               </>
                             )}
                           </div>
-                          <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-4 text-[var(--color-ink-light)]">
                             <div className="flex items-center gap-1">
                               <Clock size={16} />
                               <span>{getReadTime(article)}</span>
@@ -267,7 +267,7 @@ export default function AllArticles() {
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={!pagination.hasPreviousPage}
-                  className="p-2 bg-slate-900 border border-slate-800 rounded-lg text-white hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="p-2 bg-[var(--color-paper-alt)] border border-[var(--color-border)] rounded-lg text-[var(--color-ink)] hover:bg-[var(--color-paper-raised)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   title="Página anterior"
                 >
                   <ChevronLeft className="w-5 h-5" />
@@ -287,15 +287,15 @@ export default function AllArticles() {
                           onClick={() => handlePageChange(page)}
                           className={`px-4 py-2 rounded-lg transition-colors ${
                             page === currentPage
-                              ? 'bg-cyan-500 text-slate-900 font-bold'
-                              : 'bg-slate-900 border border-slate-800 text-white hover:bg-slate-800'
+                              ? 'bg-[var(--color-accent)] text-[var(--color-paper)] font-bold'
+                              : 'bg-[var(--color-paper-alt)] border border-[var(--color-border)] text-[var(--color-ink)] hover:bg-[var(--color-paper-raised)]'
                           }`}
                         >
                           {page}
                         </button>
                       );
                     } else if (page === currentPage - 2 || page === currentPage + 2) {
-                      return <span key={page} className="text-slate-500">...</span>;
+                      return <span key={page} className="text-[var(--color-ink-muted)]">...</span>;
                     }
                     return null;
                   })}
@@ -304,7 +304,7 @@ export default function AllArticles() {
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={!pagination.hasNextPage}
-                  className="p-2 bg-slate-900 border border-slate-800 rounded-lg text-white hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="p-2 bg-[var(--color-paper-alt)] border border-[var(--color-border)] rounded-lg text-[var(--color-ink)] hover:bg-[var(--color-paper-raised)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   title="Próxima página"
                 >
                   <ChevronRight className="w-5 h-5" />

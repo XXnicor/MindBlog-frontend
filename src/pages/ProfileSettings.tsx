@@ -216,24 +216,24 @@ export default function ProfileSettings() {
 
   if (loadingData) {
     return (
-      <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--color-paper)] text-[var(--color-ink)] flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block w-8 h-8 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-          <p className="text-slate-400">Carregando...</p>
+          <div className="inline-block w-8 h-8 border-4 border-[var(--color-accent)] border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-[var(--color-ink-muted)]">Carregando...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex flex-col">
+    <div className="min-h-screen bg-[var(--color-paper)] text-[var(--color-ink)] flex flex-col">
       <Navbar />
 
       <main className="flex-1 max-w-4xl mx-auto px-4 py-12 w-full">
         {/* Navegação Auxiliar */}
         <Link
           to="/dashboard"
-          className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-8"
+          className="inline-flex items-center gap-2 text-[var(--color-ink-light)] hover:text-[var(--color-ink)] transition-colors mb-8"
         >
           <ArrowLeft size={20} />
           <span>Voltar ao Dashboard</span>
@@ -241,24 +241,24 @@ export default function ProfileSettings() {
 
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">
+          <h1 className="text-4xl font-display font-bold text-[var(--color-ink)] mb-2">
             Configurações do Perfil
           </h1>
-          <p className="text-slate-400">
+          <p className="text-[var(--color-ink-light)]">
             Gerencie suas informações pessoais
           </p>
         </div>
 
         {/* Card do Formulário */}
-        <div className="bg-slate-900 border border-slate-800 rounded-lg p-8">
+        <div className="bg-[var(--color-paper-alt)] border border-[var(--color-border)] rounded-lg p-8">
           <form onSubmit={handleSubmit} className="space-y-8">
             {/* Seção de Avatar */}
-            <div className="flex flex-col items-center pb-8 border-b border-slate-800">
+            <div className="flex flex-col items-center pb-8 border-b border-[var(--color-border)]">
               <div className="relative group mb-4">
                 <img
                    src={getAvatarPreview()}
                    alt="Avatar"
-                   className="w-24 h-24 rounded-full object-cover border-4 border-slate-700"
+                   className="w-24 h-24 rounded-full object-cover border-4 border-[var(--color-border)]"
                    onError={(e) => {
                      e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(nome)}&size=200&background=06b6d4&color=fff`;
                    }}
@@ -278,7 +278,7 @@ export default function ProfileSettings() {
                 />
               </div>
 
-              <p className="text-sm text-slate-400 text-center max-w-sm">
+              <p className="text-sm text-[var(--color-ink-light)] text-center max-w-sm">
                 Clique na imagem para alterar seu avatar. Formatos aceitos: JPG, PNG, GIF, WEBP (máx 5MB)
               </p>
             </div>
@@ -287,7 +287,7 @@ export default function ProfileSettings() {
             <div className="space-y-6">
               {/* Nome Completo */}
               <div>
-                <label htmlFor="nome" className="block text-sm font-medium text-slate-300 mb-2">
+                <label htmlFor="nome" className="form-label">
                   Nome Completo
                 </label>
                 <input
@@ -296,13 +296,13 @@ export default function ProfileSettings() {
                   value={nome}
                   onChange={(e) => setNome(e.target.value)}
                   required
-                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-cyan-500 transition-colors"
+                  className="form-input"
                 />
               </div>
 
               {/* Email */}
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
+                <label htmlFor="email" className="form-label">
                   Email
                 </label>
                 <input
@@ -311,13 +311,13 @@ export default function ProfileSettings() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-cyan-500 transition-colors"
+                  className="form-input"
                 />
               </div>
 
               {/* Nova Senha */}
               <div>
-                <label htmlFor="senha" className="block text-sm font-medium text-slate-300 mb-2">
+                <label htmlFor="senha" className="form-label">
                   Nova Senha (opcional)
                 </label>
                 <input
@@ -327,10 +327,10 @@ export default function ProfileSettings() {
                   onChange={(e) => setSenha(e.target.value)}
                   placeholder="Deixe em branco para manter a senha atual"
                   minLength={6}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-cyan-500 transition-colors"
+                  className="form-input"
                 />
                 {senha && (
-                  <p className="mt-1 text-xs text-slate-500">
+                  <p className="mt-1 text-xs text-[var(--color-ink-muted)]">
                     Mínimo de 6 caracteres
                   </p>
                 )}
@@ -338,7 +338,7 @@ export default function ProfileSettings() {
 
               {/* Bio */}
               <div>
-                <label htmlFor="bio" className="block text-sm font-medium text-slate-300 mb-2">
+                <label htmlFor="bio" className="form-label">
                   Bio
                 </label>
                 <textarea
@@ -347,13 +347,13 @@ export default function ProfileSettings() {
                   onChange={(e) => setBio(e.target.value.slice(0, maxBioLength))}
                   rows={5}
                   placeholder="Conte um pouco sobre você..."
-                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-cyan-500 transition-colors resize-none"
+                  className="form-input resize-none"
                 />
                 <div className="mt-2 flex justify-between items-center">
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-[var(--color-ink-muted)]">
                     Compartilhe sua experiência e interesses
                   </p>
-                  <p className={`text-xs ${bioLength >= maxBioLength ? 'text-red-400' : 'text-slate-500'}`}>
+                  <p className={`text-xs ${bioLength >= maxBioLength ? 'text-[var(--color-error)]' : 'text-[var(--color-ink-muted)]'}`}>
                     {bioLength}/{maxBioLength}
                   </p>
                 </div>
@@ -361,42 +361,42 @@ export default function ProfileSettings() {
             </div>
 
             {/* Informações da Conta */}
-            <div className="pt-8 border-t border-slate-800">
-              <h3 className="text-lg font-semibold text-white mb-4">
+            <div className="pt-8 border-t border-[var(--color-border)]">
+              <h3 className="text-lg font-display font-semibold text-[var(--color-ink)] mb-4">
                 Informações da conta
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <p className="text-sm text-slate-500 mb-1">Membro desde</p>
-                  <p className="text-slate-300 font-medium">{formatDate(createdAt)}</p>
+                  <p className="text-sm text-[var(--color-ink-muted)] mb-1">Membro desde</p>
+                  <p className="text-[var(--color-ink-light)] font-medium">{formatDate(createdAt)}</p>
                 </div>
               </div>
             </div>
 
             {/* Estatísticas do Usuário */}
             {stats && (
-              <div className="pt-8 border-t border-slate-800">
+              <div className="pt-8 border-t border-[var(--color-border)]">
                 <div className="flex items-center gap-2 mb-4">
-                  <BarChart3 className="w-5 h-5 text-cyan-500" />
-                  <h3 className="text-lg font-semibold text-white">
+                  <BarChart3 className="w-5 h-5 text-[var(--color-accent)]" />
+                  <h3 className="text-lg font-display font-semibold text-[var(--color-ink)]">
                     Suas Estatísticas
                   </h3>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="bg-slate-950 border border-slate-800 rounded-lg p-4">
-                    <p className="text-sm text-slate-500 mb-1">Artigos</p>
-                    <p className="text-2xl font-bold text-white">{stats.totalArticles || 0}</p>
+                  <div className="bg-[var(--color-paper)] border border-[var(--color-border)] rounded-lg p-4">
+                    <p className="text-sm text-[var(--color-ink-muted)] mb-1">Artigos</p>
+                    <p className="text-2xl font-bold text-[var(--color-ink)]">{stats.totalArticles || 0}</p>
                   </div>
-                  <div className="bg-slate-950 border border-slate-800 rounded-lg p-4">
-                    <p className="text-sm text-slate-500 mb-1">Visualizações</p>
-                    <p className="text-2xl font-bold text-cyan-400">{stats.totalViews || 0}</p>
+                  <div className="bg-[var(--color-paper)] border border-[var(--color-border)] rounded-lg p-4">
+                    <p className="text-sm text-[var(--color-ink-muted)] mb-1">Visualizações</p>
+                    <p className="text-2xl font-bold text-[var(--color-accent)]">{stats.totalViews || 0}</p>
                   </div>
-                  <div className="bg-slate-950 border border-slate-800 rounded-lg p-4">
-                    <p className="text-sm text-slate-500 mb-1">Curtidas</p>
+                  <div className="bg-[var(--color-paper)] border border-[var(--color-border)] rounded-lg p-4">
+                    <p className="text-sm text-[var(--color-ink-muted)] mb-1">Curtidas</p>
                     <p className="text-2xl font-bold text-pink-400">{stats.totalLikes || 0}</p>
                   </div>
-                  <div className="bg-slate-950 border border-slate-800 rounded-lg p-4">
-                    <p className="text-sm text-slate-500 mb-1">Comentários</p>
+                  <div className="bg-[var(--color-paper)] border border-[var(--color-border)] rounded-lg p-4">
+                    <p className="text-sm text-[var(--color-ink-muted)] mb-1">Comentários</p>
                     <p className="text-2xl font-bold text-green-400">{stats.totalComments || 0}</p>
                   </div>
                 </div>
@@ -407,7 +407,7 @@ export default function ProfileSettings() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-primary w-full flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
@@ -422,14 +422,14 @@ export default function ProfileSettings() {
         </div>
 
         {/* Zona de Perigo (Opcional) */}
-        <div className="mt-8 bg-red-500/5 border border-red-500/20 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-red-400 mb-2">
+        <div className="mt-8 bg-[#FEF2F2] dark:bg-transparent border border-[var(--color-error)]/20 dark:border-[var(--color-error)]/30 rounded-lg p-6">
+          <h3 className="text-lg font-display font-semibold text-[var(--color-error)] mb-2">
             Zona de Perigo
           </h3>
-          <p className="text-sm text-slate-400 mb-4">
+          <p className="text-sm text-[var(--color-ink-light)] mb-4">
             Ações irreversíveis que afetam sua conta permanentemente
           </p>
-          <button className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg text-sm font-medium transition-colors">
+          <button className="px-4 py-2 bg-[var(--color-error)]/10 hover:bg-[var(--color-error)]/20 text-[var(--color-error)] border border-[var(--color-error)]/30 rounded-lg text-sm font-medium transition-colors">
             Desativar Conta
           </button>
         </div>

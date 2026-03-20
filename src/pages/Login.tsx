@@ -35,33 +35,29 @@ export default function Login() {
     }
   };
 
-  const inputClasses = "w-full h-12 bg-paper-alt border-[1.5px] border-border rounded-lg px-4 font-body text-[15px] text-ink placeholder:text-ink-muted focus:bg-paper focus:border-ink focus:ring-[3px] focus:ring-ink/10 outline-none transition-all duration-200";
-  const labelClasses = "block font-body text-[13px] font-medium text-ink-light mb-[6px]";
-  const buttonClasses = "w-full h-12 bg-ink text-paper font-body text-[15px] font-medium rounded-lg hover:bg-[#2D2D2D] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed";
-
   return (
-    <div className="min-h-screen bg-paper-alt text-ink flex flex-col">
+    <div className="min-h-screen bg-[var(--color-paper-alt)] text-[var(--color-ink)] flex flex-col">
       <Navbar />
 
       <main className="flex-1 flex items-center justify-center px-4 py-16">
         <div className="w-full max-w-[420px]">
           {/* Header */}
           <div className="text-center mb-10">
-            <h1 className="font-display font-bold text-4xl text-ink mb-3 tracking-tight">MindBlog<span className="text-accent">.</span></h1>
-            <p className="font-body text-[15px] text-ink-light">Acesse sua conta para continuar lendo e publicando.</p>
+            <h1 className="font-display font-bold text-4xl text-[var(--color-ink)] mb-3 tracking-tight">MindBlog<span className="text-[var(--color-accent)]">.</span></h1>
+            <p className="font-body text-[15px] text-[var(--color-ink-light)]">Acesse sua conta para continuar lendo e publicando.</p>
           </div>
 
           {/* Form Card */}
-          <div className="bg-paper border border-border rounded-2xl p-8 sm:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+          <div className="bg-[var(--color-paper-raised)] border border-[var(--color-border)] rounded-2xl p-8 sm:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
             {error && (
-              <div className="mb-6 bg-[#FEF2F2] border-[1.5px] border-[#DC2626] text-[#DC2626] px-4 py-3 rounded-lg font-body text-[14px]">
+              <div className="mb-6 form-error-message p-3 bg-[#FEF2F2] border border-[var(--color-error)] rounded-lg text-center">
                 {error}
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label htmlFor="email" className={labelClasses}>
+                <label htmlFor="email" className="form-label block mb-[6px]">
                   Email
                 </label>
                 <input
@@ -71,13 +67,13 @@ export default function Login() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="exemplo@email.com"
                   required
-                  className={inputClasses}
+                  className="form-input w-full"
                 />
               </div>
 
               <div>
                 <div className="flex items-center justify-between mb-[6px]">
-                  <label htmlFor="password" className="block font-body text-[13px] font-medium text-ink-light">
+                  <label htmlFor="password" className="form-label block">
                     Senha
                   </label>
                 </div>
@@ -88,14 +84,14 @@ export default function Login() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
-                  className={inputClasses}
+                  className="form-input w-full"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className={`mt-2 ${buttonClasses}`}
+                className="btn-primary w-full mt-2 h-[44px]"
               >
                 {loading ? (
                   <>
@@ -108,16 +104,16 @@ export default function Login() {
               </button>
             </form>
 
-            <div className="mt-8 text-center font-body text-[14px] text-ink-light border-t border-border pt-6">
+            <div className="mt-8 text-center font-body text-[14px] text-[var(--color-ink-light)] border-t border-[var(--color-border)] pt-6">
               Não tem uma conta?{' '}
-              <Link to="/register" className="text-ink font-medium hover:text-accent transition-colors hover-underline pb-1">
+              <Link to="/register" className="text-[var(--color-ink)] font-medium hover:text-[var(--color-accent)] transition-colors hover-underline pb-1">
                 Criar conta
               </Link>
             </div>
           </div>
 
           <div className="mt-8 text-center">
-            <Link to="/" className="inline-flex items-center gap-2 font-body text-[14px] text-ink-muted hover:text-ink transition-colors font-medium">
+            <Link to="/" className="inline-flex items-center gap-2 font-body text-[14px] text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] transition-colors font-medium">
               <ArrowLeft size={16} />
               Voltar à página inicial
             </Link>

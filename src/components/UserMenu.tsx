@@ -53,10 +53,10 @@ export default function UserMenu({ user, onSignOut }: UserMenuProps) {
         <img
           src={avatarUrl}
           alt={user.nome}
-          className="w-8 h-8 rounded-full border-2 border-slate-700 object-cover"
+          className="w-8 h-8 rounded-full border border-[var(--color-border)] object-cover"
         />
         <ChevronDown
-          className={`w-4 h-4 text-slate-400 transition-transform ${
+          className={`w-4 h-4 text-[var(--color-ink-light)] transition-transform ${
             isOpen ? 'rotate-180' : ''
           }`}
         />
@@ -64,20 +64,20 @@ export default function UserMenu({ user, onSignOut }: UserMenuProps) {
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-64 bg-slate-900 border border-slate-800 rounded-lg shadow-xl z-50 overflow-hidden">
+        <div className="absolute right-0 top-full mt-2 w-64 bg-[var(--color-paper-raised)] border border-[var(--color-border)] rounded-lg shadow-xl z-50 overflow-hidden">
           {/* Header - Informações do Usuário */}
-          <div className="p-4 border-b border-slate-800">
+          <div className="p-4 border-b border-[var(--color-border)]">
             <div className="flex items-center gap-3">
               <img
                 src={avatarUrl}
                 alt={user.nome}
-                className="w-10 h-10 rounded-full border-2 border-slate-700 object-cover"
+                className="w-10 h-10 rounded-full border border-[var(--color-border)] object-cover"
               />
               <div className="flex-1 min-w-0">
-                <p className="text-white font-semibold text-sm truncate">
+                <p className="text-[var(--color-ink)] font-semibold text-sm truncate">
                   {user.nome}
                 </p>
-                <p className="text-slate-400 text-xs truncate">
+                <p className="text-[var(--color-ink-muted)] text-xs truncate">
                   {user.email}
                 </p>
               </div>
@@ -90,7 +90,7 @@ export default function UserMenu({ user, onSignOut }: UserMenuProps) {
             <Link
               to="/dashboard"
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-3 px-4 py-3 text-slate-300 hover:bg-slate-800 transition-colors"
+              className="flex items-center gap-3 px-4 py-3 text-[var(--color-ink-light)] hover:bg-[var(--color-paper-alt)] hover:text-[var(--color-ink)] transition-colors"
             >
               <LayoutDashboard className="w-4 h-4" />
               <span className="text-sm">Dashboard</span>
@@ -100,22 +100,22 @@ export default function UserMenu({ user, onSignOut }: UserMenuProps) {
             <Link
               to="/settings"
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-3 px-4 py-3 text-slate-300 hover:bg-slate-800 transition-colors"
+              className="flex items-center gap-3 px-4 py-3 text-[var(--color-ink-light)] hover:bg-[var(--color-paper-alt)] hover:text-[var(--color-ink)] transition-colors"
             >
               <Settings className="w-4 h-4" />
               <span className="text-sm">Configurações</span>
             </Link>
 
             {/* Divider */}
-            <div className="border-t border-slate-800 my-2"></div>
+            <div className="border-t border-[var(--color-border)] my-2"></div>
 
             {/* Sair */}
             <button
               onClick={handleSignOut}
-              className="w-full flex items-center gap-3 px-4 py-3 text-red-400 hover:bg-slate-800 transition-colors"
+              className="w-full flex items-center gap-3 px-4 py-3 text-[var(--color-error)] hover:bg-[#FEF2F2] dark:hover:bg-[var(--color-paper-alt)] transition-colors"
             >
               <LogOut className="w-4 h-4" />
-              <span className="text-sm">Sair</span>
+              <span className="text-sm font-medium">Sair</span>
             </button>
           </div>
         </div>

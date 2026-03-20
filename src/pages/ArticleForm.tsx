@@ -152,31 +152,31 @@ export default function ArticleForm() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--color-paper-alt)] text-[var(--color-ink)] flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block w-8 h-8 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-          <p className="text-slate-400">Carregando artigo...</p>
+          <div className="inline-block w-8 h-8 border-4 border-[var(--color-accent)] border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-[var(--color-ink-muted)] font-body">Carregando artigo...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
-      <div className="max-w-3xl mx-auto px-4 py-8">
+    <div className="min-h-screen bg-[var(--color-paper-alt)] text-[var(--color-ink)]">
+      <div className="max-w-3xl mx-auto px-4 py-8 md:py-12">
         <Link
           to="/dashboard"
-          className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-6"
+          className="inline-flex items-center gap-2 text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] transition-colors mb-6 font-medium"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Voltar ao Dashboard</span>
         </Link>
 
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">
+          <h1 className="text-3xl font-display font-bold mb-2">
             {isEditMode ? 'Editar Artigo' : 'Criar Novo Artigo'}
           </h1>
-          <p className="text-slate-400">
+          <p className="text-[var(--color-ink-light)] font-body">
             {isEditMode 
               ? 'Atualize as informações do seu artigo' 
               : 'Compartilhe seu conhecimento com a comunidade'
@@ -186,7 +186,7 @@ export default function ArticleForm() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="title" className="block text-white font-medium mb-2">
+            <label htmlFor="title" className="form-label block mb-2">
               Título do Artigo
             </label>
             <input
@@ -196,13 +196,13 @@ export default function ArticleForm() {
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Digite o título do seu artigo..."
               required
-              className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
+              className="form-input w-full"
             />
           </div>
 
           {/* Resumo */}
           <div>
-            <label htmlFor="summary" className="block text-white font-medium mb-2">
+            <label htmlFor="summary" className="form-label block mb-2">
               Resumo
             </label>
             <textarea
@@ -212,16 +212,16 @@ export default function ArticleForm() {
               placeholder="Escreva um breve resumo do artigo..."
               required
               rows={3}
-              className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors resize-none"
+              className="form-input w-full resize-none"
             />
-            <div className="mt-1 text-right text-sm text-slate-400">
+            <div className="mt-1 text-right text-sm text-[var(--color-ink-muted)] font-body">
               {summary.length}/{SUMMARY_MAX}
             </div>
           </div>
 
           {/* Categoria */}
           <div>
-            <label htmlFor="category" className="block text-white font-medium mb-2">
+            <label htmlFor="category" className="form-label block mb-2">
               Categoria
             </label>
             <select
@@ -229,7 +229,7 @@ export default function ArticleForm() {
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               required
-              className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-cyan-500 transition-colors"
+              className="form-input w-full"
             >
               <option value="Dev">Desenvolvimento</option>
               <option value="DevOps">DevOps</option>
@@ -239,7 +239,7 @@ export default function ArticleForm() {
 
           {/* Upload de Imagem */}
           <div>
-            <label htmlFor="image" className="block text-white font-medium mb-2">
+            <label htmlFor="image" className="form-label block mb-2">
               Imagem de Capa
             </label>
             <div className="relative">
@@ -252,46 +252,34 @@ export default function ArticleForm() {
               />
               <label
                 htmlFor="image"
-                className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-slate-400 hover:text-white hover:border-cyan-500 cursor-pointer transition-colors"
+                className="flex items-center justify-center gap-2 w-full px-4 py-8 border border-dashed border-[var(--color-border)] rounded-xl text-[var(--color-ink-muted)] bg-[var(--color-paper)] hover:text-[var(--color-ink)] hover:border-[var(--color-accent)] cursor-pointer transition-colors"
               >
-                <Upload className="w-5 h-5" />
-                <span>
+                <Upload className="w-5 h-5 mb-1" />
+                <span className="font-medium text-[14px]">
                   {image 
                     ? image.name 
                     : existingImageUrl 
-                      ? 'Imagem existente (clique para alterar)' 
+                      ? 'Alterar imagem da capa' 
                       : 'Clique para fazer upload da imagem'
                   }
                 </span>
               </label>
             </div>
             
-            {image && (
-              <div className="mt-3">
+            {(image || existingImageUrl) && (
+              <div className="mt-4 rounded-xl overflow-hidden border border-[var(--color-border)] bg-[var(--color-paper)] p-2">
                 <img 
-                  src={URL.createObjectURL(image)} 
+                  src={image ? URL.createObjectURL(image) : existingImageUrl} 
                   alt="Preview" 
-                  className="w-full h-48 object-cover rounded-lg border border-slate-700"
+                  className="w-full h-[240px] md:h-[320px] object-cover rounded-lg"
                 />
-                <p className="mt-1 text-xs text-slate-400">Preview: {image.name}</p>
-              </div>
-            )}
-            
-            {existingImageUrl && !image && (
-              <div className="mt-3">
-                <img 
-                  src={existingImageUrl} 
-                  alt="Imagem atual" 
-                  className="w-full h-48 object-cover rounded-lg border border-slate-700"
-                />
-                <p className="mt-1 text-xs text-slate-400">Imagem atual</p>
               </div>
             )}
           </div>
 
           {/* Tags */}
           <div>
-            <label htmlFor="tagInput" className="block text-white font-medium mb-2">
+            <label htmlFor="tagInput" className="form-label block mb-2">
               Tags
             </label>
             <div className="flex gap-2 mb-3">
@@ -301,16 +289,16 @@ export default function ArticleForm() {
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
                 onKeyDown={handleTagKeyDown}
-                placeholder="Digite uma tag e pressione Enter..."
-                className="flex-1 px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
+                placeholder="Ex: react, tutorial..."
+                className="form-input flex-1"
               />
               <button
                 type="button"
                 onClick={handleAddTag}
-                className="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white hover:bg-slate-700 transition-colors flex items-center gap-2"
+                className="btn-outline flex items-center justify-center gap-2 font-medium px-4"
               >
                 <Plus className="w-4 h-4" />
-                Adicionar
+                Add
               </button>
             </div>
             {tags.length > 0 && (
@@ -318,15 +306,15 @@ export default function ArticleForm() {
                 {tags.map((tag) => (
                   <span
                     key={tag}
-                    className="inline-flex items-center gap-2 px-3 py-1 bg-slate-800 border border-slate-700 rounded-full text-sm text-slate-300"
+                    className="badge flex items-center gap-1.5"
                   >
                     {tag}
                     <button
                       type="button"
                       onClick={() => handleRemoveTag(tag)}
-                      className="hover:text-red-400 transition-colors"
+                      className="hover:text-[var(--color-error)] transition-colors opacity-70 hover:opacity-100"
                     >
-                      <X className="w-3 h-3" />
+                      <X className="w-3.5 h-3.5" />
                     </button>
                   </span>
                 ))}
@@ -336,7 +324,7 @@ export default function ArticleForm() {
 
           {/* Conteúdo do Artigo */}
           <div>
-            <label htmlFor="content" className="block text-white font-medium mb-2">
+            <label htmlFor="content" className="form-label block mb-2">
               Conteúdo do Artigo
             </label>
             <textarea
@@ -346,20 +334,19 @@ export default function ArticleForm() {
               placeholder="Escreva o conteúdo completo do seu artigo... Você pode usar Markdown."
               required
               rows={16}
-              className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors resize-none font-mono text-sm"
+              className="form-input w-full resize-y min-h-[300px] font-mono text-sm leading-relaxed"
             />
-            <div className="mt-2 text-sm text-slate-400">
-              <span>
-                {content.length}/{CONTENT_MAX} caracteres • {wordCount} palavras • {readingTime} {readingTime === 1 ? 'minuto' : 'minutos'} de leitura
-              </span>
+            <div className="mt-2 text-sm text-[var(--color-ink-muted)] font-body flex justify-between">
+              <span>{content.length}/{CONTENT_MAX} caracteres</span>
+              <span>{readingTime} {readingTime === 1 ? 'min.' : 'mins.'} de leitura</span>
             </div>
           </div>
 
-          <div className="flex gap-4 pt-4">
+          <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-[var(--color-border)]">
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 px-6 py-3 bg-cyan-500 hover:bg-cyan-600 disabled:bg-slate-700 disabled:cursor-not-allowed text-slate-900 font-semibold rounded-lg transition-colors"
+              className="btn-primary flex-1 h-[48px]"
             >
               {isSubmitting 
                 ? (isEditMode ? 'Salvando...' : 'Publicando...') 
@@ -368,7 +355,7 @@ export default function ArticleForm() {
             </button>
             <Link
               to="/dashboard"
-              className="px-6 py-3 bg-transparent border border-slate-700 hover:border-slate-500 text-white rounded-lg transition-colors text-center"
+              className="btn-outline w-full sm:w-auto px-8 h-[48px] flex items-center justify-center font-medium"
             >
               Cancelar
             </Link>
