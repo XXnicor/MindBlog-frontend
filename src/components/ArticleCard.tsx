@@ -1,93 +1,116 @@
 import { Link } from 'react-router-dom';
-import { Clock, Eye } from 'lucide-react';
+import { Clock, Eye, Heart } from 'lucide-react';
 import { getImageUrl } from '../lib/imageUtils';
 import { Article } from '../types/article';
 
 interface ArticleCardProps {
   article: Article;
+  variant?: 'standard' | 'featured';
 }
 
-export default function ArticleCard({ article }: ArticleCardProps) {
-  // Acesso seguro ao autor com optional chaining
+export default function ArticleCard({ article, variant = 'standard' }: ArticleCardProps) {
   const authorName = article?.autor?.nome ?? 'Autor Desconhecido';
-  
-  // Imagem: priorizar imagem_banner_url, senão image (que pode ser nome de arquivo)
   const imageUrl = article.imagem_banner_url || getImageUrl(article.image);
   
-  // Calcular tempo de leitura estimado (200 palavras por minuto)
   const wordsPerMinute = 200;
-  const wordCount = article.conteudo?.trim().split(/\s+/).filter(w => w.length > 0).length || 0;
+  const wordCount = article.conteudo?.trim().split(/\\s+/).filter(w => w.length > 0).length || 0;
   const readTime = Math.max(1, Math.ceil(wordCount / wordsPerMinute));
+
+  // Placeholder date as it's not in the Article type currently requested
+  const formattedDate = "15 mar.";
+
+  const isFeatured = variant === 'featured';
 
   return (
     <Link 
       to={`/artigo/${article.id}`}
-      className="group block bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-cyan-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/10"
+      className={`group flex flex-col bg-transparent hover:bg-paper-alt hover:-translate-y-1 hover:shadow-md transition-all duration-base rounded-2xl overflow-hidden border border-transparent hover:border-border ${
+        isFeatured ? 'md:flex-row md:items-stretch' : ''
+      }`}
     >
       {/* Imagem */}
-      <div className="relative h-48 overflow-hidden bg-gradient-to-br from-slate-800 to-slate-900">
+      <div 
+        className={`relative overflow-hidden bg-paper-alt shrink-0 ${
+          isFeatured ? 'w-full md:w-[55%] h-[280px] md:h-[420px]' : 'w-full aspect-video rounded-xl'
+        }`}
+      >
         {imageUrl ? (
           <img
             src={imageUrl}
             alt={article.titulo}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="w-full h-full object-cover transition-transform duration-slow group-hover:scale-105"
             loading="lazy"
             onError={(e) => {
               e.currentTarget.style.display = 'none';
-              e.currentTarget.parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center text-slate-600 text-4xl font-bold">M</div>';
+              e.currentTarget.parentElement!.innerHTML = '<div class="w-full h-full flex flex-col items-center justify-center text-ink-muted bg-paper-alt pattern-dots"></div>';
             }}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-slate-600 text-4xl font-bold">
-            M
+          <div className="w-full h-full flex items-center justify-center text-ink-muted bg-paper-alt pattern-dots">
+            {/* Minimal pattern fallback */}
           </div>
         )}
         
-        {/* Badge de categoria */}
-        <div className="absolute top-3 left-3">
-          <span className="inline-block px-3 py-1 bg-slate-900/80 backdrop-blur-sm text-cyan-400 text-xs font-semibold rounded-full border border-slate-700">
-            {article.categoria ?? 'Sem categoria'}
-          </span>
-        </div>
+        {/* Hover Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-base" />
 
-        {/* Badge de destaque */}
+        {/* Destaque Badge */}
         {article.highlight && (
-          <div className="absolute top-3 right-3">
-            <span className="inline-block px-3 py-1 bg-cyan-500/90 text-slate-900 text-xs font-bold rounded-full">
-              DESTAQUE
+          <div className="absolute top-4 right-4">
+            <span className="inline-block px-3 py-1 bg-ink text-paper text-[11px] uppercase tracking-wider font-bold rounded-full">
+              Destaque
             </span>
           </div>
         )}
       </div>
 
       {/* Conteúdo */}
-      <div className="p-5">
-        <h3 className="text-white font-bold text-lg leading-tight mb-3 line-clamp-2 group-hover:text-cyan-400 transition-colors">
+      <div className={`flex flex-col flex-1 ${isFeatured ? 'p-6 md:p-10 justify-center' : 'p-4 pt-1 items-start w-full'}`}>
+        
+        {/* Categoria badge */}
+        <span className="block mt-4 text-[11px] font-medium text-accent uppercase tracking-[0.08em] mb-2 leading-none">
+          {article.categoria ?? 'Editorial'}
+        </span>
+
+        {/* Título */}
+        <h3 
+          className={`font-display font-semibold text-ink line-clamp-3 group-hover:text-accent transition-colors duration-fast leading-[1.3] mb-3 ${
+            isFeatured ? 'text-[28px] md:text-[36px]' : 'text-[18px] md:text-[20px]'
+          }`}
+        >
           {article.titulo}
         </h3>
         
-        <p className="text-slate-400 text-sm mb-4 line-clamp-2 leading-relaxed">
-          {article.resumo ?? ''}
-        </p>
+        {/* Resumo */}
+        {(isFeatured || article.resumo) && (
+          <p className="font-body text-[14px] text-ink-light leading-[1.6] line-clamp-3 mb-6">
+            {article.resumo ?? 'Um olhar aprofundado sobre tecnologia, design e as ideias que moldam o nosso amanhã.'}
+          </p>
+        )}
 
-        {/* Meta informações */}
-        <div className="flex items-center justify-between text-xs text-slate-500 border-t border-slate-800 pt-4">
+        {/* Meta informações (Rodapé) */}
+        <div className="mt-auto pt-4 flex items-center justify-between border-t border-border w-full">
+          {/* Autor */}
           <div className="flex items-center gap-2">
-            {/* Avatar do autor */}
-            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-cyan-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold">
+            <div className="w-7 h-7 rounded-full bg-paper-alt flex items-center justify-center text-ink-light text-[11px] font-bold shrink-0">
               {authorName?.charAt(0)?.toUpperCase() || 'A'}
             </div>
-            <span className="truncate max-w-[100px]">{authorName}</span>
+            <div className="flex items-center gap-1.5 text-[13px]">
+              <span className="font-medium text-ink truncate max-w-[120px]">{authorName}</span>
+              <span className="text-ink-muted">·</span>
+              <span className="text-ink-muted">{formattedDate}</span>
+            </div>
           </div>
           
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1">
-              <Clock size={12} />
-              <span>{readTime}min</span>
+          {/* Métricas */}
+          <div className="flex items-center gap-3 text-[12px] text-ink-muted">
+            <div className="flex items-center gap-[4px] font-medium">
+              <Eye size={14} strokeWidth={2.5} />
+              <span>{article.views ?? 0}</span>
             </div>
-            <div className="flex items-center gap-1">
-              <Eye size={12} />
-              <span>{article.views}</span>
+            <div className="flex items-center gap-[4px] font-medium">
+              <Heart size={14} strokeWidth={2.5} />
+              <span>{Math.floor((article.views || 0) * 0.12)}</span>
             </div>
           </div>
         </div>

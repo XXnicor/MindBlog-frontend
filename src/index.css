@@ -2,178 +2,127 @@
 @tailwind components;
 @tailwind utilities;
 
-/* small helpers to match design */
-html,body{height:100%}
-body{@apply bg-slate-950 text-white}
+@layer base {
+  :root {
+    /* Colors - Light Mode (Default) */
+    --color-ink: #0D0D0D;
+    --color-ink-light: #3D3D3D;
+    --color-ink-muted: #8C8C8C;
+    --color-paper: #FAFAF8;
+    --color-paper-alt: #F2F1EE;
+    --color-border: #E8E6E0;
+    --color-accent: #C1440E;
+    --color-accent-hover: #9E3009;
 
-.line-clamp-3{display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden}
+    /* Typography */
+    --font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
+    --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-reading: 'Lora', Georgia, serif;
 
-/* Site Header */
-.site-header {
-  @apply border-b border-slate-800 bg-slate-950;
+    /* Typographic Scale */
+    --text-xs: 0.75rem;     /* 12px */
+    --text-sm: 0.875rem;    /* 14px */
+    --text-base: 1rem;      /* 16px */
+    --text-md: 1.125rem;    /* 18px */
+    --text-lg: 1.25rem;     /* 20px */
+    --text-xl: 1.5rem;      /* 24px */
+    --text-2xl: 2rem;       /* 32px */
+    --text-3xl: 2.5rem;     /* 40px */
+    --text-4xl: 3.5rem;     /* 56px */
+    --text-5xl: 4.5rem;     /* 72px */
+
+    /* Spacing Grid (8px) */
+    --space-1: 8px;
+    --space-2: 16px;
+    --space-3: 24px;
+    --space-4: 32px;
+    --space-5: 40px;
+    --space-6: 48px;
+    --space-8: 64px;
+    --space-10: 80px;
+    --space-12: 96px;
+    --space-16: 128px;
+    --space-20: 160px;
+
+    /* Animations & Transitions */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* Optional Dark Mode */
+  html.dark {
+    --color-ink: #F0EDE8;
+    --color-ink-light: #B8B4AE;
+    --color-ink-muted: #6B6761;
+    --color-paper: #141412;
+    --color-paper-alt: #1E1C1A;
+    --color-border: #2A2825;
+    --color-accent: #E05A2B;
+    --color-accent-hover: #F07040;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 }
 
-.header-inner {
-  @apply flex items-center justify-between py-4;
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
 }
 
-.logo {
-  @apply text-2xl font-bold text-blue-400;
+/* Shimmer Skeleton */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-paper-alt) 25%,
+    var(--color-border) 50%,
+    var(--color-paper-alt) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
 }
 
-.nav {
-  @apply flex items-center gap-6;
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
 }
 
-.nav a {
-  @apply text-slate-300 hover:text-white transition-colors;
+/* Micro-interactions */
+.hover-underline {
+  position: relative;
+  text-decoration: none;
+}
+.hover-underline::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  transform: scaleX(0);
+  height: 1px;
+  bottom: -2px;
+  left: 0;
+  background-color: currentColor;
+  transform-origin: bottom right;
+  transition: transform var(--transition-base);
+}
+.hover-underline:hover::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
 }
 
-/* Buttons */
-.btn-primary {
-  @apply bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors;
-}
-
-.btn-cta {
-  @apply bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-lg font-semibold transition-colors;
-}
-
-.btn-ghost {
-  @apply border border-slate-700 hover:border-slate-600 text-white px-6 py-3 rounded-lg text-lg transition-colors;
-}
-
-/* Hero Section */
-.hero {
-  @apply py-20 bg-gradient-to-b from-slate-900 to-slate-950;
-}
-
-.hero-inner {
-  @apply text-center max-w-4xl mx-auto;
-}
-
-.hero h1 {
-  @apply text-5xl md:text-6xl font-bold mb-6;
-}
-
-.accent {
-  @apply text-blue-400;
-}
-
-.subtitle {
-  @apply text-xl text-slate-400 mb-8;
-}
-
-.hero-cta {
-  @apply flex gap-4 justify-center flex-wrap;
-}
-
-/* Container */
-.container {
-  @apply max-w-7xl mx-auto px-4;
-}
-
-/* Section */
-.section {
-  @apply py-16;
-}
-
-.section-header {
-  @apply flex justify-between items-center mb-8;
-}
-
-.section-header h2 {
-  @apply text-3xl font-bold;
-}
-
-.link-muted {
-  @apply text-slate-400 hover:text-white transition-colors;
-}
-
-/* Cards Grid */
-.cards-grid {
-  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6;
-}
-
-.card {
-  @apply bg-slate-900 rounded-lg overflow-hidden border border-slate-800 hover:border-slate-700 transition-colors;
-}
-
-.card.highlight {
-  @apply md:col-span-2 lg:row-span-2;
-}
-
-.card-image {
-  @apply bg-gradient-to-br from-blue-500 to-purple-600 aspect-video flex items-center justify-center text-2xl font-bold;
-}
-
-.card.highlight .card-image {
-  @apply text-4xl aspect-auto h-full min-h-[300px];
-}
-
-.card-body {
-  @apply p-4;
-}
-
-.tag {
-  @apply inline-block bg-blue-600/20 text-blue-400 px-3 py-1 rounded-full text-sm mb-2;
-}
-
-.card h3 {
-  @apply font-semibold mb-2 line-clamp-2;
-}
-
-.meta {
-  @apply text-sm text-slate-500;
-}
-
-/* Dark Block */
-.dark-block {
-  @apply bg-slate-900 rounded-lg p-8 text-center;
-}
-
-.dark-block h2 {
-  @apply text-3xl font-bold mb-4;
-}
-
-.muted {
-  @apply text-slate-400 mb-6;
-}
-
-/* Newsletter Form */
-.newsletter {
-  @apply flex gap-3 max-w-md mx-auto flex-wrap justify-center;
-}
-
-.newsletter input {
-  @apply flex-1 min-w-[250px] bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-600;
-}
-
-/* Footer CTA */
-.footer-cta {
-  @apply text-center;
-}
-
-.footer-cta h3 {
-  @apply text-2xl font-bold mb-4;
-}
-
-/* Site Footer */
-.site-footer {
-  @apply border-t border-slate-800 bg-slate-950 py-8;
-}
-
-.footer-inner {
-  @apply flex flex-col md:flex-row justify-between items-center gap-4;
-}
-
-.brand {
-  @apply text-lg font-semibold text-slate-400;
-}
-
-.footer-nav {
-  @apply flex gap-6;
-}
-
-.footer-nav a {
-  @apply text-slate-400 hover:text-white transition-colors;
+/* Common form focus */
+.focus-ring {
+  @apply focus:outline-none focus:ring-[3px] focus:ring-border focus:border-ink;
 }

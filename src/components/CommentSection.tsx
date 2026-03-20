@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { MessageCircle, Trash2, Loader2 } from 'lucide-react';
+import { MessageCircle, Trash2, Loader2, Send } from 'lucide-react';
 import { articleService, commentService, authService } from '../lib/api';
 import { getImageUrl } from '../lib/imageUtils';
 import { Comment } from '../types/article';
@@ -42,7 +42,6 @@ export default function CommentSection({ articleId }: CommentSectionProps) {
       const user = await authService.getCurrentUser();
       setCurrentUser(user);
     } catch (err) {
-      // Usuário não está logado
       console.log('Usuário não autenticado');
     }
   };
@@ -118,132 +117,131 @@ export default function CommentSection({ articleId }: CommentSectionProps) {
     if (days === 1) return 'ontem';
     if (days < 7) return `há ${days} dias`;
     
-    return date.toLocaleDateString('pt-BR');
+    return date.toLocaleDateString('pt-BR', { day: 'numeric', month: 'short', year: 'numeric' });
   };
 
   const getAvatarUrl = (avatar?: string) => getImageUrl(avatar) || null;
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-lg p-8">
+    <div className="pt-16 pb-12 mt-16 border-t border-border">
       {/* Cabeçalho */}
-      <div className="flex items-center gap-2 mb-6">
-        <MessageCircle className="w-6 h-6 text-cyan-500" />
-        <h3 className="text-2xl font-bold text-white">
-          Comentários ({comments.length})
+      <div className="flex items-center gap-3 mb-10">
+        <h3 className="font-display text-3xl font-bold text-ink flex items-center gap-3 tracking-tight">
+          Discussão <span className="text-ink-muted text-xl font-body font-normal">({comments.length})</span>
         </h3>
       </div>
 
       {/* Formulário de novo comentário */}
       {currentUser ? (
-        <form onSubmit={handleSubmit} className="mb-8">
-          <textarea
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value.slice(0, MAX_COMMENT_LENGTH))}
-            placeholder="Escreva seu comentário..."
-            rows={4}
-            className="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors resize-none"
-            required
-          />
-          <div className="flex items-center justify-between mt-2">
-            <span className="text-sm text-slate-400">
-              {newComment.length}/{MAX_COMMENT_LENGTH}
-            </span>
-            <button
-              type="submit"
-              disabled={submitting || !newComment.trim()}
-              className="px-6 py-2 bg-cyan-500 hover:bg-cyan-400 disabled:bg-slate-700 disabled:cursor-not-allowed text-slate-900 font-bold rounded-lg transition-colors flex items-center gap-2"
-            >
-              {submitting ? (
-                <>
+        <form onSubmit={handleSubmit} className="mb-14">
+          <div className="relative">
+            <textarea
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value.slice(0, MAX_COMMENT_LENGTH))}
+              placeholder="Adicione um comentário à discussão..."
+              rows={4}
+              className="w-full px-5 py-4 bg-paper-alt border border-border rounded-xl text-ink placeholder-ink-muted focus:outline-none focus:border-ink focus:ring-1 focus:ring-ink transition-all resize-none font-body text-[16px] leading-relaxed"
+              required
+            />
+            <div className="absolute right-4 bottom-4 flex items-center gap-4">
+              <span className={`text-[12px] font-medium font-body ${newComment.length >= MAX_COMMENT_LENGTH * 0.9 ? 'text-[#DC2626]' : 'text-ink-muted'}`}>
+                {newComment.length}/{MAX_COMMENT_LENGTH}
+              </span>
+              <button
+                type="submit"
+                disabled={submitting || !newComment.trim()}
+                className="w-10 h-10 rounded-full bg-ink text-white flex items-center justify-center hover:bg-ink-light disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                title="Enviar comentário"
+              >
+                {submitting ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Enviando...
-                </>
-              ) : (
-                'Comentar'
-              )}
-            </button>
+                ) : (
+                  <Send className="w-4 h-4 ml-[-2px] mt-[2px]" />
+                )}
+              </button>
+            </div>
           </div>
         </form>
       ) : (
-        <div className="mb-8 p-4 bg-slate-950 border border-slate-700 rounded-lg text-center">
-          <p className="text-slate-400">
-            <a href="/login" className="text-cyan-500 hover:text-cyan-400 font-medium">
-              Faça login
+        <div className="mb-14 p-8 bg-paper-alt border border-border rounded-xl text-center">
+          <MessageCircle className="w-8 h-8 text-ink-muted mx-auto mb-3" />
+          <p className="font-body text-[15px] text-ink-light">
+            <a href="/login" className="text-ink font-bold hover:text-accent underline decoration-border underline-offset-4 transition-colors">
+              Identifique-se
             </a>
-            {' '}para comentar
+            {' '}para participar da discussão.
           </p>
         </div>
       )}
 
       {/* Lista de comentários */}
       {loading ? (
-        <div className="text-center py-8">
-          <div className="inline-block w-8 h-8 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mb-2"></div>
-          <p className="text-slate-400">Carregando comentários...</p>
+        <div className="flex flex-col items-center justify-center py-12">
+          <Loader2 className="w-6 h-6 animate-spin text-ink-muted mb-3" />
+          <p className="font-body text-[14px] text-ink-muted">Carregando comentários...</p>
         </div>
       ) : error ? (
-        <div className="text-center py-8">
-          <p className="text-red-400 mb-4">{error}</p>
+        <div className="text-center py-10 bg-[#FEF2F2] border border-[#DC2626] rounded-xl text-[#DC2626]">
+          <p className="font-body text-[15px] font-bold mb-3">{error}</p>
           <button
             onClick={loadComments}
-            className="px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold rounded-lg transition-colors"
+            className="px-6 py-2 border border-[#DC2626] hover:bg-[#DC2626] hover:text-white font-body text-[13px] font-bold rounded-full transition-colors uppercase tracking-widest"
           >
             Tentar novamente
           </button>
         </div>
       ) : comments.length === 0 ? (
-        <div className="text-center py-12">
-          <MessageCircle className="w-12 h-12 text-slate-700 mx-auto mb-3" />
-          <p className="text-slate-400">Nenhum comentário ainda. Seja o primeiro!</p>
+        <div className="text-center py-16">
+          <p className="font-display text-xl text-ink-light italic">Seja o primeiro a compartilhar seus pensamentos.</p>
         </div>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-10">
           {comments.map((comment) => (
             <div
               key={comment.id}
-              className="bg-slate-950 border border-slate-800 rounded-lg p-4"
+              className="group pb-10 border-b border-border last:border-0 last:pb-0"
             >
-              {/* Header do comentário */}
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    {/* Avatar */}
-                    {comment.autor?.avatar ? (
-                      <img
-                        src={getAvatarUrl(comment.autor.avatar)!}
-                        alt={comment.autor.nome || 'Usuário'}
-                        className="w-10 h-10 rounded-full object-cover border-2 border-slate-700"
-                        onError={(e) => {
-                          e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.autor?.nome || 'U')}&size=40&background=06b6d4&color=fff`;
-                        }}
-                      />
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-cyan-500 flex items-center justify-center text-slate-900 font-bold">
-                        {comment.autor?.nome?.charAt(0).toUpperCase() || '?'}
-                      </div>
-                    )}
-
-                    <div>
-                      <p className="font-medium text-white">{comment.autor?.nome || 'Usuário'}</p>
-                      <p className="text-sm text-slate-500">
-                        {formatDate(comment.createdAt)}
-                      </p>
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-4">
+                  {comment.autor?.avatar ? (
+                    <img
+                      src={getAvatarUrl(comment.autor.avatar)!}
+                      alt={comment.autor.nome || 'Usuário'}
+                      className="w-12 h-12 rounded-full object-cover bg-paper-alt"
+                      onError={(e) => {
+                        e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.autor?.nome || 'U')}&size=48&background=random&color=fff`;
+                      }}
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-full bg-paper-alt border border-border flex items-center justify-center text-ink font-bold font-display text-lg">
+                      {comment.autor?.nome?.charAt(0).toUpperCase() || '?'}
                     </div>
-                  </div>
-
-                  {/* Botão de deletar (apenas para o autor ou admin) */}
-                  {currentUser && comment.autor && currentUser.id === comment.autor.id && (
-                    <button
-                      onClick={() => handleDelete(comment.id)}
-                      className="p-2 text-slate-400 hover:text-red-400 transition-colors"
-                      title="Deletar comentário"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
                   )}
+
+                  <div>
+                    <p className="font-body font-bold text-[15px] text-ink mb-[2px]">
+                      {comment.autor?.nome || 'Usuário'}
+                    </p>
+                    <p className="font-body text-[13px] text-ink-muted">
+                      {formatDate(comment.createdAt)}
+                    </p>
+                  </div>
                 </div>
 
-              {/* Texto do comentário */}
-              <p className="text-slate-300 whitespace-pre-wrap">{comment.text}</p>
+                {currentUser && comment.autor && currentUser.id === comment.autor.id && (
+                  <button
+                    onClick={() => handleDelete(comment.id)}
+                    className="p-2 text-ink-muted hover:text-[#DC2626] hover:bg-[#FEF2F2] rounded-full opacity-0 group-hover:opacity-100 transition-all focus:opacity-100"
+                    title="Remover comentário"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+
+              <p className="font-body text-[15px] text-ink leading-relaxed whitespace-pre-wrap ml-16">
+                {comment.text}
+              </p>
             </div>
           ))}
         </div>

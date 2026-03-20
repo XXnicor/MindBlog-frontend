@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useAuth } from '../contexts/AuthContext';
@@ -19,19 +19,14 @@ export default function Login() {
     setLoading(true);
 
     try {
-      // Validação básica
       if (!email || !password) {
         throw new Error('Preencha todos os campos');
       }
-
       if (password.length < 6) {
         throw new Error('Senha deve ter pelo menos 6 caracteres');
       }
 
-      // Fazer login através do contexto
       await login(email, password);
-
-      // Sucesso - redireciona para dashboard
       navigate('/dashboard');
     } catch (err: any) {
       setError(err.message || 'Erro ao fazer login. Tente novamente.');
@@ -40,36 +35,33 @@ export default function Login() {
     }
   };
 
+  const inputClasses = "w-full h-12 bg-paper-alt border-[1.5px] border-border rounded-lg px-4 font-body text-[15px] text-ink placeholder:text-ink-muted focus:bg-paper focus:border-ink focus:ring-[3px] focus:ring-ink/10 outline-none transition-all duration-200";
+  const labelClasses = "block font-body text-[13px] font-medium text-ink-light mb-[6px]";
+  const buttonClasses = "w-full h-12 bg-ink text-paper font-body text-[15px] font-medium rounded-lg hover:bg-[#2D2D2D] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed";
+
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex flex-col">
+    <div className="min-h-screen bg-paper-alt text-ink flex flex-col">
       <Navbar />
 
-      <main className="flex-1 flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-md">
-          {/* Cabeçalho */}
-          <div className="text-center mb-8">
-            <div className="text-4xl font-bold text-white mb-6 font-mono">&lt;M/&gt;</div>
-            <h2 className="text-3xl font-bold text-white mb-2">
-              Entrar na Plataforma
-            </h2>
-            <p className="text-slate-400">
-              Acesse sua conta para gerenciar seus artigos
-            </p>
+      <main className="flex-1 flex items-center justify-center px-4 py-16">
+        <div className="w-full max-w-[420px]">
+          {/* Header */}
+          <div className="text-center mb-10">
+            <h1 className="font-display font-bold text-4xl text-ink mb-3 tracking-tight">MindBlog<span className="text-accent">.</span></h1>
+            <p className="font-body text-[15px] text-ink-light">Acesse sua conta para continuar lendo e publicando.</p>
           </div>
 
-          {/* Card de Login */}
-          <div className="bg-slate-900 border border-slate-800 rounded-lg p-8">
-            {/* Mensagem de Erro */}
+          {/* Form Card */}
+          <div className="bg-paper border border-border rounded-2xl p-8 sm:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
             {error && (
-              <div className="mb-6 bg-red-500/10 border border-red-500 text-red-500 px-4 py-3 rounded-lg text-sm">
+              <div className="mb-6 bg-[#FEF2F2] border-[1.5px] border-[#DC2626] text-[#DC2626] px-4 py-3 rounded-lg font-body text-[14px]">
                 {error}
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Campo Email */}
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
+                <label htmlFor="email" className={labelClasses}>
                   Email
                 </label>
                 <input
@@ -77,16 +69,15 @@ export default function Login() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="seu@email.com"
+                  placeholder="exemplo@email.com"
                   required
-                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-cyan-500 transition-colors"
+                  className={inputClasses}
                 />
               </div>
 
-              {/* Campo Senha */}
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label htmlFor="password" className="block text-sm font-medium text-slate-300">
+                <div className="flex items-center justify-between mb-[6px]">
+                  <label htmlFor="password" className="block font-body text-[13px] font-medium text-ink-light">
                     Senha
                   </label>
                 </div>
@@ -97,15 +88,14 @@ export default function Login() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
-                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-cyan-500 transition-colors"
+                  className={inputClasses}
                 />
               </div>
 
-              {/* Botão de Login */}
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className={`mt-2 ${buttonClasses}`}
               >
                 {loading ? (
                   <>
@@ -113,33 +103,23 @@ export default function Login() {
                     Entrando...
                   </>
                 ) : (
-                  <>
-                    Entrar
-                    <ArrowRight className="w-5 h-5" />
-                  </>
+                  'Entrar'
                 )}
               </button>
             </form>
 
-            {/* Rodapé do Card */}
-            <div className="mt-6 text-center text-sm text-slate-400">
+            <div className="mt-8 text-center font-body text-[14px] text-ink-light border-t border-border pt-6">
               Não tem uma conta?{' '}
-              <Link
-                to="/register"
-                className="text-cyan-500 hover:text-cyan-400 font-medium transition-colors"
-              >
+              <Link to="/register" className="text-ink font-medium hover:text-accent transition-colors hover-underline pb-1">
                 Criar conta
               </Link>
             </div>
           </div>
 
-          {/* Link Alternativo */}
-          <div className="mt-6 text-center">
-            <Link
-              to="/"
-              className="text-sm text-slate-400 hover:text-white transition-colors"
-            >
-              ← Voltar para a Home
+          <div className="mt-8 text-center">
+            <Link to="/" className="inline-flex items-center gap-2 font-body text-[14px] text-ink-muted hover:text-ink transition-colors font-medium">
+              <ArrowLeft size={16} />
+              Voltar à página inicial
             </Link>
           </div>
         </div>

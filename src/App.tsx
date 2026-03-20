@@ -10,12 +10,12 @@ import ProfileSettings from './pages/ProfileSettings';
 import NotFound from './pages/NotFound';
 import ServerError from './pages/ServerError';
 import ProtectedRoute from './components/ProtectedRoute';
-import { ToastContainer } from './contexts/ToastContext';
+import { Toaster } from 'sonner';
 
 export default function App() {
   return (
     <>
-      <ToastContainer />
+      <Toaster position="bottom-right" richColors />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/artigos" element={<AllArticles />} />

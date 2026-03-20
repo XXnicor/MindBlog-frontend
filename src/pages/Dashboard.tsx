@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FileText, MessageCircle, Heart, TrendingUp, Settings, Plus, Edit, Trash, Loader2, Eye } from 'lucide-react';
+import { FileText, MessageCircle, Heart, Settings, Plus, Edit, Trash, Loader2, Eye } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { articleService, userService } from '../lib/api';
@@ -95,19 +95,10 @@ export default function Dashboard() {
         handleCloseDeleteModal();
         const statsData = await userService.getStats();
         setStats(statsData || null);
-        alert('Artigo deletado com sucesso!');
       } catch (error: any) {
-        console.error('[Dashboard] Erro ao deletar artigo:', error);
-        
         if (error.message.includes('permissão')) {
           alert(
-            '❌ Erro de Permissão\n\n' +
-            'O backend não reconheceu você como autor deste artigo.\n\n' +
-            'Possíveis causas:\n' +
-            '1. O artigo foi criado com outro usuário\n' +
-            '2. O backend não está associando o autor corretamente ao criar artigos\n' +
-            '3. Há um problema na verificação de permissões no backend\n\n' +
-            'Verifique o console do backend para mais detalhes.'
+            '❌ Erro de Permissão\n\nO backend não reconheceu você como autor deste artigo.'
           );
         } else {
           alert('Erro ao deletar artigo: ' + error.message);
@@ -118,222 +109,230 @@ export default function Dashboard() {
     }
   };
 
-  // Helper para obter dados do artigo de forma segura
-  const getArticleTitle = (article: Article): string => {
-    return article.titulo || article.title || 'Sem título';
-  };
-
-  const getArticleSummary = (article: Article): string => {
-    return article.resumo || article.summary || '';
-  };
-
-  const getArticleCategory = (article: Article): string => {
-    return article.categoria || article.category || 'Sem categoria';
-  };
-
+  const getArticleTitle = (article: Article): string => article.titulo || article.title || 'Sem título';
+  const getArticleSummary = (article: Article): string => article.resumo || article.summary || '';
+  const getArticleCategory = (article: Article): string => article.categoria || article.category || 'Editorial';
   const getArticleDate = (article: Article): string => {
     const date = article.data_publicacao || article.createdAt || article.date || article.criadoEm;
     if (!date) return '';
-    return new Date(date).toLocaleDateString('pt-BR');
+    return new Date(date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
   };
-
   const getArticleImage = (article: Article): string => {
     const imageUrl = article.imagem_banner_url || getImageUrl(article.imagem || article.image);
     return imageUrl || 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=300&h=200&fit=crop';
   };
-
-  const getArticleViews = (article: Article): number => {
-    return article.views || article.visualizacoes || 0;
-  };
+  const getArticleViews = (article: Article): number => article.views || article.visualizacoes || 0;
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex flex-col">
+    <div className="min-h-screen bg-paper text-ink flex flex-col">
       <Navbar />
 
-      <main className="flex-1 max-w-7xl mx-auto px-4 py-12 w-full">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+      <main className="flex-1 max-w-[1080px] mx-auto px-6 py-16 w-full">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6 pb-6 border-b border-border">
           <div>
-            <h1 className="text-4xl font-bold text-white mb-2">
+            <span className="block font-body text-[13px] font-bold text-ink-muted uppercase tracking-widest mb-2">
               Dashboard
+            </span>
+            <h1 className="font-display text-4xl md:text-5xl font-bold text-ink mb-2 tracking-tight">
+              Meu Espaço
             </h1>
-            <p className="text-slate-400">
-              Bem-vindo de volta, {user?.nome || user?.nome || 'Usuário'}!
+            <p className="font-body text-[15px] text-ink-light">
+              Bem-vindo de volta, <span className="text-ink font-medium">{user?.nome || 'Escritor'}</span>. Aqui estão suas estatísticas e publicações.
             </p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex items-center gap-3">
             <Link
               to="/settings"
-              className="inline-flex items-center gap-2 px-4 py-2 border border-slate-700 text-slate-300 hover:text-white hover:border-slate-600 rounded-lg transition-colors"
+              className="inline-flex items-center justify-center w-10 h-10 border border-border text-ink hover:border-ink rounded-full transition-all duration-200 bg-paper-alt"
+              title="Configurações"
             >
               <Settings size={18} />
-              Configurações
             </Link>
             <Link
               to="/artigos/novo"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-semibold rounded-lg transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-2 h-10 bg-ink hover:bg-ink-light text-white font-body text-[14px] font-medium rounded-full transition-all duration-200"
             >
-              <Plus size={18} />
-              Novo Artigo
+              <Plus size={16} />
+              Escrever
             </Link>
           </div>
         </div>
 
         {error && (
-          <div className="mb-8 bg-red-500/10 border border-red-500 text-red-400 px-4 py-3 rounded-lg">
-            <p className="font-medium">Erro ao carregar dados</p>
-            <p className="text-sm mt-1">{error}</p>
+          <div className="mb-10 bg-[#FEF2F2] border-[1.5px] border-[#DC2626] text-[#DC2626] px-6 py-4 rounded-xl">
+            <p className="font-body font-bold text-[15px]">Erro ao carregar dados</p>
+            <p className="font-body text-[14px] mt-1">{error}</p>
             <button 
               onClick={loadDashboardData}
-              className="mt-2 px-4 py-1 bg-red-500/20 hover:bg-red-500/30 rounded text-sm transition-colors"
+              className="mt-3 px-4 py-2 border border-[#DC2626] text-[#DC2626] hover:bg-[#DC2626] hover:text-white rounded-lg text-[13px] font-bold transition-all duration-200"
             >
               Tentar novamente
             </button>
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-16">
           {loading ? (
             Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="bg-slate-900 border border-slate-800 rounded-lg p-6 animate-pulse">
-                <div className="h-4 bg-slate-800 rounded w-1/2 mb-3"></div>
-                <div className="h-8 bg-slate-800 rounded w-3/4"></div>
-              </div>
+              <div key={i} className="bg-paper-alt border border-border rounded-2xl p-6 skeleton h[100px]" />
             ))
           ) : (
             <>
-              <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
-                <div className="flex items-start justify-between mb-3">
-                  <h3 className="text-slate-400 text-sm">Total de Artigos</h3>
-                  <FileText className="w-6 h-6 text-cyan-500" />
+              <div className="bg-paper-alt border border-border rounded-2xl p-6 flex flex-col justify-between">
+                <div className="flex items-start justify-between mb-4">
+                  <h3 className="font-body text-[13px] font-bold text-ink-muted uppercase tracking-widest">Publicações</h3>
+                  <FileText className="w-5 h-5 text-ink-light" />
                 </div>
-                <p className="text-3xl font-bold text-white">{stats?.totalArticles || 0}</p>
+                <p className="font-display text-4xl font-semibold text-ink">{stats?.totalArticles || 0}</p>
               </div>
-              <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
-                <div className="flex items-start justify-between mb-3">
-                  <h3 className="text-slate-400 text-sm">Visualizações</h3>
-                  <Eye className="w-6 h-6 text-purple-500" />
+              <div className="bg-paper-alt border border-border rounded-2xl p-6 flex flex-col justify-between">
+                <div className="flex items-start justify-between mb-4">
+                  <h3 className="font-body text-[13px] font-bold text-ink-muted uppercase tracking-widest">Leituras</h3>
+                  <Eye className="w-5 h-5 text-ink-light" />
                 </div>
-                <p className="text-3xl font-bold text-white">{stats?.totalViews || 0}</p>
+                <p className="font-display text-4xl font-semibold text-ink">{stats?.totalViews || 0}</p>
               </div>
-              <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
-                <div className="flex items-start justify-between mb-3">
-                  <h3 className="text-slate-400 text-sm">Curtidas</h3>
-                  <Heart className="w-6 h-6 text-red-500" />
+              <div className="bg-paper-alt border border-border rounded-2xl p-6 flex flex-col justify-between">
+                <div className="flex items-start justify-between mb-4">
+                  <h3 className="font-body text-[13px] font-bold text-ink-muted uppercase tracking-widest">Curtidas</h3>
+                  <Heart className="w-5 h-5 text-accent" />
                 </div>
-                <p className="text-3xl font-bold text-white">{stats?.totalLikes || 0}</p>
+                <p className="font-display text-4xl font-semibold text-ink">{stats?.totalLikes || 0}</p>
               </div>
-              <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
-                <div className="flex items-start justify-between mb-3">
-                  <h3 className="text-slate-400 text-sm">Comentários</h3>
-                  <MessageCircle className="w-6 h-6 text-green-500" />
+              <div className="bg-paper-alt border border-border rounded-2xl p-6 flex flex-col justify-between">
+                <div className="flex items-start justify-between mb-4">
+                  <h3 className="font-body text-[13px] font-bold text-ink-muted uppercase tracking-widest">Comentários</h3>
+                  <MessageCircle className="w-5 h-5 text-ink-light" />
                 </div>
-                <p className="text-3xl font-bold text-white">{stats?.totalComments || 0}</p>
+                <p className="font-display text-4xl font-semibold text-ink">{stats?.totalComments || 0}</p>
               </div>
             </>
           )}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Content Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          
+          {/* Articles List */}
           <div className="lg:col-span-2">
-            <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
-              <h2 className="text-2xl font-bold text-white mb-6">Meus Artigos</h2>
-              
-              {loading ? (
-                <div className="flex items-center justify-center py-12">
-                  <Loader2 className="w-8 h-8 text-cyan-500 animate-spin" />
-                </div>
-              ) : articles.length === 0 ? (
-                <div className="text-center py-12">
-                  <FileText className="w-16 h-16 text-slate-700 mx-auto mb-4" />
-                  <p className="text-slate-400">Você ainda não tem artigos publicados</p>
-                  <Link
-                    to="/artigos/novo"
-                    className="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-semibold rounded-lg transition-colors"
+            <h2 className="font-display text-2xl font-bold text-ink mb-8 border-b border-border pb-4">
+              Seus Artigos
+            </h2>
+            
+            {loading ? (
+              <div className="flex items-center justify-center py-20">
+                <Loader2 className="w-8 h-8 text-accent animate-spin" />
+              </div>
+            ) : articles.length === 0 ? (
+              <div className="text-center py-20 bg-paper-alt border border-border rounded-2xl">
+                <FileText className="w-12 h-12 text-border mx-auto mb-4" />
+                <p className="font-body font-medium text-ink mb-2">Nenhum artigo publicado ainda</p>
+                <p className="font-body text-[14px] text-ink-light mb-6">Comece a compartilhar suas ideias com o mundo.</p>
+                <Link
+                  to="/artigos/novo"
+                  className="inline-flex items-center gap-2 px-6 py-2 bg-ink text-white font-body text-[14px] font-medium rounded-full hover:bg-ink-light transition-all duration-200"
+                >
+                  <Plus size={16} />
+                  Começar a Escrever
+                </Link>
+              </div>
+            ) : (
+              <div className="space-y-8">
+                {articles.map((article) => (
+                  <div
+                    key={article.id}
+                    className="group flex flex-col sm:flex-row gap-6 pb-8 border-b border-border last:border-0 relative"
                   >
-                    <Plus size={18} />
-                    Criar Primeiro Artigo
-                  </Link>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {articles.map((article) => (
-                    <div
-                      key={article.id}
-                      className="flex gap-4 p-4 bg-slate-950 border border-slate-800 rounded-lg hover:border-slate-700 transition-colors"
-                    >
+                    <Link to={`/artigos/${article.id}`} className="shrink-0">
                       <img
                         src={getArticleImage(article)}
                         alt={getArticleTitle(article)}
-                        className="w-24 h-24 rounded-lg object-cover flex-shrink-0"
+                        className="w-full sm:w-[200px] h-[140px] rounded-xl object-cover bg-paper-alt group-hover:opacity-90 transition-opacity"
                         onError={(e) => {
-                          e.currentTarget.src = 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=300&h=200&fit=crop';
+                          e.currentTarget.style.display = 'none';
                         }}
                       />
+                    </Link>
 
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-semibold text-white mb-1 truncate">
+                    <div className="flex-1 min-w-0 pr-12 sm:pr-0">
+                      <div className="mb-2">
+                        <span className="font-body text-[10px] font-bold text-accent uppercase tracking-widest bg-accent-light/10 px-2 py-1 rounded">
+                          {getArticleCategory(article)}
+                        </span>
+                      </div>
+                      
+                      <Link to={`/artigos/${article.id}`}>
+                        <h3 className="font-display text-xl font-bold text-ink mb-2 line-clamp-2 group-hover:text-accent transition-colors">
                           {getArticleTitle(article)}
                         </h3>
-                        <p className="text-sm text-slate-400 mb-3 line-clamp-2">
-                          {getArticleSummary(article)}
-                        </p>
-                        <div className="flex items-center gap-4 text-xs text-slate-500">
-                          <span>{getArticleDate(article)}</span>
-                          <span className="flex items-center gap-1">
-                            <Eye size={14} />
-                            {getArticleViews(article)}
-                          </span>
-                          <span className="px-2 py-0.5 bg-cyan-500/10 text-cyan-400 rounded">
-                            {getArticleCategory(article)}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col gap-2 flex-shrink-0">
-                        <Link
-                          to={`/artigos/editar/${article.id}`}
-                          className="p-2 text-cyan-400 hover:bg-cyan-500/10 border border-cyan-500/30 rounded-lg transition-colors"
-                          title="Editar"
-                        >
-                          <Edit size={18} />
-                        </Link>
-                        <button
-                          onClick={() => handleOpenDeleteModal(article.id)}
-                          className="p-2 text-red-400 hover:bg-red-500/10 border border-red-500/30 rounded-lg transition-colors"
-                          title="Excluir"
-                        >
-                          <Trash size={18} />
-                        </button>
+                      </Link>
+                      
+                      <p className="font-body text-[14px] text-ink-light mb-4 line-clamp-2 leading-relaxed">
+                        {getArticleSummary(article)}
+                      </p>
+                      
+                      <div className="flex items-center gap-4 font-body text-[12px] font-medium text-ink-muted">
+                        <span>{getArticleDate(article)}</span>
+                        <span className="w-1 h-1 rounded-full bg-border" />
+                        <span className="flex items-center gap-1">
+                          <Eye size={14} />
+                          {getArticleViews(article)}
+                        </span>
                       </div>
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
+
+                    {/* Desktop Actions */}
+                    <div className="absolute top-0 right-0 sm:static sm:flex flex-col gap-2 shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
+                      <Link
+                        to={`/artigos/editar/${article.id}`}
+                        className="w-10 h-10 rounded-full flex items-center justify-center bg-paper-alt border border-border text-ink-muted hover:text-ink hover:border-ink transition-all duration-200 mb-2 sm:mb-0"
+                        title="Editar artigo"
+                      >
+                        <Edit size={16} />
+                      </Link>
+                      <button
+                        onClick={() => handleOpenDeleteModal(article.id)}
+                        className="w-10 h-10 rounded-full flex items-center justify-center bg-paper-alt border border-border text-ink-muted hover:text-[#DC2626] hover:border-[#DC2626] hover:bg-[#FEF2F2] transition-all duration-200"
+                        title="Excluir artigo"
+                      >
+                        <Trash size={16} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
+          {/* Sidebar / Activity */}
           <div className="lg:col-span-1">
-            <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
-              <h2 className="text-xl font-bold text-white mb-6">Atividade Recente</h2>
-              
-              <div className="space-y-4">
+            <h2 className="font-display text-xl font-bold text-ink mb-6 pb-2 border-b border-border">
+              Notificações
+            </h2>
+            
+            <div className="bg-paper-alt border border-border rounded-2xl p-6">
+              <div className="space-y-6">
                 {RECENT_ACTIVITY.map((activity) => (
-                  <div key={activity.id} className="flex gap-3">
+                  <div key={activity.id} className="flex gap-4">
                     <img
                       src={activity.avatar}
                       alt={activity.user}
-                      className="w-10 h-10 rounded-full flex-shrink-0"
+                      className="w-10 h-10 rounded-full shrink-0 border border-border object-cover bg-white"
                     />
 
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm text-slate-300 mb-1">
-                        <span className="font-semibold text-white">{activity.user}</span>
+                      <p className="font-body text-[13px] text-ink-light mb-[2px] leading-tight">
+                        <span className="font-bold text-ink">{activity.user}</span>
                         {' '}{activity.action}{' '}
                         {activity.article && (
-                          <span className="font-semibold text-white">{activity.article}</span>
+                          <span className="font-medium text-ink">"{activity.article}"</span>
                         )}
                       </p>
-                      <p className="text-xs text-slate-500">{activity.time}</p>
+                      <p className="font-body text-[11px] font-bold text-ink-muted uppercase tracking-wider mt-1">
+                        {activity.time}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -345,42 +344,44 @@ export default function Dashboard() {
 
       <Footer />
 
+      {/* Modern Delete Modal */}
       {deleteModalOpen && (
         <div
-          className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 px-4"
+          className="fixed inset-0 bg-ink/40 backdrop-blur-sm flex items-center justify-center z-50 px-4"
           onClick={handleCloseDeleteModal}
         >
           <div
-            className="bg-slate-900 border border-slate-800 rounded-lg p-6 max-w-md w-full"
+            className="bg-paper border border-border rounded-2xl p-8 max-w-[400px] w-full shadow-2xl relative"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-xl font-bold text-white mb-2">
-              Excluir Artigo
+            <div className="w-12 h-12 rounded-full bg-[#FEF2F2] flex items-center justify-center text-[#DC2626] mb-5">
+              <Trash size={20} />
+            </div>
+            
+            <h2 className="font-display text-2xl font-bold text-ink mb-2">
+              Excluir publicação?
             </h2>
-            <p className="text-slate-400 text-sm">
-              Tem certeza que deseja excluir este artigo? Esta ação não pode ser desfeita.
+            <p className="font-body text-[15px] text-ink-light mb-8 leading-relaxed">
+              Esta ação é permanente e não poderá ser desfeita. O artigo será removido do seu perfil e da plataforma.
             </p>
 
-            <div className="flex justify-end gap-3 mt-6">
+            <div className="flex justify-end gap-3">
               <button
                 onClick={handleCloseDeleteModal}
                 disabled={deleting}
-                className="px-4 py-2 border border-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-2.5 font-body text-[14px] font-medium text-ink hover:bg-paper-alt border border-border rounded-full transition-all duration-200 disabled:opacity-50"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleConfirmDelete}
                 disabled={deleting}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-2.5 flex items-center justify-center gap-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-body text-[14px] font-medium rounded-full transition-all duration-200 disabled:opacity-50 min-w-[100px]"
               >
                 {deleting ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Excluindo...
-                  </>
+                  <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
-                  'Excluir'
+                  'Sim, excluir'
                 )}
               </button>
             </div>

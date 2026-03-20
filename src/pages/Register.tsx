@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { UserPlus, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { authService } from '../lib/api';
@@ -22,42 +23,19 @@ export default function Register() {
     setLoading(true);
 
     try {
-      // Validação de campos
-      if (!nome || !email || !senha || !confirmarSenha) {
-        throw new Error('Preencha todos os campos');
-      }
-
-      // Validação de nome
-      if (nome.length < 3 || nome.length > 100) {
-        throw new Error('O nome deve ter entre 3 e 100 caracteres');
-      }
-
-      // Validação de senha
-      if (senha.length < 6) {
-        throw new Error('A senha deve ter pelo menos 6 caracteres');
-      }
-
-      // Validação de confirmação de senha
-      if (senha !== confirmarSenha) {
-        throw new Error('As senhas não coincidem');
-      }
-
-      // Validação de email
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        throw new Error('Email inválido');
-      }
-
-      // Chamar API de registro
-      await authService.register({ nome, email, senha });
+      if (!nome || !email || !senha || !confirmarSenha) throw new Error('Preencha todos os campos');
+      if (nome.length < 3 || nome.length > 100) throw new Error('O nome deve ter entre 3 e 100 caracteres');
+      if (senha.length < 6) throw new Error('A senha deve ter pelo menos 6 caracteres');
+      if (senha !== confirmarSenha) throw new Error('As senhas não coincidem');
       
-      // Fazer login automático após cadastro
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) throw new Error('Email inválido');
+
+      await authService.register({ nome, email, senha });
       await login(email, senha);
 
-      // Sucesso
-      alert('Conta criada com sucesso! 🎉');
+      toast.success('Conta criada com sucesso! Bem-vindo(a) ao MindBlog.');
       navigate('/dashboard');
-
     } catch (err: any) {
       setError(err.message || 'Erro ao criar conta. Tente novamente.');
     } finally {
@@ -65,33 +43,36 @@ export default function Register() {
     }
   };
 
+  const inputClasses = "w-full h-12 bg-paper-alt border-[1.5px] border-border rounded-lg px-4 font-body text-[15px] text-ink placeholder:text-ink-muted focus:bg-paper focus:border-ink focus:ring-[3px] focus:ring-ink/10 outline-none transition-all duration-200";
+  const inputErrorClasses = "w-full h-12 bg-[#FEF2F2] border-[1.5px] border-[#DC2626] rounded-lg px-4 font-body text-[15px] text-ink placeholder:text-[#DC2626]/60 focus:bg-white focus:border-[#DC2626] focus:ring-[3px] focus:ring-[#DC2626]/20 outline-none transition-all duration-200";
+  const labelClasses = "block font-body text-[13px] font-medium text-ink-light mb-[6px]";
+  const buttonClasses = "w-full h-12 bg-ink text-paper font-body text-[15px] font-medium rounded-lg hover:bg-[#2D2D2D] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed";
+
+  const passwordMismatch = Boolean(confirmarSenha && senha !== confirmarSenha);
+
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex flex-col">
+    <div className="min-h-screen bg-paper-alt text-ink flex flex-col">
       <Navbar />
 
-      <main className="flex-1 flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-md">
-          <div className="text-center mb-8">
-            <div className="text-4xl font-bold text-white mb-6 font-mono">&lt;M/&gt;</div>
-            <h2 className="text-3xl font-bold text-white mb-2">
-              Criar Nova Conta
-            </h2>
-            <p className="text-slate-400">
-              Junte-se à comunidade e comece a compartilhar
-            </p>
+      <main className="flex-1 flex items-center justify-center px-4 py-16">
+        <div className="w-full max-w-[420px]">
+          {/* Header */}
+          <div className="text-center mb-10">
+            <h1 className="font-display font-bold text-4xl text-ink mb-3 tracking-tight">Junte-se a nós<span className="text-accent">.</span></h1>
+            <p className="font-body text-[15px] text-ink-light">Crie sua conta para começar a publicar.</p>
           </div>
 
-          <div className="bg-slate-900 border border-slate-800 rounded-lg p-8">
+          {/* Form Card */}
+          <div className="bg-paper border border-border rounded-2xl p-8 sm:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
             {error && (
-              <div className="mb-6 bg-red-500/10 border border-red-500 text-red-500 px-4 py-3 rounded-lg text-sm">
+              <div className="mb-6 bg-[#FEF2F2] border-[1.5px] border-[#DC2626] text-[#DC2626] px-4 py-3 rounded-lg font-body text-[14px]">
                 {error}
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-5">
-
               <div>
-                <label htmlFor="nome" className="block text-sm font-medium text-slate-300 mb-2">
+                <label htmlFor="nome" className={labelClasses}>
                   Nome Completo
                 </label>
                 <input
@@ -101,12 +82,12 @@ export default function Register() {
                   onChange={(e) => setNome(e.target.value)}
                   placeholder="John Doe"
                   required
-                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-cyan-500 transition-colors"
+                  className={inputClasses}
                 />
               </div>
 
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
+                <label htmlFor="email" className={labelClasses}>
                   Email
                 </label>
                 <input
@@ -116,13 +97,12 @@ export default function Register() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="exemplo@email.com"
                   required
-                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-cyan-500 transition-colors"
+                  className={inputClasses}
                 />
               </div>
 
-
               <div>
-                <label htmlFor="senha" className="block text-sm font-medium text-slate-300 mb-2">
+                <label htmlFor="senha" className={labelClasses}>
                   Senha
                 </label>
                 <input
@@ -133,16 +113,12 @@ export default function Register() {
                   placeholder="••••••••"
                   required
                   minLength={6}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-cyan-500 transition-colors"
+                  className={inputClasses}
                 />
-                <p className="mt-1 text-xs text-slate-500">
-                  Mínimo de 6 caracteres
-                </p>
               </div>
 
-
               <div>
-                <label htmlFor="confirmarSenha" className="block text-sm font-medium text-slate-300 mb-2">
+                <label htmlFor="confirmarSenha" className={labelClasses}>
                   Confirmar Senha
                 </label>
                 <input
@@ -152,24 +128,19 @@ export default function Register() {
                   onChange={(e) => setConfirmarSenha(e.target.value)}
                   placeholder="••••••••"
                   required
-                  className={`w-full bg-slate-950 border rounded-lg px-4 py-3 text-white placeholder-slate-600 focus:outline-none transition-colors ${
-                    confirmarSenha && senha !== confirmarSenha
-                      ? 'border-red-500 focus:border-red-500'
-                      : 'border-slate-700 focus:border-cyan-500'
-                  }`}
+                  className={passwordMismatch ? inputErrorClasses : inputClasses}
                 />
-                {confirmarSenha && senha !== confirmarSenha && (
-                  <p className="mt-1 text-xs text-red-500">
+                {passwordMismatch && (
+                  <p className="mt-2 text-[12px] text-[#DC2626] font-body font-medium">
                     As senhas não coincidem
                   </p>
                 )}
               </div>
 
-              {/* Botão de Cadastro */}
               <button
                 type="submit"
-                disabled={loading}
-                className="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed mt-6"
+                disabled={loading || passwordMismatch}
+                className={`mt-2 ${buttonClasses}`}
               >
                 {loading ? (
                   <>
@@ -177,32 +148,23 @@ export default function Register() {
                     Criando conta...
                   </>
                 ) : (
-                  <>
-                    <UserPlus className="w-5 h-5" />
-                    Criar conta
-                  </>
+                  'Criar conta'
                 )}
               </button>
             </form>
 
-            {/* Rodapé do Card */}
-            <div className="mt-6 text-center text-sm text-slate-400">
+            <div className="mt-8 text-center font-body text-[14px] text-ink-light border-t border-border pt-6">
               Já tem uma conta?{' '}
-              <Link
-                to="/login"
-                className="text-cyan-500 hover:text-cyan-400 font-medium transition-colors"
-              >
+              <Link to="/login" className="text-ink font-medium hover:text-accent transition-colors hover-underline pb-1">
                 Fazer login
               </Link>
             </div>
           </div>
 
-          <div className="mt-6 text-center">
-            <Link
-              to="/"
-              className="text-sm text-slate-400 hover:text-white transition-colors"
-            >
-              ← Voltar para a Home
+          <div className="mt-8 text-center">
+            <Link to="/" className="inline-flex items-center gap-2 font-body text-[14px] text-ink-muted hover:text-ink transition-colors font-medium">
+              <ArrowLeft size={16} />
+              Voltar à página inicial
             </Link>
           </div>
         </div>
