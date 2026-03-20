@@ -13,17 +13,17 @@ export default function Home(){
 
   if (error) {
     return (
-      <div className="min-h-screen bg-background text-on-background flex flex-col pt-24 pb-20">
+      <div className="min-h-screen bg-surface text-on-surface flex flex-col pt-24 pb-20">
         <Navbar />
         <main className="flex-1 flex flex-col items-center justify-center px-6 text-center max-w-2xl mx-auto">
-          <span className="material-symbols-outlined text-red-500 text-6xl mb-4">error</span>
+          <span className="material-symbols-outlined text-primary text-6xl mb-4">error</span>
           <h2 className="font-headline text-3xl font-bold mb-4 text-on-surface">System Error: Data Retrieval Failed</h2>
           <p className="font-body text-secondary mb-8 leading-relaxed">
             The neural link to the articles cache was severed. {error}
           </p>
           <button 
             onClick={() => window.location.reload()} 
-            className="bg-primary text-on-primary font-label text-sm font-bold px-8 py-4 rounded-lg hover:bg-primary-container transition-colors shadow-lg"
+            className="bg-primary text-on-primary font-label text-sm font-bold px-8 py-4 rounded-lg hover:bg-primary-container transition-colors shadow-lg uppercase tracking-widest"
           >
             INITIALIZE RECONNECT
           </button>
@@ -35,7 +35,7 @@ export default function Home(){
   }
 
   return (
-    <div className="min-h-screen bg-background text-on-background font-body relative">
+    <div className="min-h-screen bg-surface text-on-surface font-body relative">
       <Navbar />
 
       <main className="pt-32 pb-12 overflow-x-hidden">
@@ -51,7 +51,7 @@ export default function Home(){
                 <div className="h-10 bg-surface-container-high rounded w-48 animate-pulse"></div>
               </div>
               <div className="lg:col-span-5 relative">
-                <div className="aspect-[4/5] bg-surface-container-high rounded-xl animate-pulse bg-gradient-to-r from-surface-container-high via-surface-container-highest to-surface-container-high bg-[length:400%_100%]"></div>
+                <div className="aspect-[4/5] bg-surface-container-high rounded-xl animate-pulse"></div>
               </div>
             </div>
             

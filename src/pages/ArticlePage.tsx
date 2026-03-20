@@ -114,7 +114,7 @@ export default function ArticlePage() {
   const contentParagraphs = conteudo.split('\n\n').filter((p: string) => p.trim());
 
   return (
-    <div className="min-h-screen bg-background text-on-background font-body relative pb-16 lg:pb-0">
+    <div className="min-h-screen bg-surface text-on-surface font-body relative pb-16 lg:pb-0">
       <Navbar />
 
       <main className="pt-32 pb-24 px-6 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 relative">
@@ -158,7 +158,7 @@ export default function ArticlePage() {
           {/* Header */}
           <header className="mb-12 lg:mb-16">
             <div className="flex items-center justify-between lg:justify-start lg:gap-3 mb-6">
-              <span className="font-label text-xs tracking-widest text-tertiary bg-tertiary-fixed px-3 py-1 rounded-full font-bold uppercase">{categoria}</span>
+              <span className="font-label text-xs tracking-widest text-tertiary bg-surface-container px-3 py-1 rounded-full font-bold uppercase">{categoria}</span>
               <span className="font-label text-xs text-secondary font-medium hidden lg:inline">{readTime}</span>
               <span className="font-label text-xs text-secondary font-medium lg:hidden">{formatDate(dataPublicacao)}</span>
             </div>
@@ -173,7 +173,7 @@ export default function ArticlePage() {
           </header>
 
           {/* Lead Image */}
-          <div className="mb-12 lg:mb-16 rounded-xl overflow-hidden relative group">
+          <div className="mb-12 lg:mb-16 rounded-xl overflow-hidden relative group bg-surface-container">
             {imageUrl ? (
               <>
                 <div className="absolute inset-0 blueprint-grid opacity-20 z-10 pointer-events-none mix-blend-multiply dark:mix-blend-screen"></div>
@@ -181,15 +181,28 @@ export default function ArticlePage() {
                   src={imageUrl} 
                   alt={titulo}
                   className="w-full aspect-video lg:aspect-[21/9] object-cover transition-transform duration-700 group-hover:scale-105" 
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    const parent = e.currentTarget.parentElement;
+                    if (parent) {
+                      const placeholder = document.createElement('div');
+                      placeholder.className = "absolute inset-0 flex items-center justify-center text-primary/20";
+                      placeholder.innerHTML = '<span class="material-symbols-outlined text-6xl">article</span>';
+                      parent.appendChild(placeholder);
+                    }
+                  }}
                 />
               </>
             ) : (
-              <div className="w-full aspect-video lg:aspect-[21/9] bg-surface-container relative">
+              <div className="w-full aspect-video lg:aspect-[21/9] relative">
                 <div className="absolute inset-0 blueprint-grid opacity-40"></div>
+                <div className="absolute inset-0 flex items-center justify-center text-primary/20">
+                  <span className="material-symbols-outlined text-6xl">article</span>
+                </div>
               </div>
             )}
             
-            <div className="absolute bottom-4 right-4 z-20 font-label text-[10px] text-white/90 bg-black/40 backdrop-blur-md px-2 py-1 font-bold tracking-widest uppercase border border-white/10 rounded">
+            <div className="absolute bottom-4 right-4 z-20 font-label text-[10px] text-on-surface bg-surface/40 backdrop-blur-md px-2 py-1 font-bold tracking-widest uppercase border border-outline-variant/10 rounded">
               PLATE NO. {(article.id || 0).toString().padStart(3, '0')}
             </div>
           </div>

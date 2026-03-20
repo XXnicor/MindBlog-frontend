@@ -150,34 +150,34 @@ export default function Dashboard() {
   const getArticleViews = (article: Article): number => article.views || article.visualizacoes || 0;
 
   return (
-    <div className="min-h-screen bg-paper text-ink flex flex-col">
+    <div className="min-h-screen bg-surface text-on-surface flex flex-col">
       <Navbar />
 
       <main className="flex-1 max-w-[1080px] mx-auto px-6 py-16 w-full">
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6 pb-6 border-b border-border">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6 pb-6 border-b border-outline-variant/30">
           <div>
-            <span className="block font-body text-[13px] font-bold text-ink-muted uppercase tracking-widest mb-2">
+            <span className="block font-label text-[13px] font-bold text-secondary uppercase tracking-widest mb-2">
               Dashboard
             </span>
-            <h1 className="font-display text-4xl md:text-5xl font-bold text-ink mb-2 tracking-tight">
+            <h1 className="font-headline text-4xl md:text-5xl font-bold text-on-surface mb-2 tracking-tight">
               Meu Espaço
             </h1>
-            <p className="font-body text-[15px] text-ink-light">
-              Bem-vindo de volta, <span className="text-ink font-medium">{user?.nome || 'Escritor'}</span>. Aqui estão suas estatísticas e publicações.
+            <p className="font-body text-[15px] text-on-surface-variant">
+              Bem-vindo de volta, <span className="text-on-surface font-medium">{user?.nome || 'Escritor'}</span>. Aqui estão suas estatísticas e publicações.
             </p>
           </div>
           <div className="flex items-center gap-3">
             <Link
               to="/settings"
-              className="inline-flex items-center justify-center w-10 h-10 border border-border text-ink hover:border-ink rounded-full transition-all duration-200 bg-paper-alt"
+              className="inline-flex items-center justify-center w-10 h-10 border border-outline-variant/30 text-on-surface hover:border-primary rounded-full transition-all duration-200 bg-surface-container-low"
               title="Configurações"
             >
               <Settings size={18} />
             </Link>
             <Link
               to="/artigos/novo"
-              className="inline-flex items-center gap-2 px-6 py-2 h-10 bg-ink hover:bg-ink-light text-white font-body text-[14px] font-medium rounded-full transition-all duration-200"
+              className="inline-flex items-center gap-2 px-6 py-2 h-10 bg-primary hover:bg-primary-container text-on-primary font-label text-[14px] font-bold rounded-full transition-all duration-200 uppercase tracking-widest"
             >
               <Plus size={16} />
               Escrever
@@ -186,12 +186,12 @@ export default function Dashboard() {
         </div>
 
         {error && (
-          <div className="mb-10 bg-[#FEF2F2] border-[1.5px] border-[#DC2626] text-[#DC2626] px-6 py-4 rounded-xl">
+          <div className="mb-10 bg-error/10 border-[1.5px] border-error text-error px-6 py-4 rounded-xl">
             <p className="font-body font-bold text-[15px]">Erro ao carregar dados</p>
             <p className="font-body text-[14px] mt-1">{error}</p>
             <button 
               onClick={loadDashboardData}
-              className="mt-3 px-4 py-2 border border-[#DC2626] text-[#DC2626] hover:bg-[#DC2626] hover:text-white rounded-lg text-[13px] font-bold transition-all duration-200"
+              className="mt-3 px-4 py-2 border border-error text-error hover:bg-error hover:text-white rounded-lg text-[13px] font-bold transition-all duration-200"
             >
               Tentar novamente
             </button>
@@ -202,37 +202,37 @@ export default function Dashboard() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-16">
           {loading ? (
             Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="bg-paper-alt border border-border rounded-2xl p-6 skeleton h[100px]" />
+              <div key={i} className="bg-surface-container-low border border-outline-variant/10 rounded-2xl p-6 h-[100px] animate-pulse" />
             ))
           ) : (
             <>
-              <div className="bg-paper-alt border border-border rounded-2xl p-6 flex flex-col justify-between">
+              <div className="bg-surface-container-low border border-outline-variant/10 rounded-2xl p-6 flex flex-col justify-between">
                 <div className="flex items-start justify-between mb-4">
-                  <h3 className="font-body text-[13px] font-bold text-ink-muted uppercase tracking-widest">Publicações</h3>
-                  <FileText className="w-5 h-5 text-ink-light" />
+                  <h3 className="font-label text-[13px] font-bold text-secondary uppercase tracking-widest">Publicações</h3>
+                  <FileText className="w-5 h-5 text-secondary" />
                 </div>
-                <p className="font-display text-4xl font-semibold text-ink">{stats?.totalArticles || 0}</p>
+                <p className="font-headline text-4xl font-semibold text-on-surface">{stats?.totalArticles || 0}</p>
               </div>
-              <div className="bg-paper-alt border border-border rounded-2xl p-6 flex flex-col justify-between">
+              <div className="bg-surface-container-low border border-outline-variant/10 rounded-2xl p-6 flex flex-col justify-between">
                 <div className="flex items-start justify-between mb-4">
-                  <h3 className="font-body text-[13px] font-bold text-ink-muted uppercase tracking-widest">Leituras</h3>
-                  <Eye className="w-5 h-5 text-ink-light" />
+                  <h3 className="font-label text-[13px] font-bold text-secondary uppercase tracking-widest">Leituras</h3>
+                  <Eye className="w-5 h-5 text-secondary" />
                 </div>
-                <p className="font-display text-4xl font-semibold text-ink">{stats?.totalViews || 0}</p>
+                <p className="font-headline text-4xl font-semibold text-on-surface">{stats?.totalViews || 0}</p>
               </div>
-              <div className="bg-paper-alt border border-border rounded-2xl p-6 flex flex-col justify-between">
+              <div className="bg-surface-container-low border border-outline-variant/10 rounded-2xl p-6 flex flex-col justify-between">
                 <div className="flex items-start justify-between mb-4">
-                  <h3 className="font-body text-[13px] font-bold text-ink-muted uppercase tracking-widest">Curtidas</h3>
-                  <Heart className="w-5 h-5 text-accent" />
+                  <h3 className="font-label text-[13px] font-bold text-secondary uppercase tracking-widest">Curtidas</h3>
+                  <Heart className="w-5 h-5 text-primary" />
                 </div>
-                <p className="font-display text-4xl font-semibold text-ink">{stats?.totalLikes || 0}</p>
+                <p className="font-headline text-4xl font-semibold text-on-surface">{stats?.totalLikes || 0}</p>
               </div>
-              <div className="bg-paper-alt border border-border rounded-2xl p-6 flex flex-col justify-between">
+              <div className="bg-surface-container-low border border-outline-variant/10 rounded-2xl p-6 flex flex-col justify-between">
                 <div className="flex items-start justify-between mb-4">
-                  <h3 className="font-body text-[13px] font-bold text-ink-muted uppercase tracking-widest">Comentários</h3>
-                  <MessageCircle className="w-5 h-5 text-ink-light" />
+                  <h3 className="font-label text-[13px] font-bold text-secondary uppercase tracking-widest">Comentários</h3>
+                  <MessageCircle className="w-5 h-5 text-secondary" />
                 </div>
-                <p className="font-display text-4xl font-semibold text-ink">{stats?.totalComments || 0}</p>
+                <p className="font-headline text-4xl font-semibold text-on-surface">{stats?.totalComments || 0}</p>
               </div>
             </>
           )}
@@ -243,22 +243,22 @@ export default function Dashboard() {
           
           {/* Articles List */}
           <div className="lg:col-span-2">
-            <h2 className="font-display text-2xl font-bold text-ink mb-8 border-b border-border pb-4">
+            <h2 className="font-headline text-2xl font-bold text-on-surface mb-8 border-b border-outline-variant/30 pb-4">
               Seus Artigos
             </h2>
             
             {loading ? (
               <div className="flex items-center justify-center py-20">
-                <Loader2 className="w-8 h-8 text-accent animate-spin" />
+                <Loader2 className="w-8 h-8 text-primary animate-spin" />
               </div>
             ) : articles.length === 0 ? (
-              <div className="text-center py-20 bg-paper-alt border border-border rounded-2xl">
-                <FileText className="w-12 h-12 text-border mx-auto mb-4" />
-                <p className="font-body font-medium text-ink mb-2">Nenhum artigo publicado ainda</p>
-                <p className="font-body text-[14px] text-ink-light mb-6">Comece a compartilhar suas ideias com o mundo.</p>
+              <div className="text-center py-20 bg-surface-container-low border border-outline-variant/10 rounded-2xl">
+                <FileText className="w-12 h-12 text-outline-variant mx-auto mb-4" />
+                <p className="font-body font-medium text-on-surface mb-2">Nenhum artigo publicado ainda</p>
+                <p className="font-body text-[14px] text-secondary mb-6">Comece a compartilhar suas ideias com o mundo.</p>
                 <Link
                   to="/artigos/novo"
-                  className="inline-flex items-center gap-2 px-6 py-2 bg-ink text-white font-body text-[14px] font-medium rounded-full hover:bg-ink-light transition-all duration-200"
+                  className="inline-flex items-center gap-2 px-6 py-2 bg-primary text-on-primary font-label text-[14px] font-bold rounded-full hover:bg-primary-container transition-all duration-200 uppercase tracking-widest"
                 >
                   <Plus size={16} />
                   Começar a Escrever
@@ -269,39 +269,45 @@ export default function Dashboard() {
                 {articles.map((article) => (
                   <div
                     key={article.id}
-                    className="group flex flex-col sm:flex-row gap-6 pb-8 border-b border-border last:border-0 relative"
+                    className="group flex flex-col sm:flex-row gap-6 pb-8 border-b border-outline-variant/20 last:border-0 relative"
                   >
-                    <Link to={`/artigos/${article.id}`} className="shrink-0">
-                      <img
-                        src={getArticleImage(article)}
-                        alt={getArticleTitle(article)}
-                        className="w-full sm:w-[200px] h-[140px] rounded-xl object-cover bg-paper-alt group-hover:opacity-90 transition-opacity"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                        }}
-                      />
+                    <Link to={`/artigo/${article.id}`} className="shrink-0">
+                      <div className="w-full sm:w-[200px] h-[140px] rounded-xl overflow-hidden bg-surface-container-low relative">
+                        <img
+                          src={getArticleImage(article)}
+                          alt={getArticleTitle(article)}
+                          className="w-full h-full object-cover group-hover:opacity-90 transition-opacity"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            const parent = e.currentTarget.parentElement;
+                            if (parent) {
+                              parent.innerHTML = '<div class="absolute inset-0 flex items-center justify-center text-primary/20"><span class="material-symbols-outlined text-4xl">article</span></div>';
+                            }
+                          }}
+                        />
+                      </div>
                     </Link>
 
                     <div className="flex-1 min-w-0 pr-12 sm:pr-0">
                       <div className="mb-2">
-                        <span className="font-body text-[10px] font-bold text-accent uppercase tracking-widest bg-accent-light/10 px-2 py-1 rounded">
+                        <span className="font-label text-[10px] font-bold text-tertiary uppercase tracking-widest bg-surface-container px-2 py-1 rounded">
                           {getArticleCategory(article)}
                         </span>
                       </div>
                       
-                      <Link to={`/artigos/${article.id}`}>
-                        <h3 className="font-display text-xl font-bold text-ink mb-2 line-clamp-2 group-hover:text-accent transition-colors">
+                      <Link to={`/artigo/${article.id}`}>
+                        <h3 className="font-headline text-xl font-bold text-on-surface mb-2 line-clamp-2 group-hover:text-primary transition-colors">
                           {getArticleTitle(article)}
                         </h3>
                       </Link>
                       
-                      <p className="font-body text-[14px] text-ink-light mb-4 line-clamp-2 leading-relaxed">
+                      <p className="font-body text-[14px] text-secondary mb-4 line-clamp-2 leading-relaxed">
                         {getArticleSummary(article)}
                       </p>
                       
-                      <div className="flex items-center gap-4 font-body text-[12px] font-medium text-ink-muted">
+                      <div className="flex items-center gap-4 font-label text-[12px] font-bold text-secondary uppercase tracking-widest">
                         <span>{getArticleDate(article)}</span>
-                        <span className="w-1 h-1 rounded-full bg-border" />
+                        <span className="w-1 h-1 rounded-full bg-outline-variant/30" />
                         <span className="flex items-center gap-1">
                           <Eye size={14} />
                           {getArticleViews(article)}
@@ -313,14 +319,14 @@ export default function Dashboard() {
                     <div className="absolute top-0 right-0 sm:static sm:flex flex-col gap-2 shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
                       <Link
                         to={`/artigos/editar/${article.id}`}
-                        className="w-10 h-10 rounded-full flex items-center justify-center bg-paper-alt border border-border text-ink-muted hover:text-ink hover:border-ink transition-all duration-200 mb-2 sm:mb-0"
+                        className="w-10 h-10 rounded-full flex items-center justify-center bg-surface-container-low border border-outline-variant/20 text-secondary hover:text-primary hover:border-primary transition-all duration-200 mb-2 sm:mb-0"
                         title="Editar artigo"
                       >
                         <Edit size={16} />
                       </Link>
                       <button
                         onClick={() => handleOpenDeleteModal(article.id)}
-                        className="w-10 h-10 rounded-full flex items-center justify-center bg-paper-alt border border-border text-ink-muted hover:text-[#DC2626] hover:border-[#DC2626] hover:bg-[#FEF2F2] transition-all duration-200"
+                        className="w-10 h-10 rounded-full flex items-center justify-center bg-surface-container-low border border-outline-variant/20 text-secondary hover:text-error hover:border-error hover:bg-error/5 transition-all duration-200"
                         title="Excluir artigo"
                       >
                         <Trash size={16} />
@@ -334,29 +340,29 @@ export default function Dashboard() {
 
           {/* Sidebar / Activity */}
           <div className="lg:col-span-1">
-            <h2 className="font-display text-xl font-bold text-ink mb-6 pb-2 border-b border-border">
+            <h2 className="font-headline text-xl font-bold text-on-surface mb-6 pb-2 border-b border-outline-variant/30">
               Notificações
             </h2>
             
-            <div className="bg-paper-alt border border-border rounded-2xl p-6">
+            <div className="bg-surface-container-low border border-outline-variant/10 rounded-2xl p-6">
               <div className="space-y-6">
                 {RECENT_ACTIVITY.map((activity) => (
                   <div key={activity.id} className="flex gap-4">
                     <img
                       src={activity.avatar}
                       alt={activity.user}
-                      className="w-10 h-10 rounded-full shrink-0 border border-border object-cover bg-white"
+                      className="w-10 h-10 rounded-full shrink-0 border border-outline-variant/20 object-cover bg-surface"
                     />
 
                     <div className="flex-1 min-w-0">
-                      <p className="font-body text-[13px] text-ink-light mb-[2px] leading-tight">
-                        <span className="font-bold text-ink">{activity.user}</span>
+                      <p className="font-body text-[13px] text-secondary mb-[2px] leading-tight">
+                        <span className="font-bold text-on-surface">{activity.user}</span>
                         {' '}{activity.action}{' '}
                         {activity.article && (
-                          <span className="font-medium text-ink">"{activity.article}"</span>
+                          <span className="font-medium text-on-surface">"{activity.article}"</span>
                         )}
                       </p>
-                      <p className="font-body text-[11px] font-bold text-ink-muted uppercase tracking-wider mt-1">
+                      <p className="font-label text-[11px] font-bold text-secondary uppercase tracking-wider mt-1">
                         {activity.time}
                       </p>
                     </div>

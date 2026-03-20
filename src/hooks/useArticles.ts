@@ -16,11 +16,13 @@ export function useArticles(page = 1, limit = 10, filters: { categoria?: string;
   const [error, setError] = useState<string | null>(null);
   const [pagination, setPagination] = useState<PaginationData | null>(null);
 
+  const { categoria, search } = filters;
+
   const refetch = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await articleService.getAll(page, limit, filters);
+      const response = await articleService.getAll(page, limit, { categoria, search });
       setArticles(response.articles || []);
       setPagination(response.pagination || null);
     } catch (err: any) {
@@ -29,7 +31,7 @@ export function useArticles(page = 1, limit = 10, filters: { categoria?: string;
     } finally {
       setLoading(false);
     }
-  }, [page, limit, filters]);
+  }, [page, limit, categoria, search]);
 
   useEffect(() => {
     let cancelled = false;
@@ -41,7 +43,7 @@ export function useArticles(page = 1, limit = 10, filters: { categoria?: string;
       }
       
       try {
-        const response = await articleService.getAll(page, limit, filters);
+        const response = await articleService.getAll(page, limit, { categoria, search });
         if (!cancelled) {
           setArticles(response.articles || []);
           setPagination(response.pagination || null);
@@ -56,7 +58,7 @@ export function useArticles(page = 1, limit = 10, filters: { categoria?: string;
 
     load();
     return () => { cancelled = true; };
-  }, [page, limit, filters]);
+  }, [page, limit, categoria, search]);
 
   return {
     articles,
