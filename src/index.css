@@ -239,6 +239,35 @@
 }
 
 @layer utilities {
+  /* ---- Auth Pages CSS ---- */
+  .auth-input {
+    @apply w-full bg-surface-container-low border-0 border-b-2 border-outline-variant/30 px-0 py-3 text-on-surface placeholder-on-secondary-container focus:ring-0 focus:border-primary transition-all duration-300 outline-none;
+  }
+
+  .auth-input::placeholder {
+    @apply text-on-secondary-container;
+  }
+
+  /* Gradient button */
+  .btn-terracotta {
+    background: linear-gradient(135deg, #9b3100 0%, #c1440e 100%);
+    color: #ffffff;
+  }
+
+  .btn-terracotta:hover:not(:disabled) {
+    box-shadow: 0 8px 24px rgba(155, 49, 0, 0.2);
+    transform: scale(1.02);
+  }
+
+  .btn-terracotta:active:not(:disabled) {
+    transform: scale(0.95);
+  }
+
+  .btn-terracotta:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+
   .text-balance {
     text-wrap: balance;
   }

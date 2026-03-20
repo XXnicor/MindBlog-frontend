@@ -3,8 +3,7 @@ import Home from './pages/Home';
 import AllArticles from './pages/AllArticles';
 import ArticlePage from './pages/ArticlePage';
 import ArticleForm from './pages/ArticleForm';
-import Login from './pages/Login';
-import Register from './pages/Register';
+import AuthPage from './pages/auth/AuthPage';
 import Dashboard from './pages/Dashboard';
 import ProfileSettings from './pages/ProfileSettings';
 import NotFound from './pages/NotFound';
@@ -20,8 +19,8 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/artigos" element={<AllArticles />} />
         <Route path="/artigo/:id" element={<ArticlePage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<AuthPage mode="login" />} />
+        <Route path="/register" element={<AuthPage mode="register" />} />
         
         {/* Rotas protegidas - requerem autenticação */}
         <Route path="/artigos/novo" element={
