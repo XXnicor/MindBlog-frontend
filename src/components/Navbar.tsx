@@ -21,7 +21,6 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close mobile menu on route change
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
@@ -32,177 +31,171 @@ export default function Navbar() {
   };
 
   const navLinks = [
-    { name: 'Início', path: '/' },
-    { name: 'Explorar', path: '/artigos' },
-    { name: 'Categorias', path: '/categorias' }
+    { name: 'Home', path: '/' },
+    { name: 'AI', path: '/ai' },
+    { name: 'Engineering', path: '/artigos' },
+    { name: 'Architecture', path: '/categorias' }
   ];
 
   return (
     <>
-      <header
-        className={`fixed top-0 w-full z-50 transition-all duration-300 backdrop-blur-md`}
-        style={{
-          backgroundColor: 'var(--color-navbar-bg)',
-          borderBottom: `1px solid ${isScrolled ? 'var(--color-navbar-border)' : 'transparent'}`
-        }}
-      >
-        <div className="mx-auto w-full max-w-[1200px] px-6 md:px-12 lg:px-20 h-14 md:h-16 flex items-center justify-between">
+      <nav className={`fixed top-0 w-full z-50 bg-stone-50/85 dark:bg-stone-950/85 backdrop-blur-xl border-b border-stone-200/20 dark:border-stone-800/20 transition-all duration-300`}>
+        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center font-headline text-stone-900 dark:text-stone-100 antialiased">
           
-          {/* Logo */}
-          <Link to="/" className="flex items-baseline font-display text-[22px] font-semibold tracking-tight text-[var(--color-navbar-text)]">
-            MindBlog<span className="text-[var(--color-accent)] ml-[1px] font-bold">.</span>
-          </Link>
+          {/* ESQUERDA */}
+          <div className="flex items-center gap-8">
+            <Link 
+              to="/" 
+              className="text-2xl font-bold tracking-tight text-stone-900 dark:text-stone-50 after:content-['.'] after:text-primary-container"
+            >
+              MindBlog
+            </Link>
+            
+            <div className="hidden md:flex items-center gap-6">
+              {navLinks.map((link) => {
+                const isActive = location.pathname === link.path || (link.name === 'Home' && location.pathname === '/');
+                return (
+                  <Link
+                    key={link.name}
+                    to={link.path}
+                    className={`transition-all duration-300 pb-1 font-semibold ${
+                      isActive
+                        ? 'text-orange-700 dark:text-orange-500 border-b-2 border-orange-700 dark:border-orange-500'
+                        : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'
+                    }`}
+                  >
+                    {link.name}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
 
-          {/* Center Links (Desktop) */}
-          <nav className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => {
-              const isActive = location.pathname === link.path;
-              return (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  className={`relative text-[14px] transition-fast pb-1 hover:text-[var(--color-navbar-text)] ${
-                    isActive 
-                      ? 'text-[var(--color-navbar-text)] font-medium border-b-2 border-[var(--color-accent)]' 
-                      : 'text-[var(--color-navbar-text-muted)] font-regular hover-underline'
-                  }`}
-                >
-                  {link.name}
-                </Link>
-              );
-            })}
-          </nav>
-
-          {/* Right side logic */}
+          {/* DIREITA */}
           <div className="flex items-center gap-4">
+            <button className="hidden md:block p-2 text-stone-600 dark:text-stone-400 hover:bg-stone-100/50 dark:hover:bg-stone-800/50 transition-all duration-300 scale-95 active:scale-90 rounded-full">
+              <span className="material-symbols-outlined block">search</span>
+            </button>
+            
+            <button
+              onClick={toggleTheme}
+              className="hidden md:block p-2 text-stone-600 dark:text-stone-400 hover:bg-stone-100/50 dark:hover:bg-stone-800/50 transition-all duration-300 scale-95 active:scale-90 rounded-full"
+              title="Alternar tema"
+            >
+              {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
 
             {user ? (
-              <div className="hidden md:flex items-center gap-4">
-                <button
-                  onClick={toggleTheme}
-                  className="p-2 text-[var(--color-navbar-text)] hover:opacity-70 transition-opacity"
-                  title="Alternar tema"
-                >
-                  {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-                </button>
-                <Link to="/artigos/novo">
-                  <button className="btn-outline text-[14px]">
-                    Escrever
-                  </button>
+              <div className="hidden md:flex items-center gap-4 ml-2">
+                <Link to="/artigos/novo" className="font-label text-sm font-bold text-primary border border-primary/20 px-4 py-2 rounded-full hover:bg-primary/5 transition-colors">
+                  Write
                 </Link>
                 <UserMenu user={user} onSignOut={handleSignOut} />
               </div>
             ) : (
-              <div className="hidden md:flex items-center gap-4">
-                <button
-                  onClick={toggleTheme}
-                  className="p-2 text-[var(--color-navbar-text)] hover:opacity-70 transition-opacity"
-                  title="Alternar tema"
-                >
-                  {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-                </button>
-                <Link to="/login" className="text-[14px] text-[var(--color-navbar-text-muted)] transition-fast hover:text-[var(--color-navbar-text)]">
-                  Entrar
+              <div className="hidden md:flex items-center gap-4 ml-2">
+                <Link to="/login" className="font-label text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 transition-colors">
+                  Sign In
                 </Link>
                 <Link to="/register">
-                  <button className="btn-primary text-[14px]">
-                    Começar
+                  <button className="bg-primary hover:bg-primary-container text-on-primary px-5 py-2 rounded-lg font-label text-sm font-bold tracking-wide transition-all duration-300 scale-95 active:scale-90 shadow-sm">
+                    Join the Network
                   </button>
                 </Link>
               </div>
             )}
 
-            {/* Mobile Menu & Theme Toggle */}
+            {/* Mobile Menu Icon */}
             <div className="flex items-center gap-3 md:hidden">
               <button
                 onClick={toggleTheme}
-                className="text-[var(--color-navbar-text)] hover:opacity-70 transition-opacity p-1"
+                className="text-stone-600 dark:text-stone-400 hover:bg-stone-100/50 dark:hover:bg-stone-800/50 p-2 rounded-full transition-colors"
                 title="Alternar tema"
               >
                 {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
               </button>
               <button 
-                className="text-[var(--color-navbar-text)]"
+                className="text-stone-900 dark:text-stone-100 p-1"
                 onClick={() => setIsMobileMenuOpen(true)}
                 aria-label="Abrir menu"
               >
-                <Menu size={24} />
+                <Menu size={28} />
               </button>
             </div>
           </div>
         </div>
-      </header>
+      </nav>
 
       {/* Mobile Slide-out Menu */}
       <div 
-        className={`fixed inset-0 z-[60] bg-[rgba(13,13,13,0.2)] backdrop-blur-sm transition-opacity duration-300 md:hidden ${
+        className={`fixed inset-0 z-[60] bg-stone-900/40 backdrop-blur-sm transition-opacity duration-300 md:hidden ${
           isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
         onClick={() => setIsMobileMenuOpen(false)}
       >
         <div 
-          className={`absolute right-0 top-0 bottom-0 w-[280px] bg-[var(--color-navbar-bg)] shadow-2xl p-6 transition-transform duration-base ${
+          className={`absolute right-0 top-0 bottom-0 w-[280px] bg-stone-50 dark:bg-stone-950 shadow-2xl p-6 transition-transform duration-300 ${
             isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
           }`}
           onClick={e => e.stopPropagation()}
         >
           <div className="flex justify-between items-center mb-8">
-             <span className="font-display text-[20px] font-semibold text-[var(--color-navbar-text)]">Menu</span>
-             <button onClick={() => setIsMobileMenuOpen(false)} className="text-[var(--color-navbar-text-muted)] hover:text-[var(--color-navbar-text)] transition-fast p-1 rounded-full">
-               <X size={24} />
-             </button>
-           </div>
+            <span className="font-headline text-xl font-bold text-stone-900 dark:text-stone-100">Menu</span>
+            <button onClick={() => setIsMobileMenuOpen(false)} className="text-stone-500 hover:text-stone-900 dark:hover:text-stone-100 transition-colors p-1 rounded-full">
+              <X size={24} />
+            </button>
+          </div>
  
-           <nav className="flex flex-col gap-6">
-             {navLinks.map((link) => (
+          <nav className="flex flex-col gap-6">
+            {navLinks.map((link) => (
               <Link
-                key={link.path}
+                key={link.name}
                 to={link.path}
-                className={`text-[18px] transition-fast hover:text-[var(--color-navbar-text)] ${
+                className={`font-headline text-lg transition-colors ${
                   location.pathname === link.path 
-                    ? 'text-[var(--color-accent)] font-medium' 
-                    : 'text-[var(--color-navbar-text-muted)]'
+                    ? 'text-primary font-bold' 
+                    : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'
                 }`}
               >
                 {link.name}
               </Link>
             ))}
             
-            <hr className="border-[var(--color-navbar-border)] my-2" />
+            <hr className="border-stone-200 dark:border-stone-800 my-2" />
 
             {user ? (
               <div className="flex flex-col gap-4">
-                <Link to="/artigos/novo" className="text-[16px] text-[var(--color-navbar-text-muted)] hover:text-[var(--color-navbar-text)]">
-                   Escrever Novo Artigo
-                 </Link>
-                 <Link to="/dashboard" className="text-[16px] text-[var(--color-navbar-text-muted)] hover:text-[var(--color-navbar-text)]">
-                   Meus Artigos
-                 </Link>
-                 <Link to="/settings" className="text-[16px] text-[var(--color-navbar-text-muted)] hover:text-[var(--color-navbar-text)]">
-                   Configurações
-                 </Link>
-                 <button 
-                   onClick={handleSignOut}
-                   className="text-left text-[16px] text-red-600 font-medium hover:text-red-700"
-                 >
-                   Sair
-                 </button>
-               </div>
-             ) : (
-               <div className="flex flex-col gap-4">
-                 <Link to="/login" className="text-[16px] text-[var(--color-navbar-text-muted)] hover:text-[var(--color-navbar-text)]">
-                   Entrar na conta
-                 </Link>
-                 <Link to="/register" className="mt-2">
-                   <button className="btn-primary w-full text-[16px]">
-                     Começar a escrever
-                   </button>
-                 </Link>
-               </div>
-             )}
-           </nav>
-         </div>
-       </div>
-     </>
-   );
+                <Link to="/artigos/novo" className="font-label text-base text-stone-600 dark:text-stone-400 hover:text-primary transition-colors">
+                  Write New Article
+                </Link>
+                <Link to="/dashboard" className="font-label text-base text-stone-600 dark:text-stone-400 hover:text-primary transition-colors">
+                  My Articles
+                </Link>
+                <Link to="/settings" className="font-label text-base text-stone-600 dark:text-stone-400 hover:text-primary transition-colors">
+                  Settings
+                </Link>
+                <button 
+                  onClick={handleSignOut}
+                  className="text-left font-label text-base text-red-600 font-bold hover:text-red-700 transition-colors"
+                >
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-4">
+                <Link to="/login" className="font-label text-base text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 transition-colors">
+                  Sign In
+                </Link>
+                <Link to="/register" className="mt-2">
+                  <button className="bg-primary w-full text-on-primary px-5 py-3 rounded-lg font-label text-sm font-bold tracking-wide hover:bg-primary-container transition-colors shadow-sm">
+                    Join the Network
+                  </button>
+                </Link>
+              </div>
+            )}
+          </nav>
+        </div>
+      </div>
+    </>
+  );
 }

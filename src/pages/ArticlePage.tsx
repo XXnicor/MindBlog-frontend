@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, Heart, Bookmark, Share2, Eye, MessageCircle, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import CommentSection from '../components/CommentSection';
 import { useArticle } from '../hooks/useArticle';
+import { useArticles } from '../hooks/useArticles';
 import { getImageUrl } from '../lib/imageUtils';
 
 export default function ArticlePage() {
@@ -16,9 +17,15 @@ export default function ArticlePage() {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
-  const [showSidebar, setShowSidebar] = useState(false);
 
-  // Atualizar contagens e progresso de scroll
+  // Filtros seguros usando useMemo para evitar loop no useArticles
+  const relatedFilters = useMemo(() => ({
+    categoria: article?.categoria || undefined
+  }), [article?.categoria]);
+  const { articles: relatedResults } = useArticles(1, 4, relatedFilters);
+  const relatedArticles = relatedResults.filter(a => String(a.id) !== id).slice(0, 3);
+
+  // Atualizar contagens
   useEffect(() => {
     if (article) {
       setLikesCount(article.curtidas || article.likes || 0);
@@ -33,9 +40,6 @@ export default function ArticlePage() {
       if (docHeight > 0) {
         setScrollProgress((scrollTop / docHeight) * 100);
       }
-      
-      // Mostrar sidebar após passar do hero (aprox 400px)
-      setShowSidebar(scrollTop > 400);
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -55,29 +59,31 @@ export default function ArticlePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-paper text-ink flex flex-col">
+      <div className="min-h-screen bg-background text-on-background flex flex-col">
         <Navbar />
-        <div className="flex-1 flex items-center justify-center">
+        <div className="flex-1 flex items-center justify-center pt-32 pb-24">
           <div className="flex flex-col items-center">
-            <Loader2 className="w-10 h-10 text-accent animate-spin mb-4" />
-            <p className="text-ink-muted font-body">Carregando edição...</p>
+            <Loader2 className="w-10 h-10 text-primary animate-spin mb-4" />
+            <p className="text-secondary font-label uppercase tracking-widest text-xs font-bold">Carregando edição...</p>
           </div>
         </div>
+        <Footer />
       </div>
     );
   }
 
   if (error || !article) {
     return (
-      <div className="min-h-screen bg-paper text-ink">
+      <div className="min-h-screen bg-background text-on-background flex flex-col">
         <Navbar />
-        <div className="max-w-[680px] mx-auto px-6 py-32 text-center">
-          <p className="text-red-500 font-medium mb-6">{error || 'Artigo não encontrado'}</p>
-          <Link to="/artigos" className="inline-flex items-center gap-2 text-ink-light hover:text-ink transition-colors font-medium hover-underline pb-1">
-            <ArrowLeft size={18} />
+        <div className="max-w-[680px] mx-auto px-6 py-40 text-center flex-1">
+          <p className="text-error font-medium mb-6 font-headline text-2xl">{error || 'Artigo não encontrado'}</p>
+          <Link to="/artigos" className="inline-flex items-center gap-2 text-secondary hover:text-primary transition-colors font-label font-bold text-sm uppercase tracking-widest pb-1 border-b border-outline-variant/30">
+            <span className="material-symbols-outlined">arrow_back</span>
             Voltar aos Artigos
           </Link>
         </div>
+        <Footer />
       </div>
     );
   }
@@ -89,220 +95,277 @@ export default function ArticlePage() {
   const tags = article.tags || [];
   const views = article.views || article.visualizacoes || 0;
   
-  const wordCount = conteudo.trim().split(/\s+/).filter(w => w.length > 0).length || 0;
-  const readTime = Math.ceil(wordCount / 200) + " min de leitura";
+  const wordCount = conteudo.trim().split(/\s+/).filter((w: string) => w.length > 0).length || 0;
+  const readTime = Math.ceil(wordCount / 200) + " MIN READ";
   
   const dataPublicacao = article.data_publicacao || article.createdAt || article.date || article.criadoEm || new Date().toISOString();
   
   const autorNome = article?.autor?.nome ?? 'Autor Desconhecido';
+  const autorBio = article?.autor?.bio ?? 'Escreve sobre as ideias que cruzam as fronteiras do design, engenharia e do futuro da tecnologia.';
   
-  const imageUrl = article.imagem_banner_url || getImageUrl(article.imagem || article.image);
+  const imageUrl = article.imagem_banner_url || (article.image ? getImageUrl(article.image) : null);
 
   const formatDate = (dateString: string) => {
     if (!dateString) return '';
     const date = new Date(dateString);
-    return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
+    return date.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
   };
 
   const contentParagraphs = conteudo.split('\n\n').filter((p: string) => p.trim());
 
   return (
-    <div className="min-h-screen bg-paper text-ink relative">
-      {/* Progress Bar */}
-      <div 
-        className="fixed top-0 left-0 h-[3px] bg-accent z-[60] transition-all duration-75 origin-left"
-        style={{ width: `${scrollProgress}%` }}
-      />
-      
+    <div className="min-h-screen bg-background text-on-background font-body relative pb-16 lg:pb-0">
       <Navbar />
 
-      {/* Hero Section */}
-      <div className="relative w-full h-[320px] md:h-[480px] mt-14 md:mt-16 bg-paper-alt">
-        {imageUrl ? (
-          <img
-            src={imageUrl}
-            alt={titulo}
-            className="w-full h-full object-cover object-center"
-          />
-        ) : (
-          <div className="w-full h-full pattern-dots opacity-50" />
-        )}
+      <main className="pt-32 pb-24 px-6 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 relative">
         
-        {/* Overlay gradient */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent flex flex-col justify-end px-6 md:px-12 pb-12">
-          <div className="w-full max-w-[800px] mx-auto flex flex-col items-center text-center">
+        {/* Sidebar: Reading Progress & Actions */}
+        <aside className="hidden lg:block lg:col-span-1 sticky top-32 h-fit">
+          <div className="flex flex-col items-center gap-8 py-4">
+            <div className="w-1 h-48 bg-surface-container rounded-full relative overflow-hidden">
+              <div 
+                className="absolute top-0 left-0 w-full bg-primary rounded-full transition-all duration-75"
+                style={{ height: `${scrollProgress}%` }}
+              ></div>
+            </div>
             
-            <span className="inline-block px-3 py-1 bg-white text-ink text-[11px] font-bold uppercase tracking-wider rounded-full mb-6">
-              {categoria}
-            </span>
-            
-            <h1 className="font-display font-semibold text-white leading-tight mb-8" style={{ fontSize: 'clamp(28px, 5vw, 56px)' }}>
+            <div className="flex flex-col gap-6 text-on-surface-variant">
+              <button onClick={handleLike} className="flex flex-col items-center gap-1 hover:text-primary transition-colors group">
+                <span className={`material-symbols-outlined ${isLiked ? 'text-primary' : ''}`} style={{ fontVariationSettings: isLiked ? "'FILL' 1" : "'FILL' 0" }}>favorite</span>
+                <span className="font-label text-[10px] font-bold group-hover:text-primary">{likesCount >= 1000 ? (likesCount/1000).toFixed(1)+'K' : likesCount}</span>
+              </button>
+              
+              <button onClick={() => document.getElementById('comments')?.scrollIntoView({ behavior: 'smooth' })} className="flex flex-col items-center gap-1 hover:text-primary transition-colors group">
+                <span className="material-symbols-outlined">chat_bubble</span>
+                <span className="font-label text-[10px] font-bold group-hover:text-primary">{article.comentarios?.length || 0}</span>
+              </button>
+              
+              <button onClick={() => setIsBookmarked(!isBookmarked)} className="flex flex-col items-center gap-1 hover:text-primary transition-colors group">
+                <span className={`material-symbols-outlined ${isBookmarked ? 'text-primary' : ''}`} style={{ fontVariationSettings: isBookmarked ? "'FILL' 1" : "'FILL' 0" }}>bookmark</span>
+                <span className="font-label text-[10px] font-bold group-hover:text-primary">{isBookmarked ? 'SAVED' : 'SAVE'}</span>
+              </button>
+              
+              <button onClick={handleShare} className="flex flex-col items-center gap-1 hover:text-primary transition-colors group">
+                <span className="material-symbols-outlined">share</span>
+                <span className="font-label text-[10px] font-bold group-hover:text-primary">SHARE</span>
+              </button>
+            </div>
+          </div>
+        </aside>
+
+        {/* Article Content */}
+        <article className="lg:col-span-8 lg:col-start-2">
+          {/* Header */}
+          <header className="mb-12 lg:mb-16">
+            <div className="flex items-center justify-between lg:justify-start lg:gap-3 mb-6">
+              <span className="font-label text-xs tracking-widest text-tertiary bg-tertiary-fixed px-3 py-1 rounded-full font-bold uppercase">{categoria}</span>
+              <span className="font-label text-xs text-secondary font-medium hidden lg:inline">{readTime}</span>
+              <span className="font-label text-xs text-secondary font-medium lg:hidden">{formatDate(dataPublicacao)}</span>
+            </div>
+            <h1 className="font-headline text-4xl md:text-5xl lg:text-7xl text-on-surface leading-[1.1] mb-6 lg:mb-8 font-extrabold tracking-tight">
               {titulo}
             </h1>
-            
-            {/* Info do Autor Hero */}
-            <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-full bg-paper-alt flex items-center justify-center text-ink text-[14px] font-bold shadow-md">
-                {autorNome?.charAt(0)?.toUpperCase()}
-              </div>
-              <div className="flex flex-col items-start text-white">
-                <span className="font-medium text-[14px]">{autorNome}</span>
-                <span className="text-[13px] text-white/80">
-                  {formatDate(dataPublicacao)} · {readTime}
-                </span>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </div>
-
-      <main className="relative max-w-[680px] mx-auto px-6 py-16">
-        
-        {/* Sidebar fixa (Desktop) */}
-        <div className={`hidden lg:flex flex-col gap-6 fixed top-[250px] left-[max(24px,calc(50%-440px))] transition-opacity duration-300 ${showSidebar ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
-          <div className="flex flex-col items-center gap-1 group">
-            <button
-              onClick={handleLike}
-              className="w-12 h-12 rounded-full flex items-center justify-center bg-paper-alt border border-border text-ink-muted hover:text-accent hover:border-accent transition-all duration-base bg-white"
-            >
-              <Heart size={20} fill={isLiked ? 'currentColor' : 'none'} className={isLiked ? 'text-accent' : ''} />
-            </button>
-            <span className="text-[12px] font-medium text-ink-muted group-hover:text-ink transition-colors">{likesCount}</span>
-          </div>
-          
-          <button
-            onClick={() => setIsBookmarked(!isBookmarked)}
-            className="w-12 h-12 rounded-full flex items-center justify-center bg-paper-alt border border-border text-ink-muted hover:text-ink transition-all duration-base bg-white"
-            title="Salvar artigo"
-          >
-            <Bookmark size={20} fill={isBookmarked ? 'currentColor' : 'none'} />
-          </button>
-          
-          <button
-            onClick={handleShare}
-            className="w-12 h-12 rounded-full flex items-center justify-center bg-paper-alt border border-border text-ink-muted hover:text-ink transition-all duration-base bg-white"
-            title="Copiar link"
-          >
-            <Share2 size={20} />
-          </button>
-
-          <button
-            onClick={() => document.getElementById('comments')?.scrollIntoView({ behavior: 'smooth' })}
-            className="w-12 h-12 rounded-full flex items-center justify-center bg-paper-alt border border-border text-ink-muted hover:text-ink transition-all duration-base bg-white relative mt-4"
-          >
-            <MessageCircle size={20} />
-            {(article.comentarios?.length || 0) > 0 && (
-              <span className="absolute -top-1 -right-1 bg-ink text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full">
-                {article.comentarios?.length}
-              </span>
-            )}
-          </button>
-        </div>
-
-        {/* Resumo destacado antes do artigo */}
-        {resumo && (
-          <p className="font-reading text-[22px] text-ink-light leading-relaxed italic mb-12 pb-10 border-b border-border text-center">
-            "{resumo}"
-          </p>
-        )}
-
-        {/* Corpo do Texto */}
-        <article className="font-reading text-[18px] text-ink leading-[1.85] mb-20 space-y-6">
-          {contentParagraphs.map((paragraph: string, index: number) => {
-            // Detect H2
-            if (paragraph.startsWith('## ')) {
-              return (
-                <h2 key={index} className="font-display font-bold text-[28px] text-ink mt-12 mb-6">
-                  {paragraph.replace(/^##\s*/, '')}
-                </h2>
-              );
-            }
-            // Detect H3 or single #
-            if (paragraph.startsWith('# ')) {
-              return (
-                <h3 key={index} className="font-display font-semibold text-[22px] text-ink mt-10 mb-4">
-                  {paragraph.replace(/^#\s*/, '')}
-                </h3>
-              );
-            }
-            // Detect Blockquote
-            if (paragraph.startsWith('> ')) {
-              return (
-                <blockquote key={index} className="border-l-4 border-accent pl-6 py-2 my-10 font-reading italic text-[20px] text-ink-light bg-paper-alt/30 rounded-r-lg">
-                  {paragraph.replace(/^>\s*/, '')}
-                </blockquote>
-              );
-            }
-            
-            // Standard constraints check text length to wrap or just use paragraph
-            return (
-              <p key={index} className="mb-6 whitespace-pre-wrap">
-                {paragraph}
+            {resumo && (
+              <p className="font-body text-xl md:text-2xl text-secondary italic border-l-4 border-primary pl-6 lg:pl-8 py-2">
+                {resumo}
               </p>
-            );
-          })}
+            )}
+          </header>
+
+          {/* Lead Image */}
+          <div className="mb-12 lg:mb-16 rounded-xl overflow-hidden relative group">
+            {imageUrl ? (
+              <>
+                <div className="absolute inset-0 blueprint-grid opacity-20 z-10 pointer-events-none mix-blend-multiply dark:mix-blend-screen"></div>
+                <img 
+                  src={imageUrl} 
+                  alt={titulo}
+                  className="w-full aspect-video lg:aspect-[21/9] object-cover transition-transform duration-700 group-hover:scale-105" 
+                />
+              </>
+            ) : (
+              <div className="w-full aspect-video lg:aspect-[21/9] bg-surface-container relative">
+                <div className="absolute inset-0 blueprint-grid opacity-40"></div>
+              </div>
+            )}
+            
+            <div className="absolute bottom-4 right-4 z-20 font-label text-[10px] text-white/90 bg-black/40 backdrop-blur-md px-2 py-1 font-bold tracking-widest uppercase border border-white/10 rounded">
+              PLATE NO. {(article.id || 0).toString().padStart(3, '0')}
+            </div>
+          </div>
+
+          {/* Body Text */}
+          <div className="font-body text-lg lg:text-xl leading-relaxed text-on-surface space-y-6 lg:space-y-8 max-w-3xl">
+            {contentParagraphs.map((paragraph: string, index: number) => {
+              // Detect H2
+              if (paragraph.startsWith('## ')) {
+                return (
+                  <h2 key={index} className="font-headline text-2xl lg:text-3xl font-bold pt-8 pb-4 border-b border-outline-variant/30 text-on-surface">
+                    {paragraph.replace(/^##\s*/, '')}
+                  </h2>
+                );
+              }
+              // Detect H3 or single #
+              if (paragraph.startsWith('# ')) {
+                return (
+                  <h3 key={index} className="font-headline text-xl lg:text-2xl font-bold mt-10 mb-4 text-on-surface">
+                    {paragraph.replace(/^#\s*/, '')}
+                  </h3>
+                );
+              }
+              // Detect Blockquote
+              if (paragraph.startsWith('> ')) {
+                return (
+                  <blockquote key={index} className="border-l-4 border-primary pl-6 py-2 my-10 font-body italic text-[20px] lg:text-[22px] text-secondary bg-surface-container-low/50 rounded-r-lg">
+                    {paragraph.replace(/^>\s*/, '')}
+                  </blockquote>
+                );
+              }
+              // Code Block (simulação básica)
+              if (paragraph.startsWith('```')) {
+                const codeContent = paragraph.replace(/```\w*\n?/, '').replace(/```$/, '');
+                return (
+                  <div key={index} className="my-10 rounded-xl overflow-hidden bg-inverse-surface border border-outline-variant/10">
+                    <div className="flex items-center justify-between px-6 py-3 bg-white/5 border-b border-white/5">
+                      <span className="font-label text-xs text-secondary-fixed font-bold tracking-widest uppercase text-white/50">Snippet</span>
+                      <div className="flex gap-2">
+                        <div className="w-2.5 h-2.5 rounded-full bg-error/80"></div>
+                        <div className="w-2.5 h-2.5 rounded-full bg-tertiary/80"></div>
+                        <div className="w-2.5 h-2.5 rounded-full bg-primary/80"></div>
+                      </div>
+                    </div>
+                    <pre className="p-6 font-mono text-xs lg:text-sm overflow-x-auto leading-relaxed text-surface-bright/90">
+                      {codeContent}
+                    </pre>
+                  </div>
+                );
+              }
+              
+              // Standard text
+              return (
+                <p key={index} className="whitespace-pre-wrap">
+                  {paragraph}
+                </p>
+              );
+            })}
+          </div>
 
           {/* Tags */}
           {tags && tags.length > 0 && (
-            <div className="mt-16 pt-8 border-t border-border flex flex-wrap gap-2 items-center">
-              <span className="text-[13px] font-bold text-ink-muted uppercase tracking-widest mr-2">Tags</span>
+            <div className="mt-16 pt-8 border-t border-outline-variant/20 flex flex-wrap gap-2 items-center">
+              <span className="text-[11px] font-bold text-secondary uppercase tracking-[0.2em] mr-4">Tags:</span>
               {tags.map((tag: string) => (
-                <span
+                <Link
                   key={tag}
-                  className="px-3 py-1 bg-paper-alt border border-border text-ink-light text-[13px] rounded-full"
+                  to={`/categorias?tipo=${encodeURIComponent(tag)}`}
+                  className="px-3 py-1 bg-surface-container-low border border-outline-variant/30 text-secondary text-[11px] font-label font-bold uppercase tracking-widest rounded hover:bg-surface-container hover:text-on-surface transition-colors"
                 >
                   {tag}
-                </span>
+                </Link>
               ))}
             </div>
           )}
+
+          {/* Author Card */}
+          <section className="mt-16 lg:mt-24 p-8 lg:p-12 bg-surface-container-low rounded-xl relative overflow-hidden border border-outline-variant/10">
+            <div className="absolute top-0 right-0 p-8 opacity-5 text-on-surface pointer-events-none">
+              <span className="material-symbols-outlined text-8xl lg:text-9xl">architecture</span>
+            </div>
+            
+            <div className="flex flex-col md:flex-row items-center md:items-start text-center md:text-left gap-6 lg:gap-8 relative z-10">
+              <div className="w-20 h-20 lg:w-24 lg:h-24 rounded-full overflow-hidden bg-surface-container-highest border-2 border-primary-container shrink-0 flex items-center justify-center text-3xl font-headline font-bold text-secondary">
+                {article?.autor?.avatar ? (
+                    <img src={getImageUrl(article.autor.avatar) || undefined} alt={autorNome} className="w-full h-full object-cover" />
+                ) : (
+                   autorNome.charAt(0).toUpperCase()
+                )}
+              </div>
+              
+              <div className="flex-1">
+                <h4 className="font-headline text-2xl font-bold mb-1 text-on-surface">{autorNome}</h4>
+                <p className="font-label text-xs text-primary font-bold uppercase tracking-[0.2em] mb-4">Systems Architect & Lead Contributor</p>
+                <p className="font-body text-secondary max-w-xl text-sm lg:text-base">
+                  {autorBio}
+                </p>
+                <div className="flex justify-center md:justify-start gap-4 mt-6">
+                  <button className="font-label text-[10px] font-bold text-on-surface hover:text-primary transition-colors border-b-2 border-outline-variant/30 pb-1 uppercase tracking-widest">FOLLOW RESEARCH</button>
+                  <button className="font-label text-[10px] font-bold text-on-surface hover:text-primary transition-colors border-b-2 border-outline-variant/30 pb-1 uppercase tracking-widest">VIEW ARCHIVE</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Comment Section Placeholder */}
+          <section id="comments" className="mt-16 pt-8 border-t border-outline-variant/20">
+            <CommentSection articleId={id || ''} />
+          </section>
         </article>
 
-        {/* Footer do Autor */}
-        <div className="border border-border rounded-2xl p-8 bg-paper-alt flex flex-col md:flex-row items-center md:items-start text-center md:text-left gap-6 mb-16">
-          <div className="w-16 h-16 rounded-full bg-border flex items-center justify-center text-ink text-[22px] font-bold shrink-0">
-            {autorNome?.charAt(0)?.toUpperCase()}
+        {/* Right Column (Desktop Metadata) */}
+        <aside className="hidden lg:block lg:col-span-3 space-y-12">
+          {/* Technical Ledger */}
+          <div className="p-8 bg-surface-container-low rounded-xl border border-outline-variant/10">
+            <h5 className="font-label text-xs font-extrabold text-secondary uppercase tracking-[0.2em] mb-6">Technical Ledger</h5>
+            <ul className="space-y-4">
+              <li className="flex justify-between items-center py-2 border-b border-outline-variant/20">
+                <span className="font-label text-[10px] text-secondary font-medium tracking-widest">VERSION</span>
+                <span className="font-mono text-[10px] text-on-surface font-bold">1.0.{(article.id || 4).toString().padStart(2, '0')}-BUILD</span>
+              </li>
+              <li className="flex justify-between items-center py-2 border-b border-outline-variant/20">
+                <span className="font-label text-[10px] text-secondary font-medium tracking-widest">DATE</span>
+                <span className="font-mono text-[10px] text-on-surface font-bold">{formatDate(dataPublicacao)}</span>
+              </li>
+              <li className="flex justify-between items-center py-2 border-b border-outline-variant/20">
+                <span className="font-label text-[10px] text-secondary font-medium tracking-widest">VIEWS</span>
+                <span className="font-mono text-[10px] text-on-surface font-bold">{views}</span>
+              </li>
+              <li className="flex justify-between items-center py-2">
+                <span className="font-label text-[10px] text-secondary font-medium tracking-widest">LATENCY</span>
+                <span className="font-mono text-[10px] text-tertiary font-bold px-2 bg-tertiary/10 rounded">LOW</span>
+              </li>
+            </ul>
           </div>
-          <div className="flex-1">
-            <span className="block text-[11px] font-bold text-ink-muted uppercase tracking-widest mb-1">Escrito por</span>
-            <h4 className="font-display text-[22px] font-semibold text-ink mb-2">{autorNome}</h4>
-            <p className="font-body text-[14px] text-ink-light leading-relaxed mb-4 max-w-[400px]">
-              Editor(a) e colaborador(a) no MindBlog. Escreve sobre ideias que cruzam as fronteiras do design e tecnologia.
-            </p>
-            <button className="border border-ink text-ink font-medium text-[13px] px-6 py-2 rounded-full hover:bg-ink hover:text-white transition-colors duration-fast">
-              Seguir
-            </button>
-          </div>
-        </div>
 
-        {/* Mobile Action Bar (Fixed bottom for mobile only) */}
-        <div className="lg:hidden fixed bottom-0 left-0 w-full bg-paper/90 backdrop-blur border-t border-border p-3 px-6 flex items-center justify-around z-40">
-           <button onClick={handleLike} className="flex flex-col items-center gap-1 text-ink-muted">
-             <Heart size={22} fill={isLiked ? 'currentColor' : 'none'} className={isLiked ? 'text-accent' : ''} />
-             <span className="text-[10px] font-medium">{likesCount}</span>
-           </button>
-           <button onClick={() => setIsBookmarked(!isBookmarked)} className="flex flex-col items-center gap-1 text-ink-muted">
-             <Bookmark size={22} fill={isBookmarked ? 'currentColor' : 'none'} className={isBookmarked ? 'text-ink' : ''} />
-             <span className="text-[10px] font-medium">Salvar</span>
-           </button>
-           <button onClick={() => document.getElementById('comments')?.scrollIntoView({ behavior: 'smooth' })} className="flex flex-col items-center gap-1 text-ink-muted">
-             <MessageCircle size={22} />
-             <span className="text-[10px] font-medium">{article.comentarios?.length || 0}</span>
-           </button>
-           <button onClick={handleShare} className="flex flex-col items-center gap-1 text-ink-muted">
-             <Share2 size={22} />
-             <span className="text-[10px] font-medium">Share</span>
-           </button>
-        </div>
-
-        {/* Seção de Comentários */}
-        <section id="comments" className="mt-16 pt-8 border-t border-border">
-          <CommentSection articleId={id || ''} />
-        </section>
+          {/* Related Deep Dives */}
+          {relatedArticles.length > 0 && (
+            <div className="space-y-6">
+              <h5 className="font-label text-xs font-extrabold text-secondary uppercase tracking-[0.2em]">Related Deep Dives</h5>
+              <div className="flex flex-col gap-6">
+                {relatedArticles.map(rel => (
+                  <Link to={`/artigo/${rel.id}`} key={rel.id} className="group cursor-pointer block border-l-2 border-outline-variant/30 pl-4 hover:border-primary transition-colors">
+                    <p className="font-headline text-lg font-bold group-hover:text-primary transition-colors leading-tight line-clamp-2 text-on-surface">
+                      {rel.titulo}
+                    </p>
+                    <p className="font-label text-[10px] text-secondary mt-2 font-bold tracking-widest">{formatDate(rel.data_publicacao || '')}</p>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+        </aside>
       </main>
 
       <Footer />
+
+      {/* Mobile Action Bar */}
+      <nav className="lg:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pt-2 pb-4 bg-stone-50/90 dark:bg-stone-950/90 backdrop-blur-xl border-t border-stone-200/20 dark:border-stone-800/20 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
+        <button onClick={handleLike} className="flex flex-col items-center justify-center rounded-xl px-4 py-2 text-stone-500 dark:text-stone-400">
+          <span className={`material-symbols-outlined ${isLiked ? 'text-primary' : ''}`} style={{ fontVariationSettings: isLiked ? "'FILL' 1" : "'FILL' 0" }}>favorite</span>
+          <span className="font-label text-[10px] font-bold tracking-widest mt-1">{likesCount}</span>
+        </button>
+        <button onClick={() => setIsBookmarked(!isBookmarked)} className="flex flex-col items-center justify-center rounded-xl px-4 py-2 text-stone-500 dark:text-stone-400">
+          <span className={`material-symbols-outlined ${isBookmarked ? 'text-primary' : ''}`} style={{ fontVariationSettings: isBookmarked ? "'FILL' 1" : "'FILL' 0" }}>bookmark</span>
+          <span className="font-label text-[10px] font-bold tracking-widest mt-1">SAVE</span>
+        </button>
+        <button onClick={() => document.getElementById('comments')?.scrollIntoView({ behavior: 'smooth' })} className="flex flex-col items-center justify-center rounded-xl px-4 py-2 text-stone-500 dark:text-stone-400">
+          <span className="material-symbols-outlined">chat_bubble</span>
+          <span className="font-label text-[10px] font-bold tracking-widest mt-1">{article.comentarios?.length || 0}</span>
+        </button>
+        <button onClick={handleShare} className="flex flex-col items-center justify-center rounded-xl px-4 py-2 text-stone-500 dark:text-stone-400">
+          <span className="material-symbols-outlined">share</span>
+          <span className="font-label text-[10px] font-bold tracking-widest mt-1">SHARE</span>
+        </button>
+      </nav>
     </div>
   );
 }

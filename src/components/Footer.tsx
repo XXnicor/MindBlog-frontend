@@ -1,56 +1,46 @@
 import React from 'react';
-import { Twitter, Github, Linkedin, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function Footer() {
   return (
-    <footer className="bg-paper border-t border-border mt-20 pt-20 pb-10">
-      <div className="max-w-[1080px] mx-auto px-6">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-10 mb-16 border-b border-border pb-16">
-          <div className="flex flex-col items-center md:items-start text-center md:text-left">
-            <Link to="/" className="font-display text-3xl font-bold text-ink tracking-tight mb-4">
-              Mind<span className="text-accent italic">Blog</span>.
-            </Link>
-            <p className="font-body text-[15px] text-ink-light max-w-[300px] leading-relaxed">
-              Um espaço de pensamento independente onde ideias ganham forma escrita e ecoam para sempre.
-            </p>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row gap-12 sm:gap-20">
-            <nav className="flex flex-col items-center md:items-start gap-4">
-              <span className="font-body text-[11px] font-bold text-ink-muted uppercase tracking-widest mb-2">Plataforma</span>
-              <Link to="/" className="font-body text-[14px] font-medium text-ink hover:text-accent transition-colors flex items-center gap-1 group">
-                Explorar <ArrowUpRight size={14} className="opacity-0 group-hover:opacity-100 transition-opacity -ml-1 group-hover:ml-0" />
-              </Link>
-              <Link to="/artigos/novo" className="font-body text-[14px] font-medium text-ink hover:text-accent transition-colors flex items-center gap-1 group">
-                Publicar <ArrowUpRight size={14} className="opacity-0 group-hover:opacity-100 transition-opacity -ml-1 group-hover:ml-0" />
-              </Link>
-              <Link to="/dashboard" className="font-body text-[14px] font-medium text-ink hover:text-accent transition-colors flex items-center gap-1 group">
-                Meu Espaço <ArrowUpRight size={14} className="opacity-0 group-hover:opacity-100 transition-opacity -ml-1 group-hover:ml-0" />
-              </Link>
-            </nav>
-
-            <div className="flex flex-col items-center md:items-start gap-4">
-              <span className="font-body text-[11px] font-bold text-ink-muted uppercase tracking-widest mb-2">Conectar</span>
-              <a href="#" className="font-body text-[14px] font-medium text-ink hover:text-accent transition-colors flex items-center gap-2">
-                <Twitter size={16} /> Twitter
-              </a>
-              <a href="#" className="font-body text-[14px] font-medium text-ink hover:text-accent transition-colors flex items-center gap-2">
-                <Github size={16} /> GitHub
-              </a>
-              <a href="#" className="font-body text-[14px] font-medium text-ink hover:text-accent transition-colors flex items-center gap-2">
-                <Linkedin size={16} /> LinkedIn
-              </a>
-            </div>
+    <footer className="bg-stone-100 dark:bg-stone-900 py-16 px-8 border-t border-stone-200/20">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
+        {/* Brand */}
+        <div>
+          <span className="text-xl font-bold text-stone-900 dark:text-stone-100 mb-4 block font-headline">MindBlog</span>
+          <p className="font-headline text-stone-600 dark:text-stone-400 leading-relaxed max-w-xs mb-8">
+            The intersection of software engineering, artificial intelligence, and structural design culture.
+          </p>
+          <div className="flex gap-4">
+            <a href="#" className="text-stone-400 hover:text-primary transition-colors">
+              <span className="material-symbols-outlined">alternate_email</span>
+            </a>
+            <a href="#" className="text-stone-400 hover:text-primary transition-colors">
+              <span className="material-symbols-outlined">language</span>
+            </a>
           </div>
         </div>
-
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 font-body text-[13px] text-ink-muted">
-          <p>© {new Date().getFullYear()} MindBlog. Todos os direitos reservados.</p>
-          <div className="flex items-center gap-6">
-            <a href="#" className="hover:text-ink transition-colors">Privacidade</a>
-            <a href="#" className="hover:text-ink transition-colors">Termos</a>
-          </div>
+        
+        {/* Deep Dives */}
+        <div>
+          <h4 className="font-label text-xs font-bold uppercase tracking-widest text-on-surface mb-6">Deep Dives</h4>
+          <ul className="space-y-4 font-headline text-lg">
+            <li><Link to="/categorias?tipo=AI" className="text-stone-500 hover:text-stone-900 dark:hover:text-stone-100 transition-colors">AI Research</Link></li>
+            <li><Link to="/categorias?tipo=Architecture" className="text-stone-500 hover:text-stone-900 dark:hover:text-stone-100 transition-colors">System Architecture</Link></li>
+            <li><Link to="/categorias?tipo=Engineering" className="text-stone-500 hover:text-stone-900 dark:hover:text-stone-100 transition-colors">Engineering Culture</Link></li>
+          </ul>
+        </div>
+        
+        {/* Journal */}
+        <div>
+          <h4 className="font-label text-xs font-bold uppercase tracking-widest text-on-surface mb-6">Journal</h4>
+          <ul className="space-y-4 font-headline text-lg mb-8">
+            <li><Link to="/" className="text-stone-500 hover:text-stone-900 dark:hover:text-stone-100 transition-colors">Privacy Policy</Link></li>
+            <li><Link to="/" className="text-stone-500 hover:text-stone-900 dark:hover:text-stone-100 transition-colors">Terms of Service</Link></li>
+          </ul>
+          <p className="pt-4 text-xs font-label text-stone-400 border-t border-stone-200/50 dark:border-stone-800">
+            © {new Date().getFullYear()} MindBlog Editorial. Built for Engineers.
+          </p>
         </div>
       </div>
     </footer>

@@ -1,119 +1,67 @@
 import { Link } from 'react-router-dom';
-import { Clock, Eye, Heart } from 'lucide-react';
 import { getImageUrl } from '../lib/imageUtils';
 import { Article } from '../types/article';
 
 interface ArticleCardProps {
   article: Article;
-  variant?: 'standard' | 'featured';
+  variant?: 'standard' | 'featured'; // Retido para não quebrar componentes existentes
 }
 
 export default function ArticleCard({ article, variant = 'standard' }: ArticleCardProps) {
-  const authorName = article?.autor?.nome ?? 'Autor Desconhecido';
-  const imageUrl = article.imagem_banner_url || getImageUrl(article.image);
+  const imageUrl = article.imagem_banner_url || (article.image ? getImageUrl(article.image) : null);
   
-  const wordsPerMinute = 200;
-  const wordCount = article.conteudo?.trim().split(/\\s+/).filter(w => w.length > 0).length || 0;
-  const readTime = Math.max(1, Math.ceil(wordCount / wordsPerMinute));
-
-  // Placeholder date as it's not in the Article type currently requested
-  const formattedDate = "15 mar.";
-
-  const isFeatured = variant === 'featured';
+  const formattedDate = article.data_publicacao 
+    ? new Date(article.data_publicacao).toLocaleDateString('pt-BR', { day: 'numeric', month: 'short', year: 'numeric' })
+    : "15 mar. 2024";
 
   return (
-    <Link 
-      to={`/artigo/${article.id}`}
-      className={`article-card group flex flex-col hover:-translate-y-1 hover:shadow-md transition-all duration-base rounded-2xl overflow-hidden ${
-        isFeatured ? 'md:flex-row md:items-stretch' : ''
-      }`}
-    >
-      {/* Imagem */}
-      <div 
-        className={`relative overflow-hidden bg-[var(--color-paper-alt)] shrink-0 ${
-          isFeatured ? 'w-full md:w-[55%] h-[280px] md:h-[420px]' : 'w-full aspect-video'
-        }`}
-      >
+    <Link to={`/artigo/${article.id}`} className="group cursor-pointer flex flex-col h-full">
+      <div className="aspect-video bg-surface-container mb-6 overflow-hidden rounded-xl relative group-hover:shadow-lg transition-shadow duration-500">
         {imageUrl ? (
-          <img
-            src={imageUrl}
+          <img 
+            src={imageUrl} 
             alt={article.titulo}
-            className="w-full h-full object-cover transition-transform duration-slow group-hover:scale-105"
+            className="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-500" 
             loading="lazy"
             onError={(e) => {
               e.currentTarget.style.display = 'none';
-              e.currentTarget.parentElement!.innerHTML = '<div class="w-full h-full flex flex-col items-center justify-center text-[var(--color-ink-muted)] bg-[var(--color-paper-alt)] pattern-dots"></div>';
+              e.currentTarget.parentElement!.innerHTML = '<div class="absolute inset-0 blueprint-grid opacity-40"></div><div class="absolute inset-0 flex items-center justify-center text-primary/30"><span class="material-symbols-outlined text-4xl">article</span></div>';
             }}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-[var(--color-ink-muted)] bg-[var(--color-paper-alt)] pattern-dots">
-            {/* Minimal pattern fallback */}
-          </div>
+          <>
+            <div className="absolute inset-0 blueprint-grid opacity-40"></div>
+            <div className="absolute inset-0 flex items-center justify-center text-primary/30">
+              <span className="material-symbols-outlined text-4xl">article</span>
+            </div>
+          </>
         )}
         
-        {/* Hover Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-base" />
-
-        {/* Destaque Badge */}
+        <div className="absolute top-4 left-4 bg-surface-container-lowest/90 backdrop-blur px-3 py-1 rounded text-[10px] font-mono text-tertiary border border-outline-variant/20 uppercase shadow-sm">
+          TAG: {article.categoria || 'EDITORIAL'}
+        </div>
+        
+        {/* Destaque Badge se mantido pelo negócio */}
         {article.highlight && (
           <div className="absolute top-4 right-4">
-            <span className="inline-block px-3 py-1 bg-[var(--color-ink)] text-[var(--color-ink-inverse)] text-[11px] uppercase tracking-wider font-bold rounded-full">
+            <span className="inline-block px-3 py-1 bg-primary text-on-primary text-[10px] uppercase font-mono rounded shadow-sm">
               Destaque
             </span>
           </div>
         )}
       </div>
-
-      {/* Conteúdo */}
-      <div className={`flex flex-col flex-1 ${isFeatured ? 'p-6 md:p-10 justify-center' : 'p-4 pt-4 items-start w-full'}`}>
-        
-        {/* Categoria badge */}
-        <span className="card-category block text-[11px] font-medium uppercase tracking-[0.08em] mb-2 leading-none">
-          {article.categoria ?? 'Editorial'}
-        </span>
-
-        {/* Título */}
-        <h3 
-          className={`card-title font-display font-semibold line-clamp-3 transition-colors duration-fast leading-[1.3] mb-3 ${
-            isFeatured ? 'text-[28px] md:text-[36px]' : 'text-[18px] md:text-[20px]'
-          }`}
-        >
-          {article.titulo}
-        </h3>
-        
-        {/* Resumo */}
-        {(isFeatured || article.resumo) && (
-          <p className="card-meta font-body text-[14px] leading-[1.6] line-clamp-3 mb-6">
-            {article.resumo ?? 'Um olhar aprofundado sobre tecnologia, design e as ideias que moldam o nosso amanhã.'}
-          </p>
-        )}
-
-        {/* Meta informações (Rodapé) */}
-        <div className="mt-auto pt-4 flex items-center justify-between border-t border-[var(--color-border)] w-full">
-          {/* Autor */}
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 avatar-fallback shrink-0">
-              {authorName?.charAt(0)?.toUpperCase() || 'A'}
-            </div>
-            <div className="flex items-center gap-1.5 text-[13px]">
-              <span className="author-name font-medium truncate max-w-[120px]">{authorName}</span>
-              <span className="card-meta">·</span>
-              <span className="card-meta">{formattedDate}</span>
-            </div>
-          </div>
-          
-          {/* Métricas */}
-          <div className="card-meta flex items-center gap-3 text-[12px]">
-            <div className="flex items-center gap-[4px] font-medium">
-              <Eye size={14} strokeWidth={2.5} />
-              <span>{article.views ?? 0}</span>
-            </div>
-            <div className="flex items-center gap-[4px] font-medium">
-              <Heart size={14} strokeWidth={2.5} />
-              <span>{Math.floor((article.views || 0) * 0.12)}</span>
-            </div>
-          </div>
-        </div>
+      
+      <h3 className="font-headline text-2xl font-bold text-on-surface mb-4 group-hover:text-primary transition-colors leading-tight line-clamp-3">
+        {article.titulo}
+      </h3>
+      
+      <p className="font-body text-secondary text-sm leading-relaxed mb-6 line-clamp-2">
+        {article.resumo || 'Um olhar aprofundado sobre tecnologia, design e as ideias que moldam o amanhã.'}
+      </p>
+      
+      <div className="flex items-center justify-between border-t border-outline-variant/10 pt-4 mt-auto">
+        <span className="font-label text-[10px] text-secondary uppercase tracking-widest">{formattedDate}</span>
+        <span className="material-symbols-outlined text-primary opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0">north_east</span>
       </div>
     </Link>
   );

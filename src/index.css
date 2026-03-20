@@ -70,10 +70,16 @@
   body {
     background-color: var(--color-paper);
     color: var(--color-ink);
-    font-family: var(--font-body);
+    font-family: 'Noto Serif', serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+}
+
+.blueprint-grid {
+  background-image: linear-gradient(to right, rgba(225, 191, 181, 0.1) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(225, 191, 181, 0.1) 1px, transparent 1px);
+  background-size: 32px 32px;
 }
 
 @layer components {

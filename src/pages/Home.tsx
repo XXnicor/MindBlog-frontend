@@ -1,79 +1,75 @@
-import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import ArticleCard from '../components/ArticleCard';
+import BottomNav from '../components/BottomNav';
+import HeroArticle from '../components/HeroArticle';
+import CategoryBar from '../components/CategoryBar';
+import ArticleGrid from '../components/ArticleGrid';
+import NewsletterSection from '../components/NewsletterSection';
 import { useArticles } from '../hooks/useArticles';
-import { Mail } from 'lucide-react';
-import { ArticleCardSkeleton } from '../components/ui/Skeleton';
 
 export default function Home(){
-  const { articles, loading, error } = useArticles(1, 6);
+  // Using limit 7 to get 1 for Hero and 6 for Grid
+  const { articles, loading, error } = useArticles(1, 7);
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background text-on-background flex flex-col pt-24 pb-20">
+        <Navbar />
+        <main className="flex-1 flex flex-col items-center justify-center px-6 text-center max-w-2xl mx-auto">
+          <span className="material-symbols-outlined text-red-500 text-6xl mb-4">error</span>
+          <h2 className="font-headline text-3xl font-bold mb-4 text-on-surface">System Error: Data Retrieval Failed</h2>
+          <p className="font-body text-secondary mb-8 leading-relaxed">
+            The neural link to the articles cache was severed. {error}
+          </p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="bg-primary text-on-primary font-label text-sm font-bold px-8 py-4 rounded-lg hover:bg-primary-container transition-colors shadow-lg"
+          >
+            INITIALIZE RECONNECT
+          </button>
+        </main>
+        <Footer />
+        <BottomNav />
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-[var(--color-paper)] text-[var(--color-ink)]">
+    <div className="min-h-screen bg-background text-on-background font-body relative">
       <Navbar />
 
-      <main className="max-w-6xl mx-auto px-6">
-        <section className="text-center py-24">
-          <h1 className="text-4xl md:text-5xl font-display font-extrabold text-[var(--color-ink)]">Explore o Futuro da <span className="text-[var(--color-accent)]">Tecnologia</span></h1>
-          <p className="text-[var(--color-ink-light)] font-body mt-4 max-w-2xl mx-auto">Artigos sobre IA, desenvolvimento, DevOps e as últimas tendências tecnológicas</p>
-          <div className="mt-8 flex justify-center gap-4">
-            <Link to="/artigos" className="btn-primary">Explorar Artigos</Link>
-            <Link to="/register" className="btn-outline border-[var(--color-border)] text-[var(--color-ink)] hover:border-[var(--color-ink)] transition-colors">Começar a Escrever</Link>
+      <main className="pt-32 pb-12 overflow-x-hidden">
+        {loading ? (
+          <div className="max-w-7xl mx-auto px-6 mb-24">
+            {/* Hero Skeleton */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mb-24">
+              <div className="lg:col-span-7">
+                <div className="h-4 bg-surface-container-high rounded w-32 mb-6 animate-pulse"></div>
+                <div className="h-20 bg-surface-container-high rounded w-full mb-4 animate-pulse"></div>
+                <div className="h-20 bg-surface-container-high rounded w-5/6 mb-8 animate-pulse"></div>
+                <div className="h-6 bg-surface-container-low rounded w-3/4 mb-10 animate-pulse"></div>
+                <div className="h-10 bg-surface-container-high rounded w-48 animate-pulse"></div>
+              </div>
+              <div className="lg:col-span-5 relative">
+                <div className="aspect-[4/5] bg-surface-container-high rounded-xl animate-pulse bg-gradient-to-r from-surface-container-high via-surface-container-highest to-surface-container-high bg-[length:400%_100%]"></div>
+              </div>
+            </div>
+            
+            {/* Grid Skeleton */}
+            <ArticleGrid articles={[]} loading={true} />
           </div>
-        </section>
-
-        <section className="py-8">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-display font-semibold text-[var(--color-ink)]">Artigos em Destaque</h2>
-            <Link to="/artigos" className="text-[var(--color-accent)] hover:opacity-80 transition-opacity font-medium">Ver todos →</Link>
-          </div>
-
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <ArticleCardSkeleton key={i} />
-              ))}
-            </div>
-          ) : error ? (
-            <div className="text-center py-12">
-              <div className="text-4xl mb-4">⚠️</div>
-              <h3 className="text-xl font-bold mb-2 text-[var(--color-ink)]">Erro ao carregar artigos</h3>
-              <p className="text-[var(--color-ink-light)] mb-4">{error}</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {articles.map(a => (
-                <ArticleCard key={a.id} article={a} />
-              ))}
-            </div>
-          )}
-        </section>
-
-        <section className="bg-[var(--color-paper-alt)] border border-[var(--color-border)] rounded-2xl p-8 md:p-12 mb-12 mt-12 text-center">
-          <div className="flex flex-col md:flex-row items-center justify-center gap-8">
-            <div className="bg-[var(--color-paper)] p-4 rounded-full shadow-sm">
-              <Mail className="text-[var(--color-accent)] w-10 h-10" />
-            </div>
-            <div className="text-left">
-              <h3 className="text-[var(--color-ink)] text-2xl font-display font-bold mb-2">Newsletter Semanal</h3>
-              <p className="text-[var(--color-ink-light)] max-w-md">Receba os melhores artigos de tecnologia diretamente no seu email. Sem spam, apenas conteúdo de qualidade.</p>
-            </div>
-            <form className="flex w-full md:w-auto gap-3 mt-6 md:mt-0 flex-col md:flex-row">
-              <input type="email" placeholder="exemplo@email.com" className="form-input md:w-[280px]" />
-              <button type="submit" className="btn-primary">Inscrever</button>
-            </form>
-          </div>
-        </section>
-
-        <section className="mt-16 mb-24 text-center">
-          <h3 className="text-[var(--color-ink)] text-2xl font-display font-bold">Compartilhe Seu Conhecimento</h3>
-          <p className="text-[var(--color-ink-light)] mt-3 max-w-lg mx-auto">Junte-se à nossa comunidade de escritores e compartilhe suas experiências e conhecimentos em tecnologia</p>
-          <div className="mt-6"><Link to="/register" className="btn-primary">Criar Conta Gratuita</Link></div>
-        </section>
+        ) : (
+          <>
+            {articles.length > 0 && <HeroArticle article={articles[0]} />}
+            <CategoryBar articles={articles} />
+            <ArticleGrid articles={articles.slice(1)} />
+            <NewsletterSection />
+          </>
+        )}
       </main>
 
       <Footer />
+      <BottomNav />
     </div>
   );
 }
