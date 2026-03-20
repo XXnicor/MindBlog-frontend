@@ -6,11 +6,12 @@ import Footer from '../components/Footer';
 import CommentSection from '../components/CommentSection';
 import { articleService } from '../lib/api';
 import { getImageUrl } from '../lib/imageUtils';
+import { Article } from '../types/article';
 
 export default function ArticlePage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [article, setArticle] = useState<any>(null);
+  const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isLiked, setIsLiked] = useState(false);
@@ -27,7 +28,7 @@ export default function ArticlePage() {
     try {
       setLoading(true);
       setError('');
-      const data = await articleService.getById(articleId);
+      const data = await articleService.getById(articleId) as Article;
       setArticle(data);
       setLikesCount(data.curtidas || data.likes || 0);
     } catch (err: any) {
@@ -83,7 +84,7 @@ export default function ArticlePage() {
   const imageUrl = article.imagem_banner_url || getImageUrl(article.imagem || article.image);
 
   // Formatar data
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string | undefined) => {
     if (!dateString) return '';
     const date = new Date(dateString);
     return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -124,11 +125,16 @@ export default function ArticlePage() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-purple-600 flex items-center justify-center text-white font-bold">
-                {(article.autor?.nome || article.author?.nome || article.author || 'A')[0].toUpperCase()}
+                {(
+                  article.autor?.nome ||
+                  (typeof article.author === 'object' && article.author?.nome) ||
+                  (typeof article.author === 'string' ? article.author : '') ||
+                  'A'
+                )?.charAt(0)?.toUpperCase() || 'A'}
               </div>
               <div>
                 <div className="text-white font-medium">
-                  {article.autor?.nome || article.author?.nome || article.author || 'Autor'}
+                  {article.autor?.nome || (typeof article.author === 'object' ? article.author?.nome : '') || (typeof article.author === 'string' ? article.author : 'Autor')}
                 </div>
                 <div className="text-sm text-slate-400">
                   {formatDate(article.criadoEm || article.createdAt || article.date)} • {article.tempoLeitura || article.readTime || '5min'} de leitura

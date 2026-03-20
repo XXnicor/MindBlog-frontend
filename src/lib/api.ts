@@ -1,5 +1,11 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
+let onUnauthorizedCallback: (() => void) | null = null;
+
+export const setUnauthorizedCallback = (callback: () => void) => {
+  onUnauthorizedCallback = callback;
+};
+
 const getAuthToken = (): string | null => {
   return localStorage.getItem('token');
 };
@@ -32,6 +38,9 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
   const result = await response.json();
 
   if (!response.ok) {
+    if (response.status === 401 && onUnauthorizedCallback) {
+      onUnauthorizedCallback();
+    }
     throw new Error(result.message || result.error || `Erro ${response.status}: ${response.statusText}`);
   }
 
@@ -43,8 +52,9 @@ const mapArticle = (article: any) => ({
   title: article.titulo || article.title,
   summary: article.resumo || article.summary || '',
   category: article.categoria || article.category,
-  author: article.autor?.nome || article.author?.nome || article.author || 'Autor Desconhecido',
+  autor: article.autor || article.author,
   authorId: article.autor?._id || article.autor?.id || article.author?._id || article.author?.id,
+  authorName: article.autor?.nome || article.author?.nome || (typeof article.author === 'string' ? article.author : 'Autor Desconhecido'),
   readTime: article.tempoLeitura || article.readTime || '5min',
   views: article.visualizacoes || article.views || 0,
   image: article.imagem || article.image,
@@ -216,7 +226,6 @@ export const api = {
       const data = await res.json();
       return { data: data.data || data };
     } catch (err) {
-      console.error('API GET Error:', err);
       throw err;
     }
   },
@@ -247,7 +256,6 @@ export const api = {
       const data = await res.json();
       return { data: data.data || data };
     } catch (err) {
-      console.error('API POST Error:', err);
       throw err;
     }
   },
@@ -278,7 +286,6 @@ export const api = {
       const data = await res.json();
       return { data: data.data || data };
     } catch (err) {
-      console.error('API PUT Error:', err);
       throw err;
     }
   },
@@ -304,7 +311,6 @@ export const api = {
       const data = await res.json();
       return { data: data.data || data };
     } catch (err) {
-      console.error('API DELETE Error:', err);
       throw err;
     }
   },

@@ -56,7 +56,7 @@ export default function Register() {
 
       // Sucesso
       alert('Conta criada com sucesso! 🎉');
-      navigate('/login');
+      navigate('/dashboard');
 
     } catch (err: any) {
       setError(err.message || 'Erro ao criar conta. Tente novamente.');

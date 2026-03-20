@@ -1,33 +1,21 @@
 import { Link } from 'react-router-dom'
 import { Clock, Eye } from 'lucide-react'
 import { getImageUrl } from '../lib/imageUtils'
-
-export type Article = {
-  id: string
-  title: string
-  summary: string
-  category: string
-  author: string
-  readTime: string
-  views: number
-  image?: string
-  imagem_banner_url?: string
-  highlight?: boolean
-  date?: string
-}
+import { Article } from '../types/article'
 
 export default function ArticleCard({ article }: { article: Article }){
   const imageUrl = article.imagem_banner_url || getImageUrl(article.image);
-  
+  const authorName = article.authorName || article.author || 'Autor Desconhecido';
+
   return (
     <Link to={`/artigo/${article.id}`}>
-      <article className={`bg-slate-900 border ${article.highlight ? 'border-cyan-500' : 'border-slate-800'} rounded-md overflow-hidden hover:border-slate-700 transition-colors cursor-pointer`}> 
+      <article className={`bg-slate-900 border ${article.highlight ? 'border-cyan-500' : 'border-slate-800'} rounded-md overflow-hidden hover:border-slate-700 transition-colors cursor-pointer`}>
         <div className="h-40 bg-gradient-to-br from-pink-300 to-sky-200 flex items-center justify-center text-slate-900 font-extrabold text-3xl">
           {/* placeholder image */}
           {imageUrl ? (
-            <img 
-              src={imageUrl} 
-              alt={article.title} 
+            <img
+              src={imageUrl}
+              alt={article.title}
               className="w-full h-full object-cover"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
@@ -45,7 +33,7 @@ export default function ArticleCard({ article }: { article: Article }){
           <p className="text-slate-400 mt-2 line-clamp-3 text-sm">{article.summary}</p>
 
           <div className="mt-4 flex items-center justify-between text-slate-400 text-sm">
-            <div>{article.author}</div>
+            <div>{typeof authorName === 'string' ? authorName : 'Autor Desconhecido'}</div>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-1"><Clock size={14} /> <span>{article.readTime}</span></div>
               <div className="flex items-center gap-1"><Eye size={14} /> <span>{article.views}</span></div>

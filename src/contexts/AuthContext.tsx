@@ -1,12 +1,8 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { authService, auth } from '../lib/api';
+import { authService, auth, setUnauthorizedCallback } from '../lib/api';
+import { User as UserType } from '../types/article';
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  avatar?: string;
-}
+interface User extends UserType {}
 
 interface AuthContextType {
   user: User | null;
@@ -19,8 +15,13 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserType | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Configurar callback para 401
+  useEffect(() => {
+    setUnauthorizedCallback(handleUnauthorized);
+  }, []);
 
   // Carregar usuário ao iniciar
   useEffect(() => {
@@ -66,6 +67,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     auth.removeToken();
     setUser(null);
+  };
+
+  const handleUnauthorized = () => {
+    logout();
   };
 
   const updateUser = (userData: Partial<User>) => {

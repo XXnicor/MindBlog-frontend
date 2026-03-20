@@ -5,6 +5,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { authService, userService } from '../lib/api';
 import { getImageUrl } from '../lib/imageUtils';
+import { User, Stats } from '../types/article';
 
 export default function ProfileSettings() {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ export default function ProfileSettings() {
   const [avatarPreview, setAvatarPreview] = useState('');
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
-  const [stats, setStats] = useState<any>(null);
+  const [stats, setStats] = useState<Stats | null>(null);
   const [createdAt, setCreatedAt] = useState('');
 
   const maxBioLength = 500;
@@ -220,13 +221,12 @@ export default function ProfileSettings() {
             <div className="flex flex-col items-center pb-8 border-b border-slate-800">
               <div className="relative group mb-4">
                 <img
-                  src={getAvatarPreview()}
-                  alt="Avatar"
-                  className="w-24 h-24 rounded-full object-cover border-4 border-slate-700"
-                  onError={(e) => {
-                    console.error('Erro ao carregar avatar:', getAvatarPreview());
-                    e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(nome)}&size=200&background=06b6d4&color=fff`;
-                  }}
+                   src={getAvatarPreview()}
+                   alt="Avatar"
+                   className="w-24 h-24 rounded-full object-cover border-4 border-slate-700"
+                   onError={(e) => {
+                     e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(nome)}&size=200&background=06b6d4&color=fff`;
+                   }}
                 />
                 <label
                   htmlFor="avatarFile"

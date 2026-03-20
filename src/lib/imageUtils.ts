@@ -23,7 +23,6 @@ export const getImageUrl = (imagePath: string | null | undefined): string | null
     : imagePath;
   
   const fullUrl = `${UPLOADS_BASE_URL}/${cleanPath}`;
-  console.log('[ImageUtils] Imagem URL:', { original: imagePath, clean: cleanPath, full: fullUrl });
   return fullUrl;
 };
 

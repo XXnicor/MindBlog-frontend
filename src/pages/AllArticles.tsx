@@ -3,20 +3,11 @@ import { Search, LayoutGrid, List, Clock, Eye, ChevronLeft, ChevronRight } from 
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { Article } from '../components/ArticleCard';
+import { Article, PaginationData } from '../types/article';
 import { articleService } from '../lib/api';
 import { getImageUrl } from '../lib/imageUtils';
 
 type ViewMode = 'grid' | 'list';
-
-interface PaginationData {
-  currentPage: number;
-  totalPages: number;
-  totalItems: number;
-  itemsPerPage: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-}
 
 export default function AllArticles() {
   const [articles, setArticles] = useState<Article[]>([]);
@@ -234,7 +225,7 @@ export default function AllArticles() {
                       </p>
 
                       <div className="mt-4 flex items-center justify-between text-slate-400 text-sm">
-                        <div>{article.author}</div>
+                        <div>{typeof article.authorName === 'string' ? article.authorName : (typeof article.author === 'string' ? article.author : 'Autor Desconhecido')}</div>
                         <div className="flex items-center gap-3">
                           <div className="flex items-center gap-1">
                             <Clock size={14} />
@@ -306,7 +297,7 @@ export default function AllArticles() {
 
                       <div className="mt-4 flex items-center justify-between text-slate-400 text-sm border-t border-slate-800 pt-4">
                         <div className="flex items-center gap-2">
-                          <span className="font-medium text-slate-300">{article.author}</span>
+                          <span className="font-medium text-slate-300">{typeof article.authorName === 'string' ? article.authorName : (typeof article.author === 'string' ? article.author : 'Autor Desconhecido')}</span>
                           {article.date && (
                             <>
                               <span>•</span>

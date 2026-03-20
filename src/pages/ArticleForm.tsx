@@ -2,6 +2,7 @@ import { useState, useEffect, FormEvent, ChangeEvent, KeyboardEvent } from 'reac
 import { ArrowLeft, Upload, X, Plus } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { articleService } from '../lib/api';
+import { Article } from '../types/article';
 
 export default function ArticleForm() {
   const navigate = useNavigate();

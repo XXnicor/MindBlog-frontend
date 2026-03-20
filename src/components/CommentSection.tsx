@@ -2,17 +2,7 @@ import { useState, useEffect } from 'react';
 import { MessageCircle, Trash2, Loader2 } from 'lucide-react';
 import { articleService, commentService, authService } from '../lib/api';
 import { getImageUrl } from '../lib/imageUtils';
-
-interface Comment {
-  id: number;
-  text: string;
-  autor: {
-    id: number;
-    nome: string;
-    avatar?: string;
-  };
-  createdAt: string;
-}
+import { Comment } from '../types/article';
 
 interface CommentSectionProps {
   articleId: string;
@@ -29,8 +19,22 @@ export default function CommentSection({ articleId }: CommentSectionProps) {
   const MAX_COMMENT_LENGTH = 1000;
 
   useEffect(() => {
-    loadComments();
-    loadCurrentUser();
+    let mounted = true;
+    
+    const load = async () => {
+      if (mounted) {
+        await loadComments();
+        if (mounted) {
+          await loadCurrentUser();
+        }
+      }
+    };
+    
+    load();
+    
+    return () => {
+      mounted = false;
+    };
   }, [articleId]);
 
   const loadCurrentUser = async () => {
@@ -200,43 +204,43 @@ export default function CommentSection({ articleId }: CommentSectionProps) {
               className="bg-slate-950 border border-slate-800 rounded-lg p-4"
             >
               {/* Header do comentário */}
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  {/* Avatar */}
-                  {getAvatarUrl(comment.autor.avatar) ? (
-                    <img
-                      src={getAvatarUrl(comment.autor.avatar)!}
-                      alt={comment.autor.nome}
-                      className="w-10 h-10 rounded-full object-cover border-2 border-slate-700"
-                      onError={(e) => {
-                        e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.autor.nome)}&size=40&background=06b6d4&color=fff`;
-                      }}
-                    />
-                  ) : (
-                    <div className="w-10 h-10 rounded-full bg-cyan-500 flex items-center justify-center text-slate-900 font-bold">
-                      {comment.autor.nome.charAt(0).toUpperCase()}
-                    </div>
-                  )}
-                  
-                  <div>
-                    <p className="font-medium text-white">{comment.autor.nome}</p>
-                    <p className="text-sm text-slate-500">
-                      {formatDate(comment.createdAt)}
-                    </p>
-                  </div>
-                </div>
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    {/* Avatar */}
+                    {comment.autor?.avatar ? (
+                      <img
+                        src={getAvatarUrl(comment.autor.avatar)!}
+                        alt={comment.autor.nome || 'Usuário'}
+                        className="w-10 h-10 rounded-full object-cover border-2 border-slate-700"
+                        onError={(e) => {
+                          e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.autor?.nome || 'U')}&size=40&background=06b6d4&color=fff`;
+                        }}
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-cyan-500 flex items-center justify-center text-slate-900 font-bold">
+                        {comment.autor?.nome?.charAt(0).toUpperCase() || '?'}
+                      </div>
+                    )}
 
-                {/* Botão de deletar (apenas para o autor ou admin) */}
-                {currentUser && currentUser.id === comment.autor.id && (
-                  <button
-                    onClick={() => handleDelete(comment.id)}
-                    className="p-2 text-slate-400 hover:text-red-400 transition-colors"
-                    title="Deletar comentário"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                )}
-              </div>
+                    <div>
+                      <p className="font-medium text-white">{comment.autor?.nome || 'Usuário'}</p>
+                      <p className="text-sm text-slate-500">
+                        {formatDate(comment.createdAt)}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Botão de deletar (apenas para o autor ou admin) */}
+                  {currentUser && comment.autor && currentUser.id === comment.autor.id && (
+                    <button
+                      onClick={() => handleDelete(comment.id)}
+                      className="p-2 text-slate-400 hover:text-red-400 transition-colors"
+                      title="Deletar comentário"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
 
               {/* Texto do comentário */}
               <p className="text-slate-300 whitespace-pre-wrap">{comment.text}</p>

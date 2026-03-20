@@ -89,12 +89,6 @@ export default function Login() {
                   <label htmlFor="password" className="block text-sm font-medium text-slate-300">
                     Senha
                   </label>
-                  <Link
-                    to="/forgot-password"
-                    className="text-sm text-slate-400 hover:text-white hover:underline transition-colors"
-                  >
-                    Esqueceu a senha?
-                  </Link>
                 </div>
                 <input
                   id="password"

@@ -5,6 +5,8 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { articleService, userService } from '../lib/api';
 import { getImageUrl } from '../lib/imageUtils';
+import { Article, Stats } from '../types/article';
+import { useAuth } from '../contexts/AuthContext';
 
 const RECENT_ACTIVITY = [
   {
@@ -42,8 +44,9 @@ const RECENT_ACTIVITY = [
 ];
 
 export default function Dashboard() {
-  const [articles, setArticles] = useState<any[]>([]);
-  const [stats, setStats] = useState<any>(null);
+  const { user } = useAuth();
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [articleToDelete, setArticleToDelete] = useState<string | null>(null);
@@ -124,7 +127,7 @@ export default function Dashboard() {
               Dashboard
             </h1>
             <p className="text-slate-400">
-              Bem-vindo de volta, John Doe!
+              Bem-vindo de volta, {user?.name || 'Usuário'}!
             </p>
           </div>
           <div className="flex gap-3">
@@ -232,7 +235,7 @@ export default function Dashboard() {
                           {article.summary}
                         </p>
                         <div className="flex items-center gap-4 text-xs text-slate-500">
-                          <span>{new Date(article.date).toLocaleDateString('pt-BR')}</span>
+                          <span>{article.date ? new Date(article.date).toLocaleDateString('pt-BR') : ''}</span>
                           <span className="flex items-center gap-1">
                             <Eye size={14} />
                             {article.views || 0}

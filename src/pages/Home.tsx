@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
-import ArticleCard, { Article } from '../components/ArticleCard'
+import ArticleCard from '../components/ArticleCard'
+import { Article } from '../types/article'
 import { articleService } from '../lib/api'
 import { Mail } from 'lucide-react'
 
@@ -16,7 +17,7 @@ export default function Home(){
         const res = await articleService.getAll(1, 10)
         if(mounted && res.articles) setArticles(res.articles)
       }catch(err){
-        console.error('Erro ao carregar artigos:', err)
+        // Erro ao carregar artigos
       }
     })()
     return ()=>{ mounted = false }
