@@ -54,7 +54,33 @@ export default function Dashboard() {
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    loadDashboardData();
+    let cancelled = false;
+
+    async function load() {
+      if (!cancelled) {
+        setLoading(true);
+        setError(null);
+      }
+      try {
+        const [articlesData, statsData] = await Promise.all([
+          articleService.getMyArticles(1, 50),
+          userService.getStats()
+        ]);
+        
+        if (!cancelled) {
+          setArticles(articlesData.articles || []);
+          setStats(statsData || null);
+        }
+      } catch (err: any) {
+        console.error('Erro ao carregar dados do dashboard:', err);
+        if (!cancelled) setError(err.message || 'Erro ao carregar dados');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    load();
+    return () => { cancelled = true; };
   }, []);
 
   const loadDashboardData = async () => {

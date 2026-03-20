@@ -23,28 +23,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Carregar usuário ao iniciar
   useEffect(() => {
-    loadUser();
-  }, []);
+    let cancelled = false;
 
-  const loadUser = async () => {
-    try {
-      if (auth.isAuthenticated()) {
-        const userData = await authService.getCurrentUser();
-        setUser({
-          id: userData.id,
-          nome: userData.nome || '',
-          email: userData.email,
-          avatar: userData.avatar,
-          bio: userData.bio
-        });
+    async function load() {
+      try {
+        if (auth.isAuthenticated()) {
+          const userData = await authService.getCurrentUser();
+          if (!cancelled) {
+            setUser({
+              id: userData.id,
+              nome: userData.nome || '',
+              email: userData.email,
+              avatar: userData.avatar,
+              bio: userData.bio
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao carregar usuário:', error);
+        if (!cancelled) auth.removeToken();
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-    } catch (error) {
-      console.error('Erro ao carregar usuário:', error);
-      auth.removeToken();
-    } finally {
-      setLoading(false);
     }
-  };
+
+    load();
+    return () => { cancelled = true; };
+  }, []);
 
   const login = async (email: string, senha: string) => {
     const response = await authService.login({ email, senha });

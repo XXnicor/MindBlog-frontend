@@ -16,16 +16,15 @@ export function useArticles(page = 1, limit = 10, filters: { categoria?: string;
   const [error, setError] = useState<string | null>(null);
   const [pagination, setPagination] = useState<PaginationData | null>(null);
 
-  const loadArticles = useCallback(async () => {
+  const refetch = useCallback(async () => {
     setLoading(true);
     setError(null);
-    
     try {
       const response = await articleService.getAll(page, limit, filters);
       setArticles(response.articles || []);
       setPagination(response.pagination || null);
     } catch (err: any) {
-      console.error('Erro ao carregar artigos:', err);
+      console.error('Erro ao recarregar artigos:', err);
       setError(err.message || 'Erro ao carregar artigos');
     } finally {
       setLoading(false);
@@ -33,14 +32,37 @@ export function useArticles(page = 1, limit = 10, filters: { categoria?: string;
   }, [page, limit, filters]);
 
   useEffect(() => {
-    loadArticles();
-  }, [loadArticles]);
+    let cancelled = false;
+
+    async function load() {
+      if (!cancelled) {
+        setLoading(true);
+        setError(null);
+      }
+      
+      try {
+        const response = await articleService.getAll(page, limit, filters);
+        if (!cancelled) {
+          setArticles(response.articles || []);
+          setPagination(response.pagination || null);
+        }
+      } catch (err: any) {
+        console.error('Erro ao carregar artigos:', err);
+        if (!cancelled) setError(err.message || 'Erro ao carregar artigos');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    load();
+    return () => { cancelled = true; };
+  }, [page, limit, filters]);
 
   return {
     articles,
     loading,
     error,
     pagination,
-    refetch: loadArticles
+    refetch
   };
 }

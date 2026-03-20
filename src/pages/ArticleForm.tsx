@@ -25,29 +25,35 @@ export default function ArticleForm() {
   const WORDS_PER_MINUTE = 200;
 
   useEffect(() => {
+    let cancelled = false;
+
+    async function loadArticleData(articleId: string) {
+      if (!cancelled) setIsLoading(true);
+      try {
+        const article = await articleService.getById(articleId);
+        
+        if (!cancelled) {
+          setTitle(article.titulo || '');
+          setSummary(article.resumo || '');
+          setCategory(article.categoria || 'Dev');
+          setContent(article.conteudo || '');
+          setTags(article.tags || []);
+          setExistingImageUrl(article.imagem_banner_url || article.imagem || '');
+        }
+      } catch (error) {
+        console.error('Erro ao carregar artigo:', error);
+        if (!cancelled) alert('Erro ao carregar artigo para edição.');
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    }
+
     if (isEditMode && id) {
       loadArticleData(id);
     }
-  }, [isEditMode, id]);
 
-  const loadArticleData = async (articleId: string) => {
-    setIsLoading(true);
-    try {
-      const article = await articleService.getById(articleId);
-      
-      setTitle(article.titulo || '');
-      setSummary(article.resumo || '');
-      setCategory(article.categoria || 'Dev');
-      setContent(article.conteudo || '');
-      setTags(article.tags || []);
-      setExistingImageUrl(article.imagem_banner_url || article.imagem || '');
-    } catch (error) {
-      console.error('Erro ao carregar artigo:', error);
-      alert('Erro ao carregar artigo para edição.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    return () => { cancelled = true; };
+  }, [isEditMode, id]);
 
   const calculateReadingTime = (text: string): number => {
     const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;

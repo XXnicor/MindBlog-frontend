@@ -19,32 +19,35 @@ export default function CommentSection({ articleId }: CommentSectionProps) {
   const MAX_COMMENT_LENGTH = 1000;
 
   useEffect(() => {
-    let mounted = true;
+    let cancelled = false;
     
-    const load = async () => {
-      if (mounted) {
-        await loadComments();
-        if (mounted) {
-          await loadCurrentUser();
-        }
+    async function load() {
+      if (!cancelled) {
+        setLoading(true);
+        setError('');
       }
-    };
+
+      try {
+        const data = await articleService.getComments(articleId);
+        if (!cancelled) setComments(data);
+      } catch (err: any) {
+        console.error('Erro ao carregar comentários:', err);
+        if (!cancelled) setError('Erro ao carregar comentários');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+
+      try {
+        const user = await authService.getCurrentUser();
+        if (!cancelled) setCurrentUser(user);
+      } catch (err) {
+        console.log('Usuário não autenticado');
+      }
+    }
     
     load();
-    
-    return () => {
-      mounted = false;
-    };
+    return () => { cancelled = true; };
   }, [articleId]);
-
-  const loadCurrentUser = async () => {
-    try {
-      const user = await authService.getCurrentUser();
-      setCurrentUser(user);
-    } catch (err) {
-      console.log('Usuário não autenticado');
-    }
-  };
 
   const loadComments = async () => {
     setLoading(true);

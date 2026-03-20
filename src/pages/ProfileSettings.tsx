@@ -24,11 +24,56 @@ export default function ProfileSettings() {
   const bioLength = bio.length;
 
   useEffect(() => {
-    loadUserData();
-    loadUserStats();
-  }, []);
+    let cancelled = false;
 
-  // Cleanup da URL do preview para evitar memory leak
+    async function load() {
+      if (!cancelled) setLoadingData(true);
+      try {
+        const [user, userStats] = await Promise.all([
+          authService.getCurrentUser(),
+          userService.getStats().catch(() => null)
+        ]);
+
+        if (!cancelled) {
+          setNome(user.nome);
+          setEmail(user.email);
+          setBio(user.bio ?? '');
+          
+          if (user.avatar) {
+            const avatarUrl = user.avatar.includes('?') 
+              ? `${user.avatar}&t=${Date.now()}` 
+              : `${user.avatar}?t=${Date.now()}`;
+             setAvatarPreview(avatarUrl);
+          } else {
+             setAvatarPreview('');
+          }
+          
+          if (user.createdAt) {
+             setCreatedAt(user.createdAt);
+          } else {
+             setCreatedAt('');
+          }
+
+          if (userStats) setStats(userStats);
+        }
+      } catch (error: any) {
+        console.error('Erro ao carregar dados:', error);
+        if (!cancelled) {
+          if (error.message?.includes('token') || error.message?.includes('autenticação')) {
+            alert('Sessão expirada. Faça login novamente.');
+            navigate('/login');
+          }
+        }
+      } finally {
+        if (!cancelled) setLoadingData(false);
+      }
+    }
+
+    load();
+    return () => { cancelled = true; };
+  }, [navigate]);
+
+  // Clean-up do avatarPreview para evitar memory leak
   useEffect(() => {
     return () => {
       if (avatarPreview && avatarPreview.startsWith('blob:')) {
@@ -45,7 +90,6 @@ export default function ProfileSettings() {
       setEmail(user.email);
       setBio(user.bio ?? '');
       
-      // Adicionar timestamp para forçar atualização da imagem
       if (user.avatar) {
         const avatarUrl = user.avatar.includes('?') 
           ? `${user.avatar}&t=${Date.now()}` 
@@ -55,29 +99,15 @@ export default function ProfileSettings() {
         setAvatarPreview('');
       }
       
-      // Garantir que createdAt seja uma string
       if (user.createdAt) {
         setCreatedAt(user.createdAt);
       } else {
         setCreatedAt('');
       }
     } catch (error: any) {
-      console.error('Erro ao carregar dados do usuário:', error);
-      if (error.message.includes('token') || error.message.includes('autenticação')) {
-        alert('Sessão expirada. Faça login novamente.');
-        navigate('/login');
-      }
+      console.error('Erro ao recarregar dados do usuário:', error);
     } finally {
       setLoadingData(false);
-    }
-  };
-
-  const loadUserStats = async () => {
-    try {
-      const userStats = await userService.getStats();
-      setStats(userStats);
-    } catch (error) {
-      console.error('Erro ao carregar estatísticas:', error);
     }
   };
 

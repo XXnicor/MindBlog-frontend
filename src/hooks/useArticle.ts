@@ -14,15 +14,10 @@ export function useArticle(id: string | number | undefined): UseArticleResult {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const loadArticle = useCallback(async () => {
-    if (!id) {
-      setLoading(false);
-      return;
-    }
-
+  const refetch = useCallback(async () => {
+    if (!id) return;
     setLoading(true);
     setError(null);
-    
     try {
       const data = await articleService.getById(id);
       setArticle(data);
@@ -35,13 +30,38 @@ export function useArticle(id: string | number | undefined): UseArticleResult {
   }, [id]);
 
   useEffect(() => {
-    loadArticle();
-  }, [loadArticle]);
+    let cancelled = false;
+
+    async function load() {
+      if (!id) {
+        if (!cancelled) setLoading(false);
+        return;
+      }
+      
+      if (!cancelled) {
+        setLoading(true);
+        setError(null);
+      }
+
+      try {
+        const data = await articleService.getById(id);
+        if (!cancelled) setArticle(data);
+      } catch (err: any) {
+        console.error('Erro ao carregar artigo:', err);
+        if (!cancelled) setError(err.message || 'Erro ao carregar artigo');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    load();
+    return () => { cancelled = true; };
+  }, [id]);
 
   return {
     article,
     loading,
     error,
-    refetch: loadArticle
+    refetch
   };
 }
