@@ -153,7 +153,7 @@ export default function Dashboard() {
     <div className="min-h-screen bg-surface text-on-surface flex flex-col">
       <Navbar />
 
-      <main className="flex-1 max-w-[1080px] mx-auto px-6 py-16 w-full">
+      <main className="flex-1 max-w-[1080px] mx-auto px-6 pt-24 pb-16 w-full">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6 pb-6 border-b border-outline-variant/30">
           <div>
@@ -282,7 +282,7 @@ export default function Dashboard() {
                             e.currentTarget.nextElementSibling?.removeAttribute('hidden');
                           }}
                         />
-                        <div className="absolute inset-0 hidden flex items-center justify-center text-primary/20">
+                        <div className="absolute inset-0 flex items-center justify-center text-primary/20" hidden>
                           <span className="material-symbols-outlined text-4xl">article</span>
                         </div>
                       </div>

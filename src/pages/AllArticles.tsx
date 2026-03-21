@@ -46,7 +46,7 @@ export default function AllArticles() {
     <div className="min-h-screen bg-surface text-on-surface flex flex-col">
       <Navbar />
 
-      <main className="flex-1">
+      <main className="flex-1 pt-24">
         {/* Cabeçalho da Página */}
         <section className="bg-surface-container-low py-16 border-b border-outline-variant/30">
           <div className="max-w-7xl mx-auto px-6">
@@ -188,7 +188,7 @@ export default function AllArticles() {
                             e.currentTarget.nextElementSibling?.removeAttribute('hidden');
                           }}
                         />
-                        <div className="absolute inset-0 hidden flex items-center justify-center text-primary/20">
+                        <div className="absolute inset-0 flex items-center justify-center text-primary/20" hidden>
                           <span className="material-symbols-outlined text-4xl">article</span>
                         </div>
                       </div>
