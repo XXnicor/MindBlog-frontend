@@ -9,7 +9,7 @@ export default function Footer() {
         <div>
           <span className="text-xl font-bold text-on-surface mb-4 block font-headline">MindBlog</span>
           <p className="font-headline text-secondary leading-relaxed max-w-xs mb-8">
-            The intersection of software engineering, artificial intelligence, and structural design culture.
+            A interseção entre engenharia de software, inteligência artificial e cultura de design estrutural.
           </p>
           <div className="flex gap-4">
             <a href="#" className="text-secondary hover:text-primary transition-colors">
@@ -23,23 +23,23 @@ export default function Footer() {
         
         {/* Deep Dives */}
         <div>
-          <h4 className="font-label text-xs font-bold uppercase tracking-widest text-on-surface mb-6">Deep Dives</h4>
+          <h4 className="font-label text-xs font-bold uppercase tracking-widest text-on-surface mb-6">Explorar</h4>
           <ul className="space-y-4 font-headline text-lg">
-            <li><Link to="/categorias?tipo=AI" className="text-secondary hover:text-on-surface transition-colors">AI Research</Link></li>
-            <li><Link to="/categorias?tipo=Architecture" className="text-secondary hover:text-on-surface transition-colors">System Architecture</Link></li>
-            <li><Link to="/categorias?tipo=Engineering" className="text-secondary hover:text-on-surface transition-colors">Engineering Culture</Link></li>
+            <li><Link to="/categorias?tipo=AI" className="text-secondary hover:text-on-surface transition-colors">Pesquisa em IA</Link></li>
+            <li><Link to="/categorias?tipo=Architecture" className="text-secondary hover:text-on-surface transition-colors">Arquitetura de Sistemas</Link></li>
+            <li><Link to="/categorias?tipo=Engineering" className="text-secondary hover:text-on-surface transition-colors">Cultura de Engenharia</Link></li>
           </ul>
         </div>
         
         {/* Journal */}
         <div>
-          <h4 className="font-label text-xs font-bold uppercase tracking-widest text-on-surface mb-6">Journal</h4>
+          <h4 className="font-label text-xs font-bold uppercase tracking-widest text-on-surface mb-6">Links</h4>
           <ul className="space-y-4 font-headline text-lg mb-8">
-            <li><Link to="/" className="text-secondary hover:text-on-surface transition-colors">Privacy Policy</Link></li>
-            <li><Link to="/" className="text-secondary hover:text-on-surface transition-colors">Terms of Service</Link></li>
+            <li><Link to="/" className="text-secondary hover:text-on-surface transition-colors">Política de Privacidade</Link></li>
+            <li><Link to="/" className="text-secondary hover:text-on-surface transition-colors">Termos de Serviço</Link></li>
           </ul>
           <p className="pt-4 text-xs font-label text-secondary border-t border-outline-variant/50">
-            © {new Date().getFullYear()} MindBlog Editorial. Built for Engineers.
+            © {new Date().getFullYear()} MindBlog Editorial. Feito para Engenheiros.
           </p>
         </div>
       </div>

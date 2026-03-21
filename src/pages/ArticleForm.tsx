@@ -302,7 +302,7 @@ export default function ArticleForm() {
                 className="btn-outline flex items-center justify-center gap-2 font-medium px-4"
               >
                 <Plus className="w-4 h-4" />
-                Add
+                Adicionar
               </button>
             </div>
              {tags.length > 0 && (

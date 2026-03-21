@@ -17,15 +17,15 @@ export default function Home(){
         <Navbar />
         <main className="flex-1 flex flex-col items-center justify-center px-6 text-center max-w-2xl mx-auto">
           <span className="material-symbols-outlined text-primary text-6xl mb-4">error</span>
-          <h2 className="font-headline text-3xl font-bold mb-4 text-on-surface">System Error: Data Retrieval Failed</h2>
+          <h2 className="font-headline text-3xl font-bold mb-4 text-on-surface">Erro de Sistema: Falha na Recuperação de Dados</h2>
           <p className="font-body text-secondary mb-8 leading-relaxed">
-            The neural link to the articles cache was severed. {error}
+            A conexão com o cache de artigos foi perdida. {error}
           </p>
           <button 
             onClick={() => window.location.reload()} 
             className="bg-primary text-on-primary font-label text-sm font-bold px-8 py-4 rounded-lg hover:bg-primary-container transition-colors shadow-lg uppercase tracking-widest"
           >
-            INITIALIZE RECONNECT
+            INICIALIZAR RECONEXÃO
           </button>
         </main>
         <Footer />

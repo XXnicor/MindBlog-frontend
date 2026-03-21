@@ -29,7 +29,7 @@ export default function AuthLeftPanel() {
             
             <div className="absolute bottom-12 left-0 pl-12 max-w-xs">
               <p className="font-headline italic text-3xl leading-snug text-on-surface-variant">
-                "Where engineering minds find their voice."
+                "Onde as mentes da engenharia encontram sua voz."
               </p>
             </div>
           </div>

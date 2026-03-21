@@ -39,7 +39,7 @@ export default function AllArticles() {
     const content = article.conteudo || '';
     const words = content.trim().split(/\s+/).filter(w => w.length > 0).length;
     const minutes = Math.max(1, Math.ceil(words / 200));
-    return `${minutes} MIN READ`;
+    return `${minutes} min de leitura`;
   };
 
   return (
@@ -213,7 +213,7 @@ export default function AllArticles() {
                           <div className="flex items-center gap-3">
                             <span className="text-on-surface">{getAuthorName(article)}</span>
                             <span className="w-1 h-1 rounded-full bg-outline-variant/30"></span>
-                            <span>{article.data_publicacao ? new Date(article.data_publicacao).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }) : ''}</span>
+                            <span>{article.data_publicacao ? new Date(article.data_publicacao).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }) : ''}</span>
                           </div>
                           <div className="flex items-center gap-4">
                             <div className="flex items-center gap-1">

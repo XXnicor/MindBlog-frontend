@@ -68,9 +68,9 @@ export default function RegisterForm() {
   return (
     <div className="space-y-12">
       <header className="space-y-3">
-        <h1 className="font-headline text-4xl font-semibold text-on-surface">Join the Network</h1>
+        <h1 className="font-headline text-4xl font-semibold text-on-surface">Criar conta</h1>
         <p className="font-body text-on-surface-variant leading-relaxed">
-          Create an account to start publishing your engineering articles and research.
+          Crie uma conta para começar a publicar seus artigos e pesquisas de engenharia.
         </p>
       </header>
 
@@ -85,7 +85,7 @@ export default function RegisterForm() {
         <div className="space-y-6">
           <div className="space-y-2">
             <label htmlFor="nome" className="font-label text-xs uppercase tracking-widest text-on-surface-variant block font-bold">
-              Full Name
+              Nome Completo
             </label>
             <input 
               id="nome" 
@@ -100,7 +100,7 @@ export default function RegisterForm() {
 
           <div className="space-y-2">
             <label htmlFor="email" className="font-label text-xs uppercase tracking-widest text-on-surface-variant block font-bold">
-              Work Email
+              E-mail de Trabalho
             </label>
             <input 
               id="email" 
@@ -115,13 +115,13 @@ export default function RegisterForm() {
 
           <div className="space-y-2">
             <label htmlFor="password" className="font-label text-xs uppercase tracking-widest text-on-surface-variant block font-bold">
-              Security Key
+              Chave de Segurança
             </label>
             <div className="relative">
               <input 
                 id="password" 
                 type={showPassword ? 'text' : 'password'} 
-                placeholder="min. 6 characters" 
+                placeholder="mín. 6 caracteres" 
                 required
                 minLength={6}
                 value={password}
@@ -143,7 +143,7 @@ export default function RegisterForm() {
           <div className="space-y-2">
             <div className="flex justify-between items-center">
               <label htmlFor="confirmPassword" className="font-label text-xs uppercase tracking-widest text-on-surface-variant block font-bold">
-                Confirm Security Key
+                Confirmar Chave de Segurança
               </label>
               {password && !passwordMismatch && (
                 <span className="material-symbols-outlined text-[14px] text-green-600">check_circle</span>
@@ -153,7 +153,7 @@ export default function RegisterForm() {
               <input 
                 id="confirmPassword" 
                 type={showPassword ? 'text' : 'password'} 
-                placeholder="repeat security key" 
+                placeholder="repita a chave de segurança" 
                 required
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -172,10 +172,10 @@ export default function RegisterForm() {
             {loading ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                Initializing Access...
+                Iniciando Acesso...
               </>
             ) : (
-              'Initialize Access'
+              'Iniciar Acesso'
             )}
           </button>
         </div>
@@ -183,9 +183,9 @@ export default function RegisterForm() {
 
       <footer className="pt-8 text-center border-t border-outline-variant/10">
         <p className="font-body text-sm text-on-surface-variant">
-          Already have an account?{' '}
+          Já tem uma conta?{' '}
           <Link to="/login" className="text-primary font-semibold hover:underline decoration-2 underline-offset-4">
-            Sign in
+            Entrar
           </Link>
         </p>
       </footer>

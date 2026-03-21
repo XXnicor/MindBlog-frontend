@@ -34,9 +34,9 @@ export default function LoginForm() {
   return (
     <div className="space-y-12">
       <header className="space-y-3">
-        <h1 className="font-headline text-4xl font-semibold text-on-surface">Welcome back</h1>
+        <h1 className="font-headline text-4xl font-semibold text-on-surface">Bem-vindo de volta</h1>
         <p className="font-body text-on-surface-variant leading-relaxed">
-          Access your technical dashboard and engineering research journals.
+          Acesse seu dashboard técnico e diários de pesquisa de engenharia.
         </p>
       </header>
 
@@ -51,7 +51,7 @@ export default function LoginForm() {
         <div className="space-y-6">
           <div className="space-y-2">
             <label htmlFor="email" className="font-label text-xs uppercase tracking-widest text-on-surface-variant block font-bold">
-              Work Email
+              E-mail de Trabalho
             </label>
             <input 
               id="email" 
@@ -68,10 +68,10 @@ export default function LoginForm() {
           <div className="space-y-2">
             <div className="flex justify-between items-center">
               <label htmlFor="password" className="font-label text-xs uppercase tracking-widest text-on-surface-variant block font-bold">
-                Security Key
+                Chave de Segurança
               </label>
               <a href="#" className="font-label text-[10px] uppercase tracking-wider text-primary hover:text-primary-container transition-colors">
-                Forgot Access?
+                Esqueceu o Acesso?
               </a>
             </div>
             <div className="relative">
@@ -106,7 +106,7 @@ export default function LoginForm() {
             className="w-4 h-4 rounded-sm border-outline-variant text-primary focus:ring-primary/20 bg-transparent"
           />
           <label htmlFor="remember" className="font-label text-xs text-on-surface-variant cursor-pointer">
-            Persistent Session
+            Sessão Persistente
           </label>
         </div>
 
@@ -119,17 +119,17 @@ export default function LoginForm() {
             {loading ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                Authenticating...
+                Autenticando...
               </>
             ) : (
-              'Initialize Login'
+              'Iniciar Sessão'
             )}
           </button>
 
           <div className="relative flex py-4 items-center">
             <div className="flex-grow border-t border-outline-variant/20"></div>
             <span className="flex-shrink mx-4 font-mono text-[10px] text-on-secondary-container uppercase tracking-tighter">
-              Identity Provider
+              Provedor de Identidade
             </span>
             <div className="flex-grow border-t border-outline-variant/20"></div>
           </div>
@@ -139,16 +139,16 @@ export default function LoginForm() {
             className="w-full flex items-center justify-center space-x-3 bg-surface-container-highest text-on-surface py-3 rounded-lg border border-outline-variant/20 hover:bg-surface-container-high transition-colors font-label font-bold uppercase tracking-widest text-[11px]"
           >
             <span className="material-symbols-outlined text-[18px]">terminal</span>
-            <span>SSO / GitHub Auth</span>
+            <span>SSO / Autenticação via GitHub</span>
           </button>
         </div>
       </form>
 
       <footer className="pt-8 text-center border-t border-outline-variant/10">
         <p className="font-body text-sm text-on-surface-variant">
-          New to the network?{' '}
+          Novo na rede?{' '}
           <Link to="/register" className="text-primary font-semibold hover:underline decoration-2 underline-offset-4">
-            Join the Network
+            Criar conta
           </Link>
         </p>
       </footer>

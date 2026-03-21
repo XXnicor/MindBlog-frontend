@@ -96,7 +96,7 @@ export default function ArticlePage() {
   const views = article.views || article.visualizacoes || 0;
   
   const wordCount = conteudo.trim().split(/\s+/).filter((w: string) => w.length > 0).length || 0;
-  const readTime = Math.ceil(wordCount / 200) + " MIN READ";
+  const readTime = Math.ceil(wordCount / 200) + " MIN DE LEITURA";
   
   const dataPublicacao = article.data_publicacao || article.createdAt || article.date || article.criadoEm || new Date().toISOString();
   
@@ -108,7 +108,7 @@ export default function ArticlePage() {
   const formatDate = (dateString: string) => {
     if (!dateString) return '';
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+    return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
   };
 
   const contentParagraphs = conteudo.split('\n\n').filter((p: string) => p.trim());
@@ -142,12 +142,12 @@ export default function ArticlePage() {
               
               <button onClick={() => setIsBookmarked(!isBookmarked)} className="flex flex-col items-center gap-1 hover:text-primary transition-colors group">
                 <span className={`material-symbols-outlined ${isBookmarked ? 'text-primary' : ''}`} style={{ fontVariationSettings: isBookmarked ? "'FILL' 1" : "'FILL' 0" }}>bookmark</span>
-                <span className="font-label text-[10px] font-bold group-hover:text-primary">{isBookmarked ? 'SAVED' : 'SAVE'}</span>
+                <span className="font-label text-[10px] font-bold group-hover:text-primary">{isBookmarked ? 'SALVO' : 'SALVAR'}</span>
               </button>
               
               <button onClick={handleShare} className="flex flex-col items-center gap-1 hover:text-primary transition-colors group">
                 <span className="material-symbols-outlined">share</span>
-                <span className="font-label text-[10px] font-bold group-hover:text-primary">SHARE</span>
+                <span className="font-label text-[10px] font-bold group-hover:text-primary">COMPARTILHAR</span>
               </button>
             </div>
           </div>
@@ -240,7 +240,7 @@ export default function ArticlePage() {
                 return (
                   <div key={index} className="my-10 rounded-xl overflow-hidden bg-inverse-surface border border-outline-variant/10">
                     <div className="flex items-center justify-between px-6 py-3 bg-white/5 border-b border-white/5">
-                      <span className="font-label text-xs text-secondary-fixed font-bold tracking-widest uppercase text-white/50">Snippet</span>
+                      <span className="font-label text-xs text-secondary-fixed font-bold tracking-widest uppercase text-white/50">Fragmento</span>
                       <div className="flex gap-2">
                         <div className="w-2.5 h-2.5 rounded-full bg-error/80"></div>
                         <div className="w-2.5 h-2.5 rounded-full bg-tertiary/80"></div>
@@ -301,8 +301,8 @@ export default function ArticlePage() {
                   {autorBio}
                 </p>
                 <div className="flex justify-center md:justify-start gap-4 mt-6">
-                  <button className="font-label text-[10px] font-bold text-on-surface hover:text-primary transition-colors border-b-2 border-outline-variant/30 pb-1 uppercase tracking-widest">FOLLOW RESEARCH</button>
-                  <button className="font-label text-[10px] font-bold text-on-surface hover:text-primary transition-colors border-b-2 border-outline-variant/30 pb-1 uppercase tracking-widest">VIEW ARCHIVE</button>
+                  <button className="font-label text-[10px] font-bold text-on-surface hover:text-primary transition-colors border-b-2 border-outline-variant/30 pb-1 uppercase tracking-widest">SEGUIR PESQUISA</button>
+                  <button className="font-label text-[10px] font-bold text-on-surface hover:text-primary transition-colors border-b-2 border-outline-variant/30 pb-1 uppercase tracking-widest">VER ARQUIVO</button>
                 </div>
               </div>
             </div>
@@ -318,23 +318,23 @@ export default function ArticlePage() {
         <aside className="hidden lg:block lg:col-span-3 space-y-12">
           {/* Technical Ledger */}
           <div className="p-8 bg-surface-container-low rounded-xl border border-outline-variant/10">
-            <h5 className="font-label text-xs font-extrabold text-secondary uppercase tracking-[0.2em] mb-6">Technical Ledger</h5>
+            <h5 className="font-label text-xs font-extrabold text-secondary uppercase tracking-[0.2em] mb-6">Registro Técnico</h5>
             <ul className="space-y-4">
               <li className="flex justify-between items-center py-2 border-b border-outline-variant/20">
-                <span className="font-label text-[10px] text-secondary font-medium tracking-widest">VERSION</span>
+                <span className="font-label text-[10px] text-secondary font-medium tracking-widest">VERSÃO</span>
                 <span className="font-mono text-[10px] text-on-surface font-bold">1.0.{(article.id || 4).toString().padStart(2, '0')}-BUILD</span>
               </li>
               <li className="flex justify-between items-center py-2 border-b border-outline-variant/20">
-                <span className="font-label text-[10px] text-secondary font-medium tracking-widest">DATE</span>
+                <span className="font-label text-[10px] text-secondary font-medium tracking-widest">DATA</span>
                 <span className="font-mono text-[10px] text-on-surface font-bold">{formatDate(dataPublicacao)}</span>
               </li>
               <li className="flex justify-between items-center py-2 border-b border-outline-variant/20">
-                <span className="font-label text-[10px] text-secondary font-medium tracking-widest">VIEWS</span>
+                <span className="font-label text-[10px] text-secondary font-medium tracking-widest">VISUALIZAÇÕES</span>
                 <span className="font-mono text-[10px] text-on-surface font-bold">{views}</span>
               </li>
               <li className="flex justify-between items-center py-2">
-                <span className="font-label text-[10px] text-secondary font-medium tracking-widest">LATENCY</span>
-                <span className="font-mono text-[10px] text-tertiary font-bold px-2 bg-tertiary/10 rounded">LOW</span>
+                <span className="font-label text-[10px] text-secondary font-medium tracking-widest">LATÊNCIA</span>
+                <span className="font-mono text-[10px] text-tertiary font-bold px-2 bg-tertiary/10 rounded">BAIXA</span>
               </li>
             </ul>
           </div>
@@ -342,7 +342,7 @@ export default function ArticlePage() {
           {/* Related Deep Dives */}
           {relatedArticles.length > 0 && (
             <div className="space-y-6">
-              <h5 className="font-label text-xs font-extrabold text-secondary uppercase tracking-[0.2em]">Related Deep Dives</h5>
+              <h5 className="font-label text-xs font-extrabold text-secondary uppercase tracking-[0.2em]">Artigos Relacionados</h5>
               <div className="flex flex-col gap-6">
                 {relatedArticles.map(rel => (
                   <Link to={`/artigo/${rel.id}`} key={rel.id} className="group cursor-pointer block border-l-2 border-outline-variant/30 pl-4 hover:border-primary transition-colors">
@@ -368,7 +368,7 @@ export default function ArticlePage() {
         </button>
         <button onClick={() => setIsBookmarked(!isBookmarked)} className="flex flex-col items-center justify-center rounded-xl px-4 py-2 text-stone-500 dark:text-stone-400">
           <span className={`material-symbols-outlined ${isBookmarked ? 'text-primary' : ''}`} style={{ fontVariationSettings: isBookmarked ? "'FILL' 1" : "'FILL' 0" }}>bookmark</span>
-          <span className="font-label text-[10px] font-bold tracking-widest mt-1">SAVE</span>
+          <span className="font-label text-[10px] font-bold tracking-widest mt-1">SALVAR</span>
         </button>
         <button onClick={() => document.getElementById('comments')?.scrollIntoView({ behavior: 'smooth' })} className="flex flex-col items-center justify-center rounded-xl px-4 py-2 text-stone-500 dark:text-stone-400">
           <span className="material-symbols-outlined">chat_bubble</span>
@@ -376,7 +376,7 @@ export default function ArticlePage() {
         </button>
         <button onClick={handleShare} className="flex flex-col items-center justify-center rounded-xl px-4 py-2 text-stone-500 dark:text-stone-400">
           <span className="material-symbols-outlined">share</span>
-          <span className="font-label text-[10px] font-bold tracking-widest mt-1">SHARE</span>
+          <span className="font-label text-[10px] font-bold tracking-widest mt-1">COMPARTILHAR</span>
         </button>
       </nav>
     </div>

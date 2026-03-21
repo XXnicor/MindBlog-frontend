@@ -4,11 +4,11 @@ export default function BottomNav() {
   const location = useLocation();
   
   const tabs = [
-    { label: 'Home', icon: 'home', path: '/' },
-    { label: 'Explore', icon: 'explore', path: '/artigos' },
-    { label: 'New', icon: 'add_circle', path: '/artigos/novo' },
-    { label: 'Library', icon: 'auto_stories', path: '/categorias' },
-    { label: 'Profile', icon: 'person', path: '/dashboard' }
+    { label: 'Início', icon: 'home', path: '/' },
+    { label: 'Explorar', icon: 'explore', path: '/artigos' },
+    { label: 'Novo', icon: 'add_circle', path: '/artigos/novo' },
+    { label: 'Biblioteca', icon: 'auto_stories', path: '/categorias' },
+    { label: 'Perfil', icon: 'person', path: '/dashboard' }
   ];
 
   return (

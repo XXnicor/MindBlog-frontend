@@ -31,8 +31,8 @@ export default function Navbar() {
   };
 
   const navLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'Development', path: '/artigos' }
+    { name: 'Início', path: '/' },
+    { name: 'Desenvolvimento', path: '/artigos' }
   ];
 
   return (
@@ -86,18 +86,18 @@ export default function Navbar() {
             {user ? (
               <div className="hidden md:flex items-center gap-4 ml-2">
                 <Link to="/artigos/novo" className="font-label text-sm font-bold text-primary dark:text-primary border border-primary/20 dark:border-primary/30 px-4 py-2 rounded-full hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors">
-                  Write
+                  Escrever
                 </Link>
                 <UserMenu user={user} onSignOut={handleSignOut} />
               </div>
             ) : (
               <div className="hidden md:flex items-center gap-4 ml-2">
                 <Link to="/login" className="font-label text-sm font-medium text-secondary dark:text-secondary hover:text-on-surface dark:hover:text-on-surface transition-colors">
-                  Sign In
+                  Entrar
                 </Link>
                 <Link to="/register">
                   <button className="bg-primary dark:bg-primary-container text-on-primary hover:bg-primary-container dark:hover:bg-primary px-5 py-2 rounded-lg font-label text-sm font-bold tracking-wide transition-all duration-300 scale-95 active:scale-90 shadow-sm">
-                    Join Network
+                    Criar conta
                   </button>
                 </Link>
               </div>
@@ -164,29 +164,29 @@ export default function Navbar() {
             {user ? (
               <div className="flex flex-col gap-4">
                 <Link to="/artigos/novo" className="font-label text-base text-secondary dark:text-secondary hover:text-primary dark:hover:text-primary transition-colors">
-                  Write New Article
+                  Novo artigo
                 </Link>
                 <Link to="/dashboard" className="font-label text-base text-secondary dark:text-secondary hover:text-primary dark:hover:text-primary transition-colors">
-                  My Articles
+                  Meus artigos
                 </Link>
                 <Link to="/settings" className="font-label text-base text-secondary dark:text-secondary hover:text-primary dark:hover:text-primary transition-colors">
-                  Settings
+                  Configurações
                 </Link>
                 <button 
                   onClick={handleSignOut}
                   className="text-left font-label text-base text-error font-bold hover:text-error dark:hover:text-error transition-colors"
                 >
-                  Sign Out
+                  Sair
                 </button>
               </div>
             ) : (
               <div className="flex flex-col gap-4">
                 <Link to="/login" className="font-label text-base text-secondary dark:text-secondary hover:text-on-surface dark:hover:text-on-surface transition-colors">
-                  Sign In
+                  Entrar
                 </Link>
                 <Link to="/register" className="mt-2">
                   <button className="bg-primary dark:bg-primary-container hover:bg-primary-container dark:hover:bg-primary w-full text-on-primary px-5 py-3 rounded-lg font-label text-sm font-bold tracking-wide transition-colors shadow-sm">
-                    Join Network
+                    Criar conta
                   </button>
                 </Link>
               </div>

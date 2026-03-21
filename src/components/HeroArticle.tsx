@@ -28,9 +28,9 @@ export default function HeroArticle({ article }: HeroArticleProps) {
         {/* Left Column: Text */}
         <div className="lg:col-span-7">
           <div className="mb-6 flex items-center gap-3">
-            <span className="font-label text-xs uppercase tracking-[0.2em] text-primary font-bold">Featured Thesis</span>
+            <span className="font-label text-xs uppercase tracking-[0.2em] text-primary font-bold">Resumo em Destaque</span>
             <span className="w-12 h-[1px] bg-outline-variant/30"></span>
-            <span className="font-label text-xs uppercase tracking-[0.2em] text-tertiary">{readTime}</span>
+            <span className="font-label text-xs uppercase tracking-[0.2em] text-tertiary">{readTime.replace('Min Read', 'min de leitura')}</span>
           </div>
           
           <h1 className="font-headline text-5xl md:text-7xl font-bold leading-[1.1] text-on-surface mb-8 tracking-tight">
@@ -44,10 +44,10 @@ export default function HeroArticle({ article }: HeroArticleProps) {
           <div className="flex items-center gap-4">
             <div className="flex flex-col">
               <span className="font-label text-sm font-bold text-on-surface">{authorName}</span>
-              <span className="font-label text-xs text-secondary">{authorBio || 'Lead Architect'}</span>
+              <span className="font-label text-xs text-secondary">{authorBio || 'Arquiteto Principal'}</span>
             </div>
             <Link to={`/artigo/${article.id}`} className="ml-auto text-primary font-label text-sm font-bold flex items-center gap-2 group">
-              READ FULL ARTICLE
+              LER ARTIGO COMPLETO
               <span className="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">arrow_forward</span>
             </Link>
           </div>
@@ -80,9 +80,9 @@ export default function HeroArticle({ article }: HeroArticleProps) {
           
           {/* Floating Element */}
           <div className="absolute -bottom-6 -left-12 hidden lg:block bg-surface-container-lowest p-6 shadow-xl rounded-xl border border-outline-variant/10 max-w-[240px]">
-            <span className="font-mono text-tertiary text-[10px] block mb-2">SYSTEM_LOG_{(article.id || 42).toString().padStart(3, '0')}</span>
+            <span className="font-mono text-tertiary text-[10px] block mb-2">LOG_SISTEMA_{(article.id || 42).toString().padStart(3, '0')}</span>
             <p className="font-label text-xs leading-relaxed text-secondary">
-              "The boundary between human intent and machine execution is dissolving."
+              "A fronteira entre a intenção humana e a execução da máquina está se dissolvendo."
             </p>
           </div>
         </div>
